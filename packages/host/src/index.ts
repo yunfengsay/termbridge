@@ -55,7 +55,10 @@ import {
   hasProxyForUrl,
   getVolcengineVoiceCredentials,
   loadSettings,
+  loadLocalEnv,
 } from '@termbridge/settings';
+
+loadLocalEnv();
 import { HomeActions } from './homeActions.js';
 import { createSilentConversations, SilentExecutions, type SilentModelTier } from './silentExecution.js';
 import { createVoiceExecutionConversations, selectExecutionConversation } from './voiceExecutionModels.js';

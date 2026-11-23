@@ -11,7 +11,9 @@ import {
   type ControlMessage,
   ControlMessageSchema, relayTopology, type RelayTopologyNode,
 } from '@termbridge/protocol';
-import { resolveSecret, makeNonce, verifyMac, loadServerTls } from '@termbridge/settings';
+import { resolveSecret, makeNonce, verifyMac, loadServerTls, loadLocalEnv } from '@termbridge/settings';
+
+loadLocalEnv();
 
 /**
  * Relay = dumb, stateful forwarder.

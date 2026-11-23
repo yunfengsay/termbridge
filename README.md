@@ -337,6 +337,10 @@ tb update                      # 安全更新并保留备份
 }
 ```
 
+### 本机 `.env` 环境变量覆盖（不入库）
+
+CLI、Host 和 Relay 启动时会自动加载本机 `.env`（优先级：`shell 环境变量 > ./.env.local > ./.env > ~/.termbridge/.env`，绝不覆盖已有 shell 变量，隔离测试环境自动跳过）。复制 [`.env.example`](./.env.example) 为 `.env` 或 `~/.termbridge/.env`（建议 `chmod 600`）即可集中管理 `TB_CLOUDFLARE_RELAY`、`TB_BRAIN_FILES_ROOT`、`DASHSCOPE_API_KEY` 等个人配置，同时保持 Git 仓库完全干净。
+
 ### 3. 可选：自动接管本地 `codex` / `claude`（Herdr）
 
 如果本机安装了 Herdr，`tb init` 会在 PATH 中放置透明 shim，让交互式 `codex` / `claude` 自动在 Herdr workspace 中启动并被 TermBridge 发现：

@@ -30,5 +30,7 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Claude Code — local-only settings (keep skills/ and shared settings.json)
+# Claude Code / Codex — local-only settings and private agent instructions
 .claude/settings.local.json
+CLAUDE.local.md
+AGENTS.override.md

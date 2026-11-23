@@ -21,6 +21,7 @@ import type { HomeAssistantSettings } from './homeAssistant.js';
 export * from './identity.js';
 export * from './artifactCrypto.js';
 export * from './homeAssistant.js';
+export * from './dotenv.js';
 
 /** Default port the middle relay listens on (`tb middle serve`). */
 export const MIDDLE_PORT = 8001;

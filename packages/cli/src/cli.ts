@@ -57,8 +57,11 @@ import {
   setNetworkPolicy,
   hasProxyForUrl,
   resolveRelayUrl,
+  loadLocalEnv,
   type NetworkPolicy,
 } from '@termbridge/settings';
+
+loadLocalEnv();
 import { runDesktop } from './desktop.js';
 import { runAttach, runInfo, runKill, runList, runNew, runRemove, runRestart, runSet } from './client.js';
 import { ok, fail } from './ui.js';
