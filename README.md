@@ -12,6 +12,44 @@ Cross-machine terminal, coding-agent, and remote-automation bridge. Run Claude C
 
 ---
 
+## Screenshots
+
+### macOS Control Center & Native Terminal
+
+<table>
+  <tr>
+    <td align="center" width="38%">
+      <img src="./docs/images/macos-menubar.jpg" alt="macOS Menu Bar Control Center" height="360" /><br />
+      <sub><b>Menu Bar Control Center</b> — 多主机切换与实时 Agent 状态</sub>
+    </td>
+    <td align="center" width="62%">
+      <img src="./docs/images/macos-terminal.jpg" alt="macOS Native Terminal Window" height="360" /><br />
+      <sub><b>Native Terminal</b> — 远端 Coding Agent 会话、Git 改动与图片附件</sub>
+    </td>
+  </tr>
+</table>
+
+### Mobile (Android): Multi-Host Sessions, Terminal Composer & Real-Time Voice Call
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="./docs/images/android-sessions.jpg" alt="Android Multi-Host Session List" width="260" /><br />
+      <sub><b>Multi-Host Sessions</b> — 多台电脑会话与 Recap</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="./docs/images/android-terminal.jpg" alt="Android Terminal and Native Composer" width="260" /><br />
+      <sub><b>Mobile Terminal</b> — 快捷键栏、原生输入与 Git 审查</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="./docs/images/android-voice-call.jpg" alt="Android Global Voice Call" width="260" /><br />
+      <sub><b>Global Voice Call</b> — 端侧 VAD 门控与实时语音</sub>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## 🤖 Agent 自动安装与配置协议（AI Agent Setup Protocol）
 
 If you are an AI Agent setting up TermBridge for a user, follow Steps 1 → 5 in order. Do not skip Step 2 (asking the user for decisions) or Step 5 (end-to-end verification).
