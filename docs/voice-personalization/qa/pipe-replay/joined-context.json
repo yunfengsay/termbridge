@@ -1,0 +1,324 @@
+{
+  "label": "joined-context",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "9f00a214fd404f1c7b02d94542821fd7739f335fc74a1498a3f431ee6e2a8205",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": false,
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3603.5625,
+      "submitted": [
+        "我最近的。",
+        "agent是什么？"
+      ],
+      "answer": "Agent 可以理解为一个能帮你完成具体任务的程序或软件。它会根据你的指令执行操作，比如控制电脑、运行脚本或者处理数据等。在你当前的环境中，TermBridge 就是一个正在运行的 Agent，负责语音控制验证。",
+      "outputBytes": 1082880,
+      "responseCount": 3,
+      "judgeCalls": 0,
+      "fixtureToolCompletions": 1,
+      "finished": true,
+      "prematureResponses": 2,
+      "events": [
+        {
+          "ms": 269,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": true,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 269,
+          "event": "session.updated"
+        },
+        {
+          "ms": 270,
+          "event": "ready"
+        },
+        {
+          "ms": 1129,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2412,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2561,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 2561,
+          "event": "submitted",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 2561,
+          "event": "response.created"
+        },
+        {
+          "ms": 2562,
+          "event": "response_started"
+        },
+        {
+          "ms": 2572,
+          "event": "fixture_tool_completed"
+        },
+        {
+          "ms": 2572,
+          "event": "output_item",
+          "type": "function_call",
+          "name": "inspect_fixture"
+        },
+        {
+          "ms": 2572,
+          "event": "response.done"
+        },
+        {
+          "ms": 2572,
+          "event": "usage",
+          "inputTokens": 799,
+          "outputTokens": 15,
+          "totalTokens": 814
+        },
+        {
+          "ms": 2572,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 2763,
+          "event": "response.created"
+        },
+        {
+          "ms": 2763,
+          "event": "response_started"
+        },
+        {
+          "ms": 3824,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 3824,
+          "event": "response.done"
+        },
+        {
+          "ms": 3824,
+          "event": "usage",
+          "inputTokens": 853,
+          "outputTokens": 87,
+          "totalTokens": 940
+        },
+        {
+          "ms": 3824,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 4271,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6066,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6187,
+          "event": "response.created"
+        },
+        {
+          "ms": 6187,
+          "event": "response_started"
+        },
+        {
+          "ms": 6239,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 6239,
+          "event": "submitted",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 9398,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 9398,
+          "event": "response.done"
+        },
+        {
+          "ms": 9398,
+          "event": "usage",
+          "inputTokens": 890,
+          "outputTokens": 262,
+          "totalTokens": 1152
+        },
+        {
+          "ms": 9398,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "adaptive": true,
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3564.5625,
+      "submitted": [
+        "我最近的。 agent是什么？"
+      ],
+      "answer": "Agent 是一种能够感知环境、做出决策并执行任务的智能程序。在 TermBridge 系统中，它通常指代你电脑上正在运行的具体自动化任务或脚本，比如自动整理文件、监控数据或运行特定流程的工具。每个 Agent 都有独立的目标和状态，你可以同时运行多个 Agent 来处理不同任务。如果你想知道当前电脑上哪个 Agent 正在运行，我可以帮你查看最近的测试数据。需要我查一下吗？",
+      "outputBytes": 1516800,
+      "responseCount": 1,
+      "judgeCalls": 2,
+      "fixtureToolCompletions": 0,
+      "finished": true,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 231,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 231,
+          "event": "session.updated"
+        },
+        {
+          "ms": 231,
+          "event": "ready"
+        },
+        {
+          "ms": 1109,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2350,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2489,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 4172,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 4172,
+          "event": "response.done"
+        },
+        {
+          "ms": 4172,
+          "event": "finished",
+          "status": "interrupted"
+        },
+        {
+          "ms": 4172,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6002,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6167,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 6914,
+          "event": "judge",
+          "decision": "respond",
+          "latencyMs": 511,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 6914,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 6982,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 6982,
+          "event": "session.updated"
+        },
+        {
+          "ms": 7101,
+          "event": "response.created"
+        },
+        {
+          "ms": 7101,
+          "event": "response_started"
+        },
+        {
+          "ms": 12971,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 12971,
+          "event": "response.done"
+        },
+        {
+          "ms": 12971,
+          "event": "usage",
+          "inputTokens": 806,
+          "outputTokens": 487,
+          "totalTokens": 1293
+        },
+        {
+          "ms": 12971,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

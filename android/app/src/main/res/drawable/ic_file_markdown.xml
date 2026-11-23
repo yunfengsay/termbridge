@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Derived from vscode-icons file_type_markdown.svg (MIT). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    <path android:fillColor="#755838" android:pathData="M2.5,7.955H29.5V24.046H2.5ZM4,9.455V22.546H28V9.455Z" />
+    <path android:fillColor="#755838" android:pathData="M5.909,20.636V11.364H8.636L11.364,14.773L14.091,11.364H16.818V20.636H14.091V15.318L11.364,18.727L8.636,15.318V20.636ZM22.955,20.636L18.864,16.136H21.591V11.364H24.318V16.136H27.045Z" />
+</vector>

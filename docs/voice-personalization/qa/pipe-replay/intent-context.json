@@ -1,0 +1,166 @@
+{
+  "label": "intent-context",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "2fb1809d7d245d670ed3cd4de5306363ae5338362fae2481ec728c326e631d54",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": true,
+      "judge": "cloud",
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3814.5625,
+      "submitted": [
+        "我最近的。 agent是什么？"
+      ],
+      "answer": "Agent 是一种智能程序，能够自主执行任务、处理信息或与其他系统交互。在 TermBridge 中，它通常指代正在你电脑上运行的具体自动化程序，负责完成特定操作，比如文件管理、数据分析或网络请求等。如果你想知道最近正在运行的是哪个 Agent，我可以帮你查看最新的数据。",
+      "outputBytes": 1155840,
+      "responseCount": 1,
+      "judgeCalls": 2,
+      "fixtureToolCompletions": 0,
+      "finished": true,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 480,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 480,
+          "event": "session.updated"
+        },
+        {
+          "ms": 481,
+          "event": "ready"
+        },
+        {
+          "ms": 1334,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2622,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2769,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 4753,
+          "event": "judge",
+          "decision": "wait",
+          "latencyMs": 528,
+          "segments": [
+            "我最近的。"
+          ]
+        },
+        {
+          "ms": 4753,
+          "event": "waiting",
+          "reason": "incomplete"
+        },
+        {
+          "ms": 4792,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 4792,
+          "event": "response.done"
+        },
+        {
+          "ms": 4792,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6293,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6460,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 7335,
+          "event": "judge",
+          "decision": {
+            "decision": "respond",
+            "intent": "查询最近正在执行任务的 Agent 的名称及任务详情"
+          },
+          "latencyMs": 641,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 7336,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 7412,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 7412,
+          "event": "session.updated"
+        },
+        {
+          "ms": 7574,
+          "event": "response.created"
+        },
+        {
+          "ms": 7574,
+          "event": "response_started"
+        },
+        {
+          "ms": 12012,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 12013,
+          "event": "response.done"
+        },
+        {
+          "ms": 12013,
+          "event": "usage",
+          "inputTokens": 877,
+          "outputTokens": 369,
+          "totalTokens": 1246
+        },
+        {
+          "ms": 12014,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

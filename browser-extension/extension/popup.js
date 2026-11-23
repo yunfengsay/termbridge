@@ -1,0 +1,4 @@
+let state={};const button=document.querySelector('#toggle');
+async function refresh(){state=await chrome.runtime.sendMessage({op:'status'});document.querySelector('#status').textContent=state.connected?(state.enabled?'浏览器协助已开启':'已连接 · 浏览器协助已关闭'):'尚未连接 TB';button.textContent=state.enabled?'停止浏览器协助':'开启浏览器协助';button.disabled=false;document.querySelector('#help').textContent=state.connected?'关闭此开关会立即拒绝后续操作。':'先在 TermBridge App 设置中安装 Chrome 连接组件，再点击开启。'+(state.error?' '+state.error:'');}
+button.onclick=async()=>{try{if(state.enabled)await chrome.runtime.sendMessage({op:'disable'});else{const granted=await chrome.permissions.request({origins:['<all_urls>']});if(!granted)return;await chrome.runtime.sendMessage({op:'enable'});}await refresh();}catch(e){document.querySelector('#help').textContent=e.message;}};
+refresh();setInterval(refresh,1000);

@@ -1,0 +1,488 @@
+{
+  "model": "qwen3.8-flash",
+  "calls": 32,
+  "at": "2026-09-07T18:36:26.879Z",
+  "design": "2x2: history x full segments; 8 fresh authored scenes, prompt frozen before evaluation",
+  "expectedLabels": "author judgment using full context, not measured user intent",
+  "note": "No training on these outputs. Small sanity set, not a general intelligence score or permission to distill vendor outputs",
+  "rows": [
+    {
+      "id": "deictic-unfinished",
+      "segments": [
+        "帮我找一下那个"
+      ],
+      "expected": "wait",
+      "history": "电脑里有几个代码仓库。",
+      "withContext": false,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 730,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "conditional-unfinished",
+      "segments": [
+        "如果今天构建通过",
+        "那么"
+      ],
+      "expected": "wait",
+      "history": "我们在讨论构建后的下一步。",
+      "withContext": false,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 606,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "direct-count",
+      "segments": [
+        "现在有多少个任务还没有结束"
+      ],
+      "expected": "respond",
+      "history": "我们在检查本机任务的状态。",
+      "withContext": false,
+      "fullSegments": false,
+      "decision": "respond",
+      "interpretation": "查询当前未结束的任务数量",
+      "latencyMs": 600,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "two-tasks",
+      "segments": [
+        "我昨天开的那两个任务",
+        "分别做到哪一步了"
+      ],
+      "expected": "respond",
+      "history": "你昨天的两个任务是检查日历权限与调整图标。",
+      "withContext": false,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 452,
+      "correct": false,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "referent",
+      "segments": [
+        "哪一个"
+      ],
+      "expected": "respond",
+      "history": "你昨天的两个任务里，有一个失败了。",
+      "withContext": false,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 491,
+      "correct": false,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "withhold",
+      "segments": [
+        "别执行刚才的命令",
+        "等我把参数说完整"
+      ],
+      "expected": "wait",
+      "history": "你还在口述尚未派发的命令。",
+      "withContext": false,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 440,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "confirmation",
+      "segments": [
+        "对，就是这个"
+      ],
+      "expected": "respond",
+      "history": "你是否要只读检查刚才选中的 TermBridge 仓库？",
+      "withContext": false,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 510,
+      "correct": false,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "inspect-and-report",
+      "segments": [
+        "先查最新的日志",
+        "然后告诉我失败在哪一步"
+      ],
+      "expected": "respond",
+      "history": "我们在讨论本机昨天构建失败的任务。",
+      "withContext": false,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 498,
+      "correct": false,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "deictic-unfinished",
+      "segments": [
+        "帮我找一下那个"
+      ],
+      "expected": "wait",
+      "history": "电脑里有几个代码仓库。",
+      "withContext": false,
+      "fullSegments": true,
+      "decision": "wait",
+      "latencyMs": 434,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "conditional-unfinished",
+      "segments": [
+        "如果今天构建通过",
+        "那么"
+      ],
+      "expected": "wait",
+      "history": "我们在讨论构建后的下一步。",
+      "withContext": false,
+      "fullSegments": true,
+      "decision": "wait",
+      "latencyMs": 545,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "direct-count",
+      "segments": [
+        "现在有多少个任务还没有结束"
+      ],
+      "expected": "respond",
+      "history": "我们在检查本机任务的状态。",
+      "withContext": false,
+      "fullSegments": true,
+      "decision": "respond",
+      "interpretation": "查询当前未结束的任务数量",
+      "latencyMs": 527,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "two-tasks",
+      "segments": [
+        "我昨天开的那两个任务",
+        "分别做到哪一步了"
+      ],
+      "expected": "respond",
+      "history": "你昨天的两个任务是检查日历权限与调整图标。",
+      "withContext": false,
+      "fullSegments": true,
+      "decision": "respond",
+      "interpretation": "查询昨天启动的两个任务各自的当前执行进度",
+      "latencyMs": 570,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "referent",
+      "segments": [
+        "哪一个"
+      ],
+      "expected": "respond",
+      "history": "你昨天的两个任务里，有一个失败了。",
+      "withContext": false,
+      "fullSegments": true,
+      "decision": "wait",
+      "latencyMs": 664,
+      "correct": false,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "withhold",
+      "segments": [
+        "别执行刚才的命令",
+        "等我把参数说完整"
+      ],
+      "expected": "wait",
+      "history": "你还在口述尚未派发的命令。",
+      "withContext": false,
+      "fullSegments": true,
+      "decision": "wait",
+      "latencyMs": 458,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "confirmation",
+      "segments": [
+        "对，就是这个"
+      ],
+      "expected": "respond",
+      "history": "你是否要只读检查刚才选中的 TermBridge 仓库？",
+      "withContext": false,
+      "fullSegments": true,
+      "decision": "wait",
+      "latencyMs": 438,
+      "correct": false,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "inspect-and-report",
+      "segments": [
+        "先查最新的日志",
+        "然后告诉我失败在哪一步"
+      ],
+      "expected": "respond",
+      "history": "我们在讨论本机昨天构建失败的任务。",
+      "withContext": false,
+      "fullSegments": true,
+      "decision": "respond",
+      "interpretation": "查询最新日志并定位失败步骤",
+      "latencyMs": 543,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "deictic-unfinished",
+      "segments": [
+        "帮我找一下那个"
+      ],
+      "expected": "wait",
+      "history": "电脑里有几个代码仓库。",
+      "withContext": true,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 581,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "conditional-unfinished",
+      "segments": [
+        "如果今天构建通过",
+        "那么"
+      ],
+      "expected": "wait",
+      "history": "我们在讨论构建后的下一步。",
+      "withContext": true,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 463,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "direct-count",
+      "segments": [
+        "现在有多少个任务还没有结束"
+      ],
+      "expected": "respond",
+      "history": "我们在检查本机任务的状态。",
+      "withContext": true,
+      "fullSegments": false,
+      "decision": "respond",
+      "interpretation": "查询当前未结束的任务数量",
+      "latencyMs": 535,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "two-tasks",
+      "segments": [
+        "我昨天开的那两个任务",
+        "分别做到哪一步了"
+      ],
+      "expected": "respond",
+      "history": "你昨天的两个任务是检查日历权限与调整图标。",
+      "withContext": true,
+      "fullSegments": false,
+      "decision": "respond",
+      "interpretation": "查询昨天两个任务（检查日历权限与调整图标）分别执行到了哪一步",
+      "latencyMs": 669,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "referent",
+      "segments": [
+        "哪一个"
+      ],
+      "expected": "respond",
+      "history": "你昨天的两个任务里，有一个失败了。",
+      "withContext": true,
+      "fullSegments": false,
+      "decision": "respond",
+      "interpretation": "询问昨天失败的具体任务名称",
+      "latencyMs": 483,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "withhold",
+      "segments": [
+        "别执行刚才的命令",
+        "等我把参数说完整"
+      ],
+      "expected": "wait",
+      "history": "你还在口述尚未派发的命令。",
+      "withContext": true,
+      "fullSegments": false,
+      "decision": "wait",
+      "latencyMs": 514,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "confirmation",
+      "segments": [
+        "对，就是这个"
+      ],
+      "expected": "respond",
+      "history": "你是否要只读检查刚才选中的 TermBridge 仓库？",
+      "withContext": true,
+      "fullSegments": false,
+      "decision": "respond",
+      "interpretation": "确认只读检查刚才选中的 TermBridge 仓库",
+      "latencyMs": 532,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "inspect-and-report",
+      "segments": [
+        "先查最新的日志",
+        "然后告诉我失败在哪一步"
+      ],
+      "expected": "respond",
+      "history": "我们在讨论本机昨天构建失败的任务。",
+      "withContext": true,
+      "fullSegments": false,
+      "decision": "respond",
+      "interpretation": "查询昨天构建失败任务的具体失败步骤",
+      "latencyMs": 650,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "deictic-unfinished",
+      "segments": [
+        "帮我找一下那个"
+      ],
+      "expected": "wait",
+      "history": "电脑里有几个代码仓库。",
+      "withContext": true,
+      "fullSegments": true,
+      "decision": "wait",
+      "latencyMs": 489,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "conditional-unfinished",
+      "segments": [
+        "如果今天构建通过",
+        "那么"
+      ],
+      "expected": "wait",
+      "history": "我们在讨论构建后的下一步。",
+      "withContext": true,
+      "fullSegments": true,
+      "decision": "wait",
+      "latencyMs": 413,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "direct-count",
+      "segments": [
+        "现在有多少个任务还没有结束"
+      ],
+      "expected": "respond",
+      "history": "我们在检查本机任务的状态。",
+      "withContext": true,
+      "fullSegments": true,
+      "decision": "respond",
+      "interpretation": "查询当前未结束的任务数量",
+      "latencyMs": 541,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "two-tasks",
+      "segments": [
+        "我昨天开的那两个任务",
+        "分别做到哪一步了"
+      ],
+      "expected": "respond",
+      "history": "你昨天的两个任务是检查日历权限与调整图标。",
+      "withContext": true,
+      "fullSegments": true,
+      "decision": "respond",
+      "interpretation": "查询昨天创建的两个任务（检查日历权限与调整图标）的当前执行进度",
+      "latencyMs": 676,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "referent",
+      "segments": [
+        "哪一个"
+      ],
+      "expected": "respond",
+      "history": "你昨天的两个任务里，有一个失败了。",
+      "withContext": true,
+      "fullSegments": true,
+      "decision": "respond",
+      "interpretation": "询问昨天失败的具体任务名称",
+      "latencyMs": 583,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "withhold",
+      "segments": [
+        "别执行刚才的命令",
+        "等我把参数说完整"
+      ],
+      "expected": "wait",
+      "history": "你还在口述尚未派发的命令。",
+      "withContext": true,
+      "fullSegments": true,
+      "decision": "wait",
+      "latencyMs": 480,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "confirmation",
+      "segments": [
+        "对，就是这个"
+      ],
+      "expected": "respond",
+      "history": "你是否要只读检查刚才选中的 TermBridge 仓库？",
+      "withContext": true,
+      "fullSegments": true,
+      "decision": "respond",
+      "interpretation": "确认对刚才选中的 TermBridge 仓库进行只读检查",
+      "latencyMs": 705,
+      "correct": true,
+      "source": "cloud-advisory"
+    },
+    {
+      "id": "inspect-and-report",
+      "segments": [
+        "先查最新的日志",
+        "然后告诉我失败在哪一步"
+      ],
+      "expected": "respond",
+      "history": "我们在讨论本机昨天构建失败的任务。",
+      "withContext": true,
+      "fullSegments": true,
+      "decision": "respond",
+      "interpretation": "查询本机昨天构建失败任务的最新日志并定位失败步骤",
+      "latencyMs": 648,
+      "correct": true,
+      "source": "cloud-advisory"
+    }
+  ]
+}

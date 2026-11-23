@@ -1,0 +1,1 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0-windows10.0.19041.0</TargetFramework><AssemblyName>tb</AssemblyName></PropertyGroup><ItemGroup><ProjectReference Include="../TermBridge.Core/TermBridge.Core.csproj" /></ItemGroup></Project>

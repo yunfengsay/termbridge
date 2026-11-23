@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  termbridge host — macOS LaunchAgent (runs as your user, with your token & files).
+  装法见 docs/deploy.md。按需改：仓库路径、HOST_ID、SHELL、PATH。
+  注意：agent（codex/claude）在这台机器上跑，proxy/别名/PATH 来自这里的 SHELL 启动配置。
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.termbridge.host</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/path/to/termbridge/node_modules/.bin/tsx</string>
+    <string>/path/to/termbridge/packages/host/src/index.ts</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/path/to/termbridge</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>RELAY_URL</key>
+    <string>ws://127.0.0.1:7400</string>
+    <key>HOST_ID</key>
+    <string>my-mac</string>
+    <key>HOST_NAME</key>
+    <string>my-mac</string>
+    <!-- 默认会话用 zsh（交互式，会加载 ~/.zshrc → 别名/proxy/PATH 都在） -->
+    <key>SHELL</key>
+    <string>/bin/zsh</string>
+    <!-- 兜底 PATH；交互式 zsh 会再用 .zshrc 覆盖，但 codex/claude 的目录最好也列上 -->
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/Users/YOUR_USER/.local/bin:/usr/bin:/bin</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/termbridge-host.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/termbridge-host.log</string>
+</dict>
+</plist>

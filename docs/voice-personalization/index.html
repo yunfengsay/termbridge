@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TermBridge 个性化语音设计：手机即时学习，Mac mini 异步训练，大模型按需参与。让一个随时待命的助手先学会什么时候不打扰。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="color-scheme" content="light">
+  <title>让助手学会什么时候不说话 · TermBridge</title>
+  <link rel="stylesheet" href="article.css">
+  <script src="learning-demo.js" defer></script>
+  <script src="article.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#story">跳到文章正文</a>
+  <header class="masthead wrap">
+    <a class="wordmark" href="#top" aria-label="TermBridge，回到文章顶部"><span class="mark" aria-hidden="true">t<span>b</span></span>TERMBRIDGE</a>
+    <span class="edition">FIELD NOTES <span>/</span> VOICE 01</span>
+    <a class="small-link" href="plan.md">工程方案 <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap" aria-labelledby="headline">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>工程实现与实验 · 尚未部署</p>
+        <h1 id="headline">一个随时待命的助手，<br><em>先学会安静。</em></h1>
+        <p class="dek">真正的个人助手，不只是听懂你说了什么。<br class="desktop-only">它还要知道：这句话，是说给它听的吗？</p>
+        <div class="byline"><span>TermBridge 设计笔记</span><span>2026.09.08</span></div>
+        <a class="pill" href="#story">从一个误唤醒说起 <span class="pill-icon" aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-art bezel" aria-label="概念图：全天待命与持续上传是不同的事情">
+        <div class="hero-art-core core">
+          <div class="art-label">ALWAYS AVAILABLE.<br>NOT ALWAYS LISTENING TO THE CLOUD.</div>
+          <div class="quiet-orbit" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="orbit orbit-three"></span><span class="orbit-dot"></span></div>
+          <div class="standby-type"><span>24<span class="slash">/</span>7</span><small>是可被唤起，不是持续上传</small></div>
+          <div class="art-bottom"><span class="mini-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span>LOCAL FIRST<br><b>把注意力留给真正的请求</b></span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="intro-note wrap"><span class="note-index">关于这篇文章</span><p>系统设计已有第一批实现：手机即时校准、Host 训练回执和轮次协调。本文演示仍只用合成数字，网页不联网、不录音。另做了无声 PCM 管道的真实云调用；成功与失败都保留在<a href="implementation.md">实验报告</a>，不把代码通过等同于全天候可靠。</p></div>
+
+    <div class="essay-layout wrap">
+      <aside class="rail" aria-label="文章目录">
+        <div class="rail-inner">
+          <p class="eyebrow">IN THIS NOTE</p>
+          <nav><a href="#story">01 <span>不该接的那句话</span></a><a href="#attention">02 <span>给交互一个边界</span></a><a href="#learning">03 <span>两种速度的学习</span></a><a href="#data">04 <span>你拥有的数据</span></a><a href="#models">05 <span>大模型的位置</span></a><a href="#evidence">06 <span>拿什么证明变好</span></a></nav>
+          <div class="rail-caption">一部手机。<br>一台自己的电脑。<br>一个懂得不打扰的助手。</div>
+        </div>
+      </aside>
+
+      <article>
+        <section class="chapter" id="story">
+          <p class="section-number">01 / THE WRONG INTERRUPTION</p>
+          <h2>最令人不安的，<br>不是没听懂，是不该听的时候接了话。</h2>
+          <p>你戴着耳机，问助手最近哪个 Agent 完成了任务。它回答了。你转头和朋友说了一句“这个先别动”，它又认真地开始处理。旁边的电视继续说话，它也继续回应。</p>
+          <p>再换一个更聪明的大模型，可能只是让这些不该发生的回答更流畅。问题出在更早的位置：<strong>谁决定这段声音可以成为一次交互？</strong></p>
+          <blockquote><p>“能听见”是一种能力。<br>“该不该听”是一种边界。</p></blockquote>
+          <p>我们希望 TermBridge 成为一个随时可用的个人入口：手机在身边，电脑上的 Agent 在工作，人仍然决定要做什么。但随时可用，不应该等于把一天的环境声音持续交给云端。</p>
+          <p>因此，我们把语音问题拆开：有没有人声、是不是本人、是不是对助手说、有没有说完、要交给哪个 Agent，以及是否允许执行。一个分数不能回答这六个问题。</p>
+          <div class="margin-note"><span>一个容易混淆的词</span><p><b>DDSD</b>，Device-Directed Speech Detection，判断“这句话是否说给设备听”。它不是声纹认证，也不是语音转文字。主人也会和别人聊天。</p></div>
+        </section>
+
+        <section class="chapter" id="attention">
+          <p class="section-number">02 / A BOUNDARY FOR ATTENTION</p>
+          <h2>不是永远打开麦克风通道，<br>而是短暂地进入一段交互。</h2>
+          <p>待机时，手机只保留最小的本地检测。被唤起后，一段短暂的交互窗口打开：你可以提问、补充、打断。窗口结束，新的环境音不再上传；已经委派出去的任务可以继续运行。</p>
+          <figure class="bezel diagram-figure"><div class="core diagram-scroll" tabindex="0" role="region" aria-label="交互状态图，可横向滚动"><img src="assets/interaction.svg" width="1080" height="420" alt="本地待机、候选复核、交互、输入结束四个状态；业务任务独立继续。"></div><figcaption><span>FIG. 01</span> 三种寿命：待机、交互、任务。完成通知不能自行续租麦克风。<a href="assets/interaction.svg">查看原图 ↗</a></figcaption></figure>
+          <p>“Over”仍然有用。它是明确的输入结束信号，不是挂断一切，也不是取消所有 Worker。助手刚问你“哪个仓库？”，则可以为你的回答保留短窗口。电视声音、工具执行耗时和助手自己的播报，都不能替你延长这个窗口。</p>
+          <p>自然连续通话仍保留为用户主动选择的模式。长时间待命则应该采用更克制的策略：不确定时先安静，保留唤醒词和按键作为可靠入口。模型失败，不应降级成“所有声音都上传”。</p>
+          <p>这也不是一个纯 Prompt 问题。客户端需要真正的音频准入与代次控制，Host 需要一个唯一的轮次提交点。旧工具结果不能在你重新开口后抢着续答。</p>
+        </section>
+
+        <section class="chapter" id="learning">
+          <p class="section-number">03 / TWO SPEEDS OF LEARNING</p>
+          <h2>你纠正一次，<br>它应该真的改变一点。</h2>
+          <p>如果每次说“不是在跟你说”，只是得到一句道歉，系统并没有变得更懂你。我们想让这次纠正落到一个具体片段、一个明确标签，以及一组可以核验的参数变化上。</p>
+          <p>快路径在手机：冻结负责提取声音特征的底座，仅对很小的个人层做有限更新。保存、去重、校验，然后在下一句话边界启用。既不用等待 Mac mini 在线，也不在你说到一半时更换判断标准。</p>
+          <p>慢路径在自己的电脑：累计获准样本，划分训练与独立测试，重新训练和校准，检查是否真的减少误触发。只有兼容、通过验证的候选版本，才进入手机的影子评测与启用流程。</p>
+          <figure class="bezel diagram-figure"><div class="core diagram-scroll" tabindex="0" role="region" aria-label="快慢两条学习路径图，可横向滚动"><img src="assets/learning.svg" width="1080" height="490" alt="手机明确纠正后更新个人层；获准样本同步给 Host，训练评测后下发兼容模型。"></div><figcaption><span>FIG. 02</span> 快路径适应这一次纠正；慢路径验证这种适应是否值得保留。<a href="assets/learning.svg">查看原图 ↗</a></figcaption></figure>
+          <div class="demo bezel" id="learning-demo">
+            <div class="core demo-core">
+              <div class="demo-top"><span class="eyebrow">TRY THE IDEA</span><span class="demo-tag">合成数字 · 非真实 DDSD</span></div>
+              <h3>一次纠正，参数会怎样动？</h3>
+              <p class="demo-explanation">这里有一个固定底座分数和三个合成特征。点击按钮，仅在本页面更新一个线性个人层。分数变化不代表真实准确率提升。</p>
+              <div class="score-pair">
+                <div><span class="score-label">固定底座分数</span><strong id="base-score">59.9<span>%</span></strong><div class="score-track"><span class="score-fill base-fill" id="base-fill"></span></div></div>
+                <div><span class="score-label">加入个人层后</span><strong id="personal-score">59.9<span>%</span></strong><div class="score-track"><span class="score-fill" id="personal-fill"></span></div></div>
+              </div>
+              <div class="demo-actions"><button type="button" id="negative" class="pill">不是对助手说 <span class="pill-icon" aria-hidden="true">−</span></button><button type="button" id="positive" class="secondary">这句是在叫它</button><button type="button" id="undo" class="text-button" disabled>撤销</button><button type="button" id="reset" class="text-button">重置</button></div>
+              <p id="demo-status" class="demo-status" role="status" aria-live="polite">尚未调整。模型通常需要多样的明确反馈，不能凭一条样本学会所有场景。</p>
+              <noscript><p>JavaScript 已关闭。文章与图解仍可阅读；交互演示需要 JavaScript。</p></noscript>
+            </div>
+          </div>
+          <p>我们不是要在手机里训练一个越来越大的聊天模型。公开研究已有约 50 万参数的轻量声学方案，也有约 500 万参数的 DDSD 学生模型；个人化层可以远小于底座。<a class="ref" href="#source-1" aria-label="参考资料 1">[1]</a><a class="ref" href="#source-2" aria-label="参考资料 2">[2]</a></p>
+          <p>但“小”不能偷偷省略声学编码器、音频缓存和运行库。我们的专用 DDSD 权重预算是 5–10 MB，个人层小于 1 MB；这是设计预算，不是手机实测。冻结编码器的首个实验候选来自开源 Smart Turn，迁移到 DDSD 必须重新训练独立分类头，不能把原来的“说完了”分数改名使用。<a class="ref" href="#source-3" aria-label="参考资料 3">[3]</a></p>
+        </section>
+
+        <section class="chapter" id="data">
+          <p class="section-number">04 / YOUR DATA, YOUR BOUNDARY</p>
+          <h2>真正的个人化，<br>从“这次允许学什么”开始。</h2>
+          <p>数据越多，不一定越懂你。把错误样本持续收进去，也可能让系统越来越偏。尤其不能把“用户没有投诉”当作接受正确，更不能默认认为每天的环境声音都是自己的训练素材。</p>
+          <div class="settings-layout">
+            <figure class="settings bezel">
+              <div class="core settings-core" role="img" aria-label="设置页草图，尚未实现：本机个性化、同步到我的 Host、保留短音频、云端辅助标注是四个独立开关，默认关闭。">
+                <div class="settings-top"><span aria-hidden="true">‹</span><span>个性化学习</span><span class="mock-label">草图</span></div>
+                <div class="model-line"><span class="model-symbol" aria-hidden="true">p</span><div><strong>我的声音，我的边界</strong><small>尚未启用个人化 · 仅本地待命</small></div></div>
+                <div class="settings-row"><div><strong>本机个性化</strong><small>用明确纠正调整个人参数</small></div><span class="toggle" aria-hidden="true"></span></div>
+                <div class="settings-row"><div><strong>同步到我的 Host</strong><small>选择一台自己的训练电脑</small></div><span class="toggle" aria-hidden="true"></span></div>
+                <div class="settings-row"><div><strong>保留短音频</strong><small>独立授权，不录整段生活</small></div><span class="toggle" aria-hidden="true"></span></div>
+                <div class="settings-row"><div><strong>云端辅助标注</strong><small>按批次授权，并限制预算</small></div><span class="toggle" aria-hidden="true"></span></div>
+                <div class="settings-footer">查看纠错记录 <span>撤销个人调整</span></div>
+              </div>
+              <figcaption>产品交互草图，尚未接入 App；不是可用开关。</figcaption>
+            </figure>
+            <div class="settings-notes"><h3>四个开关，四种许可。</h3><p>允许本机学习，不代表允许上传；允许同步自己的电脑，不代表允许发给云端；特征和声纹也不是匿名数据。</p><p>默认不保存原音。真正需要录音对照时，由用户主动进入场景校准，看到范围与保留时间，并能随时结束。</p><p>删除也要贯穿整条链路：删除样本、撤销排队上传、处理受它影响的模型。Host 离线，就如实显示“待同步删除”，而不是提前宣称已经消失。</p></div>
+          </div>
+          <div class="label-ledger">
+            <div><span>“不是对你说”</span><b>对话对象</b><p>教 DDSD 分清一次误接受。</p></div>
+            <div><span>“我还没说完”</span><b>话轮结束</b><p>教端点判断别把停顿当结束。</p></div>
+            <div><span>“Over”</span><b>交互边界</b><p>只说明结束，不是整段意图真值。</p></div>
+          </div>
+        </section>
+
+        <section class="chapter" id="models">
+          <p class="section-number">05 / THE RIGHT JOB FOR EACH MODEL</p>
+          <h2>大模型当老师、当执行者。<br>不要让它全天站在门口。</h2>
+          <p>手机上的小模型先守住音频边界；进入交互后，Omni 继续负责低延迟交流。对于确实含糊的停顿，可以让一个没有工具权限的判断器参考少量上下文，给出“继续等”“可以交接”或“需要澄清”。</p>
+          <p>这里不发送整个 History、全部 Agent 日志和所有图片。上一轮问了什么、当前还缺哪个参数、这句话是否沿着同一个任务继续，往往比一大段无关 Memory 更有用。相关研究也表明，历史上下文和 ASR 不确定性值得联合考虑，但不等于文字模型能看穿说话对象。<a class="ref" href="#source-4" aria-label="参考资料 4">[4]</a></p>
+          <figure class="bezel diagram-figure"><div class="core diagram-scroll" tabindex="0" role="region" aria-label="手机、Host 与云端总体架构，可横向滚动"><img src="assets/architecture.svg" width="1080" height="650" alt="本地准入和个人学习、Host 轮次与训练、云端 Omni 与可选教师的职责分工。"></div><figcaption><span>FIG. 03</span> 对话、执行、学习共用证据，但不共用无限权限。<a href="assets/architecture.svg">查看原图 ↗</a></figcaption></figure>
+          <p>在慢路径里，大模型可以帮助发现标签冲突、挑出值得复核的样本，辅助蒸馏。但它的猜测不能盖过用户明确说的“刚才不是在问你”。没有足够证据，就留下 unknown，而不是编出高置信度。</p>
+          <p>复杂任务仍然交给执行 Fork，再通过受控工具委派 Codex 或 Claude。修改代码、操作日历和学习个人参数，各有自己的授权与回执。一个学习任务不应该因为“用了 Agent SDK”，就拥有读取整台电脑的权力。</p>
+          <div class="cost-note"><span class="section-number">THE COST MODEL</span><p>费用应该随着<strong>真正的交流、少量不确定判断、获准的教师批处理</strong>增长，而不是随着房间里有声音的时长增长。</p><small>本地更新不产生云模型 tokens；仍然有手机耗电和 Host 算力成本。所有节省比例都要用真实 usage 验证。</small></div>
+        </section>
+
+        <section class="chapter" id="evidence">
+          <p class="section-number">06 / EVIDENCE BEFORE CONFIDENCE</p>
+          <div class="cost-note"><span class="section-number">PUBLIC DATA / PERSONAL CONTROL</span><p>新增实测：Open Yap 公开 8.922 小时的逐词时序，25 个长停顿续说回放全部通过。公开语义样本 80 条，标签一致 68 条，另有 4 次超时，保留全部分歧。</p><p>个人学习已接入 <code>tb serve</code>：先确认，再训练，反馈能影响下一轮。三个不同通话中一致确认的相同表达和前文，才能形成可撤销的等待/忽略规则。11 组闭环通过，但不是泛化准确率 100%。</p><small>不播放音频，不把公开样本当成你的个人数据。<a href="personal-learning.md">阅读实现、失败对照与边界 ↗</a></small></div>
+          <h2>不是“看起来更懂我”，<br>而是少打扰、少漏接、少花钱。</h2>
+          <p>最容易得到的漂亮数字，是训练之后再测试刚才那条样本。最难得到的证据，是第二天换了耳机、到了车里、旁边有人说话，系统依然知道该不该回应。</p>
+          <p>所以我们按完整会话、日期和场景分开训练与测试。在线学习先预测计分，再更新参数；原音、修订文本和增强副本不能偷偷跨进测试集。通用模型、个人层、Host 训练、上下文判断分别消融，证明每一层值得留下。</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="验收目标表，可横向滚动"><table><caption>拟议验收目标，不是已测结果</caption><thead><tr><th scope="col">要量什么</th><th scope="col">起始目标</th><th scope="col">当前证据</th></tr></thead><tbody><tr><td>环境声误启动</td><td>&lt; 0.1 次 / 小时</td><td>待真实场景回放</td></tr><tr><td>目标话语接受率</td><td>≥ 95%</td><td>待独立留出集</td></tr><tr><td>个人小层更新 P95</td><td>≤ 500 ms</td><td>Android 已实现；真机待测</td></tr><tr><td>未授权待机音频</td><td>0 字节上传</td><td>新链路待端到端验收</td></tr></tbody></table></div>
+          <p>几十秒安静的演示，不足以证明一天都不会误唤醒。即使三十小时里一次也没发生，稀有错误的上界仍然值得谨慎估计。还要测电池、蓝牙、游戏并发开麦和后台可见性；普通 Android App 并不拥有系统助手的一切权限。<a class="ref" href="#source-5" aria-label="参考资料 5">[5]</a></p>
+          <div class="margin-note"><span>2026.09.08 / 第一次落地</span><p>ASR 留在云端。本地 6 特征校准头可以学习、撤销并与 Host 对账；异步工具回执不会再自动抢回新一轮说话权。实验使用文件和 PCM 管道，没有播放器，也没有采集房间里的声音。</p></div>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="实际管道实验结果"><table><caption>小型开发集实测，不是独立准确率基准</caption><thead><tr><th scope="col">实验</th><th scope="col">观察</th><th scope="col">结论</th></tr></thead><tbody><tr><td>“我最近的” + 2.6 秒 + “Agent 是什么”</td><td>1 条完整输入、1 次真实 mock 工具回执，回答 TermBridge 正在做语音控制验证</td><td>原始复现通过</td></tr><tr><td>相同话语，停顿 4.5 秒</td><td>文字已拼接，但 Omni 仍解释 Agent 的概念，没有调用工具</td><td>长分句交接失败</td></tr><tr><td>160 条声学特征对照数据</td><td>相同特征、相反意图：留出集 50%，高置信覆盖 0</td><td>仅声学标量不够</td></tr></tbody></table></div>
+          <p>上表保留首轮历史反例。后续修复把声学分段与语义提交分开：4.5 秒停顿、12 秒一次追问以及连续两轮查询的管道回放通过，Host 已更新、三星已安装，智能停顿默认开启。参数校准仍是影子模式，真机听感仍待验证。<a href="pause-repair.md">查看最新根因、回执和装机证据 ↗</a></p>
+          <p>另外 8 个新场景做了 32 次云端对照：只给末句，与完整意图一致的是 4/8；加上前半句是 6/8；带最近上下文是 8/8。它说明上下文有用，不说明模型已经“百分之百聪明”。这些是作者编写的启动样本，模型返回只作待复核建议，没有混成人工真值去训练个人参数。</p>
+          <div class="boundary-note"><h3>我们还没有越过的边界</h3><p>CAM++ 本人校验仍关闭；完整语义 DDSD 尚未验收。新的数据与校准闭环不保存录音、不自动把云端标签当作真值，也尚未成为生产音频的判断门。构建与单测通过，不代表车内风噪、电视旁人、长停顿或 24 小时耗电已经验证。</p></div>
+        </section>
+
+        <section class="closing chapter" aria-labelledby="closing-title">
+          <p class="section-number">THE QUIET AMBITION</p>
+          <h2 id="closing-title">不是让它听得更多。<br>是让每次倾听，<em>都有理由。</em></h2>
+          <p>手机学习细微的个人习惯，自己的电脑验证这些变化，大模型只在需要时参与。人仍然拥有纠正、撤销和关闭的权力。</p>
+          <p>一个真正能陪伴很久的助手，需要的可能不是更强的存在感，而是更可靠的边界。</p>
+          <a class="pill" href="plan.md">阅读完整工程方案 <span class="pill-icon" aria-hidden="true">↗</span></a>
+        </section>
+
+        <section class="sources" aria-labelledby="sources-title">
+          <h2 id="sources-title">参考与实现边界</h2>
+          <ol><li id="source-1"><a href="https://arxiv.org/pdf/2010.10591">Knowledge Transfer for Efficient On-device False Trigger Mitigation</a><span>小型声学学生的研究参照，不是我们的测量。</span></li><li id="source-2"><a href="https://arxiv.org/html/2508.02801v1">Adaptive Knowledge Distillation for Device-Directed Speech Detection</a><span>约 5M 学生模型；不能假定私有数据与产品权重可复用。</span></li><li id="source-3"><a href="https://github.com/pipecat-ai/smart-turn">Smart Turn v3.2</a><span>开源 EOU 模型与训练代码；DDSD 是需要另行验证的迁移任务。</span></li><li id="source-4"><a href="https://machinelearning.apple.com/research/device-directed">Device-Directed Speech Detection for Follow-up Conversations Using Large Language Models</a><span>上下文与识别不确定性的研究参考。</span></li><li id="source-5"><a href="https://developer.android.com/media/platform/sharing-audio-input">Android：Sharing audio input</a><span>后台与并发采音不能仅凭模型设计保证。</span></li><li><a href="plan.md">本项目工程方案与源码映射</a><span>数据契约、更新算法、Host job、版本竞态、权限、消融与验收。</span></li></ol>
+          <p class="colophon">设计起于 master@9cd9241，本批实现基于 master@3610ee9；尚未部署。三个图解为可编辑 SVG；页面演示仅改变合成参数，刷新后清除。网页无网络资源、无分析上报、无麦克风访问。</p>
+        </section>
+      </article>
+    </div>
+  </main>
+  <footer class="footer wrap"><a class="wordmark" href="#top">TERMBRIDGE</a><span>Personal tools. Considered boundaries.</span><button type="button" class="text-button" id="print">打印 / 保存为 PDF</button></footer>
+</body>
+</html>

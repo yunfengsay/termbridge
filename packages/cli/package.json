@@ -1,0 +1,21 @@
+{
+  "name": "@termbridge/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": {
+    "termbridge": "./src/cli.ts",
+    "tb": "./src/cli.ts"
+  },
+  "dependencies": {
+    "@termbridge/tool-scripts": "workspace:*",
+    "@clack/prompts": "^0.7.0",
+    "@termbridge/protocol": "workspace:*",
+    "@termbridge/settings": "workspace:*",
+    "@termbridge/voice": "workspace:*",
+    "cli-table3": "^0.6.3",
+    "picocolors": "^1.0.0",
+    "ws": "^8.18.0"
+  }
+}

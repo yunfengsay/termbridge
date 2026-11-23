@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Termbridge" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:textColorPrimary">@color/content_primary</item>
+        <item name="android:textColorSecondary">@color/content_secondary</item>
+        <item name="colorPrimary">@color/green_dark</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/green</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/ink</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/ink_muted</item>
+        <item name="colorPrimaryContainer">@color/working_tint</item>
+        <item name="colorOnPrimaryContainer">@color/green_dark</item>
+        <item name="colorSecondaryContainer">@color/surface_variant</item>
+        <item name="colorOnSecondaryContainer">@color/ink</item>
+        <item name="colorSurfaceContainerLowest">@color/surface</item>
+        <item name="colorSurfaceContainerLow">@color/paper</item>
+        <item name="colorSurfaceContainer">@color/surface</item>
+        <item name="colorSurfaceContainerHigh">@color/surface</item>
+        <item name="colorSurfaceContainerHighest">@color/surface_variant</item>
+
+        <item name="colorOutline">@color/line</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">@bool/light_system_bars</item>
+        <item name="android:statusBarColor">@color/paper</item>
+        <item name="android:navigationBarColor">@color/navigation_bar</item>
+        <item name="android:windowBackground">@color/paper</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Termbridge.Dialog</item>
+        <item name="actionButtonStyle">@style/Widget.Termbridge.CompactAction</item>
+        <!-- The chat composer sits under a day/night surface and follows it. -->
+        <item name="composerBarBackground">@color/surface_variant</item>
+        <item name="composerKeyBackground">@color/composer_key_surface</item>
+        <item name="composerKeyStroke">@color/composer_key_outline</item>
+        <item name="composerFieldBackground">@color/surface</item>
+        <item name="composerFieldStroke">@color/line</item>
+        <item name="composerText">@color/ink</item>
+        <item name="composerHintText">@color/ink_muted</item>
+        <item name="composerIconTint">@color/ink_muted</item>
+        <item name="composerSendTint">@color/on_primary</item>
+        <item name="composerStatusText">@color/green_dark</item>
+        <item name="composerSendEnabled">@color/green_dark</item>
+        <item name="composerSendDisabled">@color/surface_variant</item>
+    </style>
+
+    <style name="ThemeOverlay.Termbridge.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Termbridge.Dialog</item>
+    </style>
+
+    <style name="ShapeAppearance.Termbridge.Dialog" parent="ShapeAppearance.Material3.Corner.Large">
+        <item name="cornerSize">18dp</item>
+    </style>
+
+    <style name="TextAppearance.Termbridge.Toolbar" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Theme.Termbridge.Terminal" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:textColorPrimary">@color/content_primary</item>
+        <item name="android:textColorSecondary">@color/content_secondary</item>
+        <item name="actionButtonStyle">@style/Widget.Termbridge.CompactAction</item>
+        <item name="colorPrimary">#8FBF98</item>
+        <item name="colorOnPrimary">@color/terminal_bg</item>
+        <item name="colorSurface">@color/terminal_toolbar</item>
+        <item name="colorOnSurface">@color/terminal_text</item>
+        <item name="colorOnSurfaceVariant">@color/terminal_text</item>
+        <item name="colorSurfaceVariant">@color/terminal_key</item>
+        <item name="colorSurfaceContainerLowest">@color/terminal_bg</item>
+        <item name="colorSurfaceContainerLow">@color/terminal_toolbar</item>
+        <item name="colorSurfaceContainer">@color/terminal_toolbar</item>
+        <item name="colorSurfaceContainerHigh">@color/terminal_toolbar</item>
+        <item name="colorSurfaceContainerHighest">@color/terminal_key</item>
+
+        <item name="android:statusBarColor">@color/terminal_toolbar</item>
+        <item name="android:navigationBarColor">@color/terminal_toolbar</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/terminal_bg</item>
+        <!-- The terminal is always dark, so its composer keeps the dark bar. -->
+        <item name="composerBarBackground">@color/terminal_toolbar</item>
+        <item name="composerKeyBackground">#353D37</item>
+        <item name="composerKeyStroke">#515B53</item>
+        <item name="composerFieldBackground">@color/terminal_key</item>
+        <item name="composerFieldStroke">#6E9676</item>
+        <item name="composerText">@color/terminal_text</item>
+        <item name="composerHintText">#8D998F</item>
+        <item name="composerIconTint">@color/terminal_text</item>
+        <item name="composerSendTint">@color/terminal_bg</item>
+        <item name="composerStatusText">#91C39A</item>
+        <item name="composerSendEnabled">#91C39A</item>
+        <item name="composerSendDisabled">#465149</item>
+    </style>
+
+    <style name="Widget.Termbridge.CompactAction" parent="Widget.AppCompat.ActionButton">
+        <item name="android:minWidth">48dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+    </style>
+
+    <style name="Theme.Termbridge.Transparent" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorAccent">@color/green</item>
+    </style>
+    <style name="Widget.Termbridge.DesktopPopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/desktop_popup_background</item>
+    </style>
+    <style name="Theme.Termbridge.Connections" parent="Theme.Termbridge">
+        <item name="colorPrimaryContainer">@color/working_tint</item>
+        <item name="colorOnPrimaryContainer">@color/green_dark</item>
+        <item name="colorSecondaryContainer">@color/surface_variant</item>
+        <item name="colorOnSecondaryContainer">@color/ink</item>
+        <item name="colorSurfaceContainerHigh">@color/surface</item>
+        <item name="colorSurfaceContainerHighest">@color/surface_variant</item>
+    </style>
+</resources>

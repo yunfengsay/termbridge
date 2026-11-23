@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The send button follows the effective theme like the rest of the composer, so
+  the dark terminal bar and the day/night chat bar each get a button that reads
+  against their own background instead of one fixed pair of greens.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/composerSendDisabled" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/composerSendEnabled" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

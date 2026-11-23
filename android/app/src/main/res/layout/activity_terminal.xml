@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/terminal_toolbar"
+        app:menu="@menu/terminal_menu"
+        app:contentInsetEnd="0dp"
+        app:contentInsetEndWithActions="0dp"
+        app:titleMarginEnd="4dp"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:subtitleTextColor="#8D998F"
+        app:titleTextColor="@color/terminal_text" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.termbridge.android.terminal.TerminalWebView
+            android:id="@+id/terminalView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/terminal_bg" />
+
+        <LinearLayout
+            android:id="@+id/terminalStatusBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/terminal_status_pill"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="5dp"
+            android:paddingBottom="3dp">
+
+            <TextView
+                android:id="@+id/terminalStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/terminal_waiting"
+                android:textColor="#AAB5AC"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteSession"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/delete_session"
+                android:textColor="@color/red"
+                android:textSize="11sp"
+                android:visibility="gone"
+                android:insetBottom="0dp"
+                android:insetTop="0dp" />
+        </LinearLayout>
+
+        <com.termbridge.android.brain.VoiceLevelView
+            android:id="@+id/voiceMiniOrb"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@string/voice_call_return"
+            android:elevation="10dp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@color/terminal_toolbar"
+        android:fillViewport="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/extraKeys"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="7dp"
+            android:paddingEnd="7dp">
+
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyEsc" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_esc" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyCtrl" style="@style/Widget.Termbridge.TerminalKey" android:checkable="true" android:text="@string/key_ctrl" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyAlt" style="@style/Widget.Termbridge.TerminalKey" android:checkable="true" android:text="@string/key_alt" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyTab" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_tab" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyHome" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_home" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyUp" style="@style/Widget.Termbridge.TerminalKey.Wide" android:text="@string/key_up" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyDown" style="@style/Widget.Termbridge.TerminalKey.Wide" android:text="@string/key_down" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyLeft" style="@style/Widget.Termbridge.TerminalKey.Wide" android:text="@string/key_left" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyRight" style="@style/Widget.Termbridge.TerminalKey.Wide" android:text="@string/key_right" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyEnd" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_end" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyEnter" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_enter" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyCopy" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_copy" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/keyPaste" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_paste" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <include
+        android:id="@+id/composer"
+        layout="@layout/view_composer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  termbridge relay — macOS LaunchAgent.
+  装法见 docs/deploy.md。按需改：仓库路径、PORT。
+  cp 到 ~/Library/LaunchAgents/ 后 `launchctl bootstrap gui/$(id -u) <plist>`。
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.termbridge.relay</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/path/to/termbridge/node_modules/.bin/tsx</string>
+    <string>/path/to/termbridge/packages/relay/src/index.ts</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/path/to/termbridge</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PORT</key>
+    <string>7400</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/termbridge-relay.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/termbridge-relay.log</string>
+</dict>
+</plist>

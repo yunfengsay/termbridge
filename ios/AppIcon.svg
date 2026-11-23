@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 108 108"><title>TermBridge</title>
+<!-- Generated from Android launcher artwork by scripts/sync-app-icons.py. -->
+<rect width="108" height="108" fill="#111412"/>
+<g transform="translate(54 54) scale(0.66 0.66) translate(-54 -54)"><path fill="#F4F2E9" fill-rule="evenodd" d="M54,16C58,16 61,17 65,19L85,31C89,34 91,38 92,43L95,75C96,81 93,86 88,90L71,102C66,106 61,107 54,107C47,107 42,106 37,102L20,90C15,86 12,81 13,75L16,43C17,38 19,34 23,31L43,19C47,17 50,16 54,16ZM59,106C68,96 72,86 70,79C68,72 58,69 51,64C42,58 41,50 50,43C57,37 68,33 83,29L86,35C74,38 64,42 59,47C56,50 57,53 62,56C70,60 82,64 86,74C90,84 84,94 73,101Z" /></g>
+</svg>

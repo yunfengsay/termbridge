@@ -1,0 +1,31 @@
+direction: right
+classes: {
+  state: {style.fill: "#E8EFF8"; style.stroke: "#58799C"; style.font-size: 22}
+  stop: {style.fill: "#F4E3DE"; style.stroke: "#AD7465"; style.font-size: 22}
+  note: {style.fill: "#FFF0D8"; style.stroke: "#B18943"; style.font-size: 20}
+}
+idle: "等待唤醒\n本地入口" {class: state}
+listening: "倾听 LISTENING\n保留未提交原话" {class: state}
+pause: "停顿候选\nPAUSE_CANDIDATE" {class: state}
+checking: "判断中 CHECKING\n绑定 turnId + revision" {class: state}
+waiting: "继续等 WAITING\n原话不丢失" {class: state}
+committed: "已提交 COMMITTED\n幂等提交一次" {class: state}
+responding: "回复 / 执行中\n媒体与任务状态分开" {class: state}
+barge: "用户插话\n先让出播放，继续采音" {class: stop}
+closed: "已挂断 CLOSED\n停止采音 / 播放 / 释放 route" {class: stop}
+idle -> listening: "唤醒词 / 显式进入"
+listening -> pause: "候选静音"
+pause -> checking: "启动一次检查"
+checking -> waiting: "未完整 / 不确定"
+waiting -> listening: "继续说话"
+checking -> listening: "新 revision：取消旧检查"
+checking -> committed: "完整且需回应"
+committed -> responding
+responding -> barge: "用户开始插话"
+barge -> listening: "保留用户新音频"
+responding -> listening: "回答完成：自然模式"
+responding -> idle: "回答完成：唤醒模式策略"
+listening -> idle: "Over：按配置结束交流"
+responding -> closed: "显式挂断"
+listening -> closed: "显式挂断"
+late: "拟议状态机 · 尚未部署验收\n旧检查、旧音频、迟到字幕不能复活已关闭会话。\n挂断不等于撤销业务动作；取消任务另走 ID 回执。" {class: note}

@@ -1,0 +1,38 @@
+direction: down
+classes: {
+  observed: {style.fill: "#E4EFEB"; style.stroke: "#4C7770"; style.font-size: 22}
+  proposed: {style.fill: "#E8EFF8"; style.stroke: "#58799C"; style.stroke-dash: 4; style.font-size: 22}
+  caution: {style.fill: "#FFF0D8"; style.stroke: "#B18943"; style.font-size: 20}
+}
+doubao: "豆包 macOS 输入法 · 0.9.2 · 静态证据" {
+  direction: right
+  mic: "采音 / ASR" {class: observed}
+  context: "输入上下文\n热词 / 修改记录" {class: observed}
+  result: "分段结果\n完整 / 最近 / 待定" {class: observed}
+  diff: "修订文本\nsrc → dst / diff" {class: observed}
+  wait: "停止采音后\n等待尾包" {class: observed}
+  commit: "提交到输入框\n丢弃迟到旧结果" {class: observed}
+  mic -> result -> diff -> wait -> commit
+  context -> result: "接口线索"
+}
+codex: "Codex Desktop · 26.901.51231 · 代码复核" {
+  direction: right
+  mic: "听写采音" {class: observed}
+  stream: "流式字幕\nutterance_id + revision" {class: observed}
+  final: "最终文本\nfinal 覆盖 partial" {class: observed}
+  clean: "可选文本清理\n上下文 + 字典" {class: observed}
+  insert: "写入 / 展示" {class: observed}
+  mic -> stream -> final -> clean -> insert
+  final -> insert: "未开启清理 / 失败保留原文"
+}
+tb: "TermBridge 目标方案 · 虚线是待实现设计" {
+  direction: right
+  omni: "连续语音 / Omni" {class: observed}
+  ledger: "可修订字幕账本\n原话 + 版本 + 来源" {class: proposed}
+  check: "轮次判断\n声音 + 语义 + 对象" {class: proposed}
+  coordinator: "唯一提交点\nTurnCoordinator" {class: proposed}
+  worker: "回答 / 工具 / Agent" {class: observed}
+  omni -> ledger -> check -> coordinator -> worker
+  check -> ledger: "没说完：保留、继续听"
+}
+boundary: "证据边界\n字幕修订不等于用户说完。\n豆包有 LLM 线索，逐轮启用未验证。\nCodex 清理可选，实时通话独立。\n静态证据不等于线上验收。\n蓝色模块为建议，尚未实现。" {class: caution}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="420" viewBox="0 0 1080 420" role="img" aria-labelledby="title desc">
+  <title id="title">待机、交互、任务有三个不同的寿命</title>
+  <desc id="desc">本地待机经唤醒进入候选，拒绝回待机，接受进入交互，Over 后结束新输入，回答收尾后回待机。业务任务独立继续并只发通知。任何状态失去可见通话表面都停止录音。</desc>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#587569" stroke-width="1.4"/></marker>
+    <style>text{font-family:'PingFang SC','Noto Sans CJK SC',sans-serif;fill:#243b35}.head{font-size:22px;font-weight:600}.sub{font-size:15px;fill:#60736d}.line{fill:none;stroke:#587569;stroke-width:1.7;marker-end:url(#a)}</style>
+  </defs>
+  <rect width="1080" height="420" rx="24" fill="#f6f7f0"/>
+  <g fill="#e4eee6"><rect x="35" y="78" width="210" height="95" rx="15"/><rect x="300" y="78" width="210" height="95" rx="15"/></g>
+  <g fill="#e9e7d9"><rect x="565" y="78" width="210" height="95" rx="15"/><rect x="830" y="78" width="210" height="95" rx="15"/></g>
+  <text x="58" y="113" class="head">本地待机</text><text x="58" y="144" class="sub">只有轻量检测，不上传</text>
+  <text x="323" y="113" class="head">候选复核</text><text x="323" y="144" class="sub">是不是在对助手说？</text>
+  <text x="588" y="113" class="head">交互窗口</text><text x="588" y="144" class="sub">允许连续交流与续说</text>
+  <text x="853" y="113" class="head">输入结束</text><text x="853" y="144" class="sub">拒绝新音频，回答收尾</text>
+  <path d="M246 122H297" class="line"/><text x="271" y="59" class="sub" text-anchor="middle">唤醒</text>
+  <path d="M511 122H562" class="line"/><text x="538" y="59" class="sub" text-anchor="middle">接受</text>
+  <path d="M776 122H827" class="line"/><text x="803" y="59" class="sub" text-anchor="middle">Over</text>
+  <path d="M405 174V204H140V176" class="line"/><text x="272" y="229" class="sub" text-anchor="middle">拒绝 / 不确定：保持安静</text>
+  <path d="M935 77V28H140V74" class="line"/><text x="540" y="21" class="sub" text-anchor="middle">收尾结束，回到本地待命</text>
+  <rect x="565" y="249" width="475" height="84" rx="15" fill="#e6ecf1"/>
+  <text x="588" y="283" class="head">业务任务继续执行</text><text x="588" y="312" class="sub">完成 → 结果卡片 / 通知，不重新打开麦克风</text>
+  <path d="M670 174V246" class="line"/><text x="690" y="215" class="sub">用户已委派</text>
+  <text x="40" y="308" class="sub">暂停检查属于交互窗口内部的子状态。</text>
+  <path d="M36 359H1040" stroke="#668070" stroke-opacity=".18"/>
+  <text x="40" y="389" class="sub">任何状态：用户挂断 / 权限撤销 / 小球不可见 → 停止采音与播放，旧代次失效。</text>
+</svg>

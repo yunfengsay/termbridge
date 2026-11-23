@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agent_chat_title">对话</string>
+    <string name="agent_chat_terminal">终端</string>
+    <string name="agent_chat_load_earlier">加载更早的对话</string>
+    <string name="session_ui_setting">会话界面</string>
+    <string name="session_ui_auto">自动选择</string>
+    <string name="session_ui_value">会话界面：%1$s</string>
+    <string name="session_ui_summary">选择此设备默认的会话界面。自动选择会用对话打开支持的 Agent；会话内可随时切回终端。</string>
+    <string name="agent_chat_composer_hint">给这个 Agent 发消息…</string>
+    <string name="agent_chat_send">发送</string>
+    <string name="agent_chat_too_long">一条消息最多 16,000 个字符，草稿已保留。</string>
+    <string name="agent_chat_retry">重试未发送消息</string>
+    <string name="agent_chat_retry_draft">请先发送或清空当前草稿，再重试未发送的消息。</string>
+    <string name="agent_chat_copy_unconfirmed">复制未确认的消息</string>
+    <string name="agent_chat_attachments_unsupported">这台 Host 还不支持在对话里加图片，请切到终端操作。</string>
+    <string name="agent_chat_host_update">此 Host 未提供对话能力，请升级 Host 或使用终端。</string>
+    <string name="agent_chat_unsupported">此会话暂不支持对话界面，请切到终端。</string>
+    <string name="agent_chat_accepted">Host 已接受，正在投递…</string>
+    <string name="agent_chat_delivered">输入通道已投递，等待 Agent 记录确认…</string>
+    <string name="agent_chat_observed">已在这个 Agent 的对话记录中确认。</string>
+    <string name="agent_chat_uncertain">无法确认消息是否送达。请先在终端核对，再决定是否重新发送。</string>
+    <string name="agent_chat_not_sent">消息尚未发送，可以重试。</string>
+    <string name="agent_chat_history_retry">历史记录未返回，可再次点击加载更早的对话。</string>
+    <string name="session_host_missing">这个会话属于一个已被移除的连接。请重新添加该连接，或从会话列表重新打开。</string>
+</resources>

@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/paper"
+        android:elevation="0dp"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="@color/ink"
+        app:subtitleTextColor="@color/ink_muted"
+        app:title="@string/global"
+        app:titleTextAppearance="@style/TextAppearance.Termbridge.Toolbar"
+        app:titleTextColor="@color/ink" />
+
+    <LinearLayout
+        android:id="@+id/connectionBar"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <View
+            android:id="@+id/connectionDot"
+            android:layout_width="7dp"
+            android:layout_height="7dp"
+            android:background="@drawable/status_dot_idle" />
+
+        <TextView
+            android:id="@+id/connectionStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/connecting"
+            android:textColor="@color/ink_muted"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/hostLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:maxWidth="160dp"
+            android:textColor="@color/ink_muted"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/topDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line" />
+
+    <LinearLayout
+        android:id="@+id/boundaryPreparation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/boundaryPreparationStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/voice_boundary_prepare_inline"
+            android:textColor="@color/ink_muted"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/boundaryPrepareButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/voice_boundary_prepare_download" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/boundaryContinuousButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/voice_boundary_prepare_continuous" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/timeline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="6dp"
+            android:paddingBottom="12dp"
+            android:scrollbars="none" />
+
+        <FrameLayout
+            android:id="@+id/voiceCallPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/voice_stage_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <com.termbridge.android.brain.VoiceLevelView
+                android:id="@+id/voiceCallLevel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:id="@+id/voiceTopActions"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/voiceSilentButton"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content" android:layout_height="38dp"
+                    android:minWidth="0dp" android:insetTop="0dp" android:insetBottom="0dp"
+                    android:text="@string/voice_silent_execution" android:textSize="12sp"
+                    android:textColor="@color/ink_muted" />
+
+                <TextView
+                    android:id="@+id/voiceInteractionMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/voice_provider_pill"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/voice_mode_continuous"
+                    android:textColor="@color/voice_stage_text"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/voiceProviderStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:background="@drawable/voice_provider_pill"
+                    android:clickable="true"
+                    android:contentDescription="@string/voice_provider_switch"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:minWidth="48dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textColor="@color/voice_stage_text"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/voiceAttachButton"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="6dp"
+                    android:contentDescription="@string/brain_attach_images"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="10dp"
+                    android:text=""
+                    app:backgroundTint="@color/voice_call_speaker_tint"
+                    app:cornerRadius="20dp"
+                    app:icon="@drawable/ic_attach"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/voice_stage_text" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:id="@+id/voiceUserCaption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:lineSpacingExtra="3dp"
+                    android:maxLines="3"
+                    android:text="@string/voice_call_waiting_caption"
+                    android:textColor="@color/voice_stage_text"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/voiceBrainCaption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:lineSpacingExtra="2dp"
+                    android:maxLines="4"
+                    android:textColor="@color/voice_stage_text_muted"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/voiceDebugStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:fontFamily="monospace"
+                    android:maxLines="3"
+                    android:textColor="@color/voice_stage_text_muted"
+                    android:textSize="11sp" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/voiceToolResultPanel"
+                    android:layout_width="match_parent"
+                    android:layout_height="156dp"
+                    android:layout_marginTop="14dp"
+                    android:clipToPadding="false"
+                    android:fillViewport="false"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    android:visibility="gone">
+
+                    <com.termbridge.android.brain.VoiceToolResultView
+                        android:id="@+id/voiceToolResult"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </androidx.core.widget.NestedScrollView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/voiceTextButton"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:contentDescription="@string/voice_call_voice_reply"
+                        android:tooltipText="@string/voice_silent_execution"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="18dp"
+                        android:text=""
+                        app:backgroundTint="@color/voice_call_speaker_tint"
+                        app:cornerRadius="32dp"
+                        app:icon="@drawable/ic_volume_off"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="@color/voice_stage_text" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/voiceSpeakerButton"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="18dp"
+                        android:contentDescription="@string/voice_call_speaker_on"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="18dp"
+                        android:text=""
+                        app:backgroundTint="@color/voice_call_speaker_tint"
+                        app:cornerRadius="32dp"
+                        app:icon="@drawable/ic_volume_up"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="@color/voice_stage_text" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/voiceEndButton"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="18dp"
+                        android:contentDescription="@string/voice_call_end"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="18dp"
+                        android:text=""
+                        app:backgroundTint="@color/voice_call_end"
+                        app:cornerRadius="32dp"
+                        app:icon="@drawable/ic_call_end"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="@color/voice_stage_text" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/green"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingStart="36dp"
+            android:paddingEnd="36dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="@drawable/brain_icon_background"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_launcher_foreground" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/brain_empty_title"
+                android:textColor="@color/ink"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:gravity="center"
+                android:lineSpacingExtra="3dp"
+                android:text="@string/brain_empty_detail"
+                android:textColor="@color/ink_muted"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <View
+        android:id="@+id/bottomDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line" />
+
+    <LinearLayout
+        android:id="@+id/composerPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="10dp">
+
+        <LinearLayout
+            android:id="@+id/dictationPanel"
+            android:layout_width="match_parent" android:layout_height="36dp"
+            android:orientation="horizontal" android:gravity="center_vertical" android:visibility="gone">
+            <com.termbridge.android.brain.DictationLevelView
+                android:id="@+id/dictationLevel"
+                android:layout_width="64dp" android:layout_height="28dp"
+                android:importantForAccessibility="no" />
+            <TextView android:id="@+id/dictationStatus"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:layout_marginStart="8dp" android:textSize="12sp" android:textColor="@color/ink_muted" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/modeButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/brain_mode_voice"
+                android:textColor="@color/green_dark"
+                android:textSize="12sp"
+                app:icon="@drawable/ic_call"
+                app:iconGravity="textStart"
+                app:iconPadding="4dp"
+                app:iconSize="15dp"
+                app:iconTint="@color/green_dark" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/attachmentButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="2dp"
+                android:contentDescription="@string/brain_attach_images"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/brain_images"
+                android:textColor="@color/green_dark"
+                android:textSize="12sp"
+                app:icon="@drawable/ic_attach"
+                app:iconGravity="textStart"
+                app:iconPadding="4dp"
+                app:iconSize="15dp"
+                app:iconTint="@color/green_dark" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/silentModeButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="36dp"
+                android:minWidth="0dp" android:insetTop="0dp" android:insetBottom="0dp"
+                android:paddingStart="6dp" android:paddingEnd="6dp"
+                app:icon="@drawable/ic_mic" app:iconSize="16dp" app:iconPadding="4dp"
+                android:text="@string/dictation_title" android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/silentCancelButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="36dp"
+                android:minWidth="0dp" android:insetTop="0dp" android:insetBottom="0dp"
+                android:paddingStart="6dp" android:paddingEnd="6dp"
+                android:visibility="gone" android:text="@string/silent_cancel" android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/composerStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/ink_muted"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/composerLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:boxBackgroundColor="@color/paper"
+                app:boxCornerRadiusBottomEnd="14dp"
+                app:boxCornerRadiusBottomStart="14dp"
+                app:boxCornerRadiusTopEnd="14dp"
+                app:boxCornerRadiusTopStart="14dp"
+                app:boxStrokeColor="@color/line"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="1dp"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/composerInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
+                    android:hint="@string/brain_composer_hint"
+                    android:imeOptions="flagNoEnterAction|flagNoExtractUi"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLines="5"
+                    android:minHeight="48dp"
+                    android:paddingStart="14dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="11dp"
+                    android:textColor="@color/ink"
+                    android:textColorHint="@color/ink_muted"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageButton
+                android:id="@+id/sendButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/composer_send_background"
+                android:contentDescription="@string/brain_send"
+                android:padding="13dp"
+                android:src="@drawable/ic_send" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

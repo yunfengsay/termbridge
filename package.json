@@ -1,0 +1,112 @@
+{
+  "name": "agent-termbridge",
+  "version": "0.1.38",
+  "description": "Cross-machine terminal-agent bridge \u2014 run Claude Code / Codex on one machine and drive it from anywhere through your own relay (node-pty + WebSocket, optional password + self-signed wss).",
+  "type": "module",
+  "bin": {
+    "tb": "dist/cli.js",
+    "termbridge": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "cloudflare/worker.js",
+    "cloudflare/wrangler.jsonc",
+    "cloudflare/wrangler.official.jsonc",
+    "cloudflare/README.md",
+    "scripts/fix-pty-perms.mjs",
+    "README.md",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "license": "MIT",
+  "author": "yunfeng",
+  "homepage": "https://github.com/yunfengsay/termbridge#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yunfengsay/termbridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yunfengsay/termbridge/issues"
+  },
+  "keywords": [
+    "terminal",
+    "pty",
+    "node-pty",
+    "websocket",
+    "relay",
+    "claude",
+    "claude-code",
+    "codex",
+    "agent",
+    "remote-terminal",
+    "tmux",
+    "ssh-alternative"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "postinstall": "node scripts/fix-pty-perms.mjs",
+    "build": "node scripts/build.mjs",
+    "build:agent-chat-ui": "tsx packages/agent-chat-ui/scripts/build-webview.mjs",
+    "prepack": "node scripts/build.mjs",
+    "surf": "tsx packages/cli/src/index.ts surf",
+    "relay": "tsx packages/relay/src/index.ts",
+    "host": "tsx packages/host/src/index.ts",
+    "tb": "tsx packages/cli/src/index.ts",
+    "typecheck": "tsc --noEmit -p packages/agent-chat/tsconfig.json && tsc --noEmit -p packages/agent-chat-ui/tsconfig.json && tsc --noEmit -p packages/mobile-terminal/tsconfig.json && tsc --noEmit -p packages/protocol/tsconfig.json && tsc --noEmit -p packages/settings/tsconfig.json && tsc --noEmit -p packages/voice/tsconfig.json && tsc --noEmit -p packages/brain/tsconfig.json && tsc --noEmit -p packages/review/tsconfig.json && tsc --noEmit -p packages/relay/tsconfig.json && tsc --noEmit -p packages/host/tsconfig.json && tsc --noEmit -p packages/cli/tsconfig.json && tsc --noEmit -p packages/cloudflare-relay/tsconfig.json",
+    "test:unit": "tsx --test packages/desktop-ui/src/viewer.test.ts packages/desktop-ui/src/geometry.test.ts packages/mobile-terminal/src/touch-scroll.test.ts packages/mobile-terminal/src/transcript-reconcile.test.ts packages/mobile-terminal/src/transcript-patch.test.ts packages/voice/src/index.test.ts packages/brain/src/index.test.ts packages/settings/src/identity.test.ts packages/settings/src/network.test.ts packages/review/src/index.test.ts packages/host/src/agentTranscriptLinks.test.ts packages/host/src/brainDispatch.test.ts packages/host/src/brainRoutes.test.ts packages/host/src/brainImageAttachments.test.ts packages/host/src/imageInspection.test.ts packages/host/src/brainMemory.test.ts packages/host/src/bridge.test.ts packages/host/src/hostLease.test.ts packages/host/src/peerRouting.test.ts packages/host/src/phoneActions.test.ts packages/host/src/phoneActionTimeline.test.ts packages/host/src/config.test.ts packages/host/src/contextIndex.test.ts packages/host/src/sessionManager.test.ts packages/host/src/herdr.test.ts packages/host/src/mobileTranscript.test.ts packages/host/src/uploads.test.ts packages/host/src/voiceCompletionEvent.test.ts packages/host/src/voiceDiagnostics.test.ts packages/host/src/voiceEchoGuard.test.ts packages/host/src/voiceHistory.test.ts packages/host/src/voicePrompt.test.ts packages/host/src/voiceTools.test.ts packages/host/src/voiceUsage.test.ts packages/host/src/workspaceFiles.test.ts packages/cli/src/androidArtifact.test.ts packages/cli/src/cloudflare.test.ts packages/cli/src/context.test.ts packages/cli/src/hostService.test.ts packages/cli/src/init.test.ts packages/cli/src/pairing.test.ts packages/cli/src/lan.test.ts packages/cli/src/peer.test.ts packages/cli/src/terminalMode.test.ts packages/host/src/silentExecution.test.ts packages/cli/src/client.test.ts packages/cli/src/attachInput.test.ts packages/host/src/herdrTerminal.test.ts packages/host/src/sessionFiles.test.ts packages/host/src/conversationFiles.test.ts packages/cli/src/macApp.test.ts packages/agent-chat/src/decoders.test.ts packages/agent-chat/src/delivery.test.ts packages/agent-chat/src/merge.test.ts packages/agent-chat-ui/src/transcriptView.test.ts packages/agent-chat-ui/src/webview.test.ts packages/host/src/agentChat/incrementalReader.test.ts packages/host/src/agentChat/transcriptLocator.test.ts packages/host/src/agentChat/service.test.ts packages/host/src/agentChat/routes.test.ts packages/cli/src/desktop.test.ts packages/host/src/remoteDesktop/native.test.ts packages/host/src/remoteDesktop/systemSharing.test.ts packages/host/src/remoteDesktop/transport.test.ts packages/host/src/remoteDesktop/systemFrames.test.ts packages/host/src/remoteDesktop/rfb.test.ts packages/host/src/remoteDesktop/service.test.ts packages/protocol/src/desktopCrypto.test.ts packages/protocol/src/topology.test.ts packages/cli/src/topology.test.ts packages/cli/src/serveSupervisor.test.ts packages/cli/src/update.test.ts packages/cli/src/setup.test.ts packages/cli/src/peerNetwork.test.ts packages/host/src/peerRequests.test.ts packages/cli/src/serveIntegration.test.ts",
+    "test:cloudflare": "vitest run --config vitest.cloudflare.config.ts",
+    "test:home": "tsx --test packages/host/src/homeActions.test.ts",
+    "test:silent-call": "tsx --test packages/host/src/silentCall.test.ts",
+    "test:traffic": "tsx --test packages/host/src/clientTraffic.test.ts",
+    "test:intent": "tsx --test packages/host/src/intentHints.test.ts packages/host/src/voiceDelivery.test.ts packages/host/src/completionSupervisor.test.ts packages/host/src/completionReview.test.ts packages/agent-chat-ui/src/artifactLinks.test.ts",
+    "test:tool-scripts": "tsc --noEmit -p packages/tool-scripts/tsconfig.json && tsx --test packages/tool-scripts/src/index.test.ts packages/host/src/toolScripts.test.ts packages/cli/src/toolScripts.test.ts",
+    "test:intent-live": "tsx scripts/test-intent-hints-live.ts --live",
+    "test:integration": "tsx scripts/test.ts",
+    "test:peer": "tsx --test packages/host/src/bridge.test.ts packages/host/src/peerRouting.test.ts packages/cli/src/peer.test.ts packages/cli/src/peerIdentity.test.ts packages/cli/src/peerTargeting.test.ts",
+    "test:bailian": "tsx scripts/test-bailian.ts",
+    "test:voice": "tsx scripts/test-voice.ts",
+    "test:voice-control": "tsx --test packages/voice/src/control/*.test.ts packages/host/src/voiceLearning.test.ts packages/host/src/voiceTurnJudge.test.ts packages/host/src/voicePipeline.test.ts packages/host/src/turnTraining.test.ts packages/cli/src/voiceLearning.test.ts packages/cli/src/voiceTraining.test.ts",
+    "test:voice-control-live": "tsx scripts/test-voice-control-live.ts --live",
+    "test:voice-control-lab": "tsx scripts/voice-control-lab.ts",
+    "test:voice-realtime": "tsx scripts/test-realtime-voice.ts",
+    "test:voice-omni": "tsx scripts/test-omni-realtime.ts",
+    "test:voice-host-e2e": "tsx scripts/test-host-omni-e2e.ts",
+    "test": "pnpm typecheck && pnpm test:unit && pnpm test:intent && pnpm test:tool-scripts && pnpm test:peer && pnpm test:home && pnpm test:silent-call && pnpm test:voice-control && pnpm test:cloudflare && pnpm test:integration",
+    "build:desktop-ui": "node packages/desktop-ui/scripts/build.mjs",
+    "test:automation": "node scripts/test-automation.mjs"
+  },
+  "dependencies": {
+    "@earendil-works/pi-agent-core": "0.84.4",
+    "@earendil-works/pi-ai": "0.84.4",
+    "@novnc/novnc": "1.7.0",
+    "commander": "^13.1.0",
+    "https-proxy-agent": "^9.1.0",
+    "proxy-from-env": "^2.1.0",
+    "qrcode": "^1.5.4",
+    "sharp": "0.35.2"
+  },
+  "optionalDependencies": {
+    "node-pty": "1.2.0-beta.18"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.1.1",
+    "@cloudflare/workers-types": "5.20260827.1",
+    "@termbridge/protocol": "workspace:*",
+    "@termbridge/settings": "workspace:*",
+    "@types/node": "^22.10.0",
+    "@types/proxy-from-env": "^1.0.4",
+    "@types/qrcode": "^1.5.6",
+    "@types/ws": "^8.5.13",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "4.1.11",
+    "wrangler": "4.127.0",
+    "ws": "^8.18.0"
+  }
+}

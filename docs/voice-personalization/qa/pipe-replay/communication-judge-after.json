@@ -1,0 +1,329 @@
+{
+  "label": "communication-judge-after",
+  "provenance": "authored synthetic text, not recorded private history",
+  "sourceSha256": "c92ca3f7ee311b72112bbd4c30715bc2322f0a5a0ef19d8b8e2ace5d6602ce64",
+  "at": "2026-09-08T02:00:29.113Z",
+  "model": "qwen3.8-flash",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "name": "listening-continuation",
+      "segments": [
+        "你现在在听。",
+        "在听我说话吗？"
+      ],
+      "clarification": "您想让我做什么呢？",
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        },
+        {
+          "role": "assistant",
+          "content": "您想让我做什么呢？"
+        }
+      ],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "确认助手是否正在接收语音输入"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"确认助手是否正在接收语音输入\"}",
+      "latencyMs": 1741,
+      "passed": true
+    },
+    {
+      "name": "without-history",
+      "segments": [
+        "你现在在听。",
+        "在听我说话吗？"
+      ],
+      "clarification": "您想让我做什么呢？",
+      "history": [],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "确认助手是否在监听/在线"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"确认助手是否在监听/在线\"}",
+      "latencyMs": 830,
+      "passed": true
+    },
+    {
+      "name": "without-clarification",
+      "segments": [
+        "你现在在听。",
+        "在听我说话吗？"
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        }
+      ],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "确认助手是否正在接收语音输入"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"确认助手是否正在接收语音输入\"}",
+      "latencyMs": 682,
+      "passed": true
+    },
+    {
+      "name": "standalone-check",
+      "segments": [
+        "在听我说话吗？"
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        },
+        {
+          "role": "assistant",
+          "content": "您想让我做什么呢？"
+        }
+      ],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "确认助手是否在线并接收到了语音输入"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"确认助手是否在线并接收到了语音输入\"}",
+      "latencyMs": 682,
+      "passed": true
+    },
+    {
+      "name": "single-full-question",
+      "segments": [
+        "你现在在听我说话吗？"
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        },
+        {
+          "role": "assistant",
+          "content": "您想让我做什么呢？"
+        }
+      ],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "确认助手是否正在接收语音输入"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"确认助手是否正在接收语音输入\"}",
+      "latencyMs": 691,
+      "passed": true
+    },
+    {
+      "name": "unfinished-agent",
+      "segments": [
+        "我最近的"
+      ],
+      "history": [],
+      "expected": "wait",
+      "verdict": {
+        "decision": "wait",
+        "clarification": "您最近的什么？"
+      },
+      "raw": "{\"decision\":\"wait\", \"clarification\": \"您最近的什么？\"}",
+      "latencyMs": 572,
+      "passed": true
+    },
+    {
+      "name": "agent-continuation",
+      "segments": [
+        "我最近的",
+        "Agent 是什么"
+      ],
+      "clarification": "您想让我做什么呢？",
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        },
+        {
+          "role": "assistant",
+          "content": "您想让我做什么呢？"
+        }
+      ],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "询问最近一个 Agent 的名称或任务详情"
+      },
+      "raw": "{\n\"decision\": \"respond\",\n\"intent\": \"询问最近一个 Agent 的名称或任务详情\"\n}",
+      "latencyMs": 754,
+      "passed": true
+    },
+    {
+      "name": "still-thinking",
+      "segments": [
+        "我最近的",
+        "对，我还在想，没说完"
+      ],
+      "clarification": "您想让我做什么呢？",
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        },
+        {
+          "role": "assistant",
+          "content": "您想让我做什么呢？"
+        }
+      ],
+      "expected": "wait",
+      "verdict": "wait",
+      "raw": "{\"decision\":\"wait\"}",
+      "latencyMs": 500,
+      "passed": true
+    },
+    {
+      "name": "unresolved-task",
+      "segments": [
+        "帮我把那个"
+      ],
+      "clarification": "您想让我做什么呢？",
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        },
+        {
+          "role": "assistant",
+          "content": "您想让我做什么呢？"
+        }
+      ],
+      "expected": "wait",
+      "verdict": {
+        "decision": "wait",
+        "clarification": "您想让我对那个 Agent 做什么操作？"
+      },
+      "raw": "{\"decision\":\"wait\", \"clarification\": \"您想让我对那个 Agent 做什么操作？\"}",
+      "latencyMs": 709,
+      "passed": true
+    },
+    {
+      "name": "self-correction",
+      "segments": [
+        "那个服务的",
+        "不对，我是想问你能收到声音吗"
+      ],
+      "clarification": "您想让我做什么呢？",
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        },
+        {
+          "role": "assistant",
+          "content": "您想让我做什么呢？"
+        }
+      ],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "确认助手是否能接收声音"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"确认助手是否能接收声音\"}",
+      "latencyMs": 776,
+      "passed": true
+    },
+    {
+      "name": "stop-request",
+      "segments": [
+        "先不要继续了"
+      ],
+      "history": [
+        {
+          "role": "user",
+          "content": "刚才哪个 Agent 在执行任务？"
+        },
+        {
+          "role": "assistant",
+          "content": "TermBridge 在检查语音链路。"
+        },
+        {
+          "role": "assistant",
+          "content": "您想让我做什么呢？"
+        }
+      ],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "用户要求停止当前操作或对话"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"用户要求停止当前操作或对话\"}",
+      "latencyMs": 572,
+      "passed": true
+    },
+    {
+      "name": "greeting",
+      "segments": [
+        "你好"
+      ],
+      "history": [],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "问候"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"问候\"}",
+      "latencyMs": 585,
+      "passed": true
+    },
+    {
+      "name": "no-punctuation-continuation",
+      "segments": [
+        "你现在在听",
+        "在听我说话吗"
+      ],
+      "clarification": "您想让我做什么呢？",
+      "history": [],
+      "expected": "respond",
+      "verdict": {
+        "decision": "respond",
+        "intent": "确认助手是否在监听/在线"
+      },
+      "raw": "{\"decision\":\"respond\",\"intent\":\"确认助手是否在监听/在线\"}",
+      "latencyMs": 651,
+      "passed": true
+    }
+  ]
+}

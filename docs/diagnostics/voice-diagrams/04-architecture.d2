@@ -1,0 +1,38 @@
+direction: down
+classes: {
+  node: {style.fill: "#E4EFEB"; style.stroke: "#4C7770"; style.font-size: 22}
+  plan: {style.fill: "#E8EFF8"; style.stroke: "#58799C"; style.stroke-dash: 4; style.font-size: 22}
+  note: {style.fill: "#FFF0D8"; style.stroke: "#B18943"; style.font-size: 20}
+}
+phone: "Android 手机" {
+  capture: "麦克风\nAEC / 降噪 / 人声门控" {class: node}
+  endpoint: "可选音频端点小模型\n只判断声音是否像说完" {class: plan}
+  capture -> endpoint: "短音频窗口"
+}
+output: "Android 展示与播放（同一客户端）" {
+  display: "实时字幕 / 结果卡\n未定稿内容可见但不执行" {class: node}
+  playback: "唯一播放会话\n打断先让出 / 挂断释放" {class: node}
+}
+host: "Host · 目标控制架构" {
+  ledger: "TranscriptLedger\n原话 / revision / final" {class: plan}
+  history: "有界 History\n相关轮次 + 少量术语" {class: node}
+  classifier: "上下文判断器\n完整性 / 是否需回应" {class: plan}
+  coordinator: "TurnCoordinator\n等待 / 续说 / 取消 / 唯一提交" {class: plan}
+  harness: "工具 Harness\n批准 / 幂等 / taskId / 回执" {class: node}
+  ledger -> classifier
+  history -> classifier
+  classifier -> coordinator: "结构化判断"
+  coordinator -> harness: "仅已提交意图"
+}
+cloud: "云端 Omni\n保留连续语音主链" {class: node}
+worker: "执行 Worker\nCodex / Claude / 手机动作" {class: node}
+phone.capture -> cloud: "持续有效音频，经现有中继 / Host"
+cloud -> host.ledger: "字幕事件"
+host.ledger -> output.display: "版本化展示"
+phone.endpoint -> host.coordinator: "端点分数（不替代声纹）"
+host.coordinator -> cloud: "响应控制 · 须先验证 API 能力"
+cloud -> output.playback: "流式回复音频，经现有链路"
+host.harness -> worker: "派发"
+worker -> output.display: "完成 / 失败 / 取消（经 Harness 回执）"
+host.harness -> output.display: "进度与终态"
+boundary: "设计边界\n蓝色模块为建议，尚未部署。\n须验证 API 的字幕时机与响应控制能力。\n不满足时仅辅助判定，不宣称接管话轮。" {class: note}

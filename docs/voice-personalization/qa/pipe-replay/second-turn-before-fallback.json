@@ -1,0 +1,448 @@
+{
+  "label": "second-turn-before-fallback",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "74db1a4dc8ad9f3c4cd3fd80d5e89b67bfe7fd781464552fd7fad2d7ea46870e",
+  "at": "2026-09-08T01:26:43.060Z",
+  "model": "qwen3.5-omni-flash-realtime",
+  "pcm": {
+    "rate": 16000,
+    "channels": 1,
+    "bits": 16,
+    "endian": "little",
+    "bytes": 1166936,
+    "sha256": "8708a7f0c8d4be7ab91f9377d4e08a53b17ec0a6223e670b2505ecdad8716d7b"
+  },
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": true,
+      "productionFork": true,
+      "turns": 2,
+      "providerSilenceMs": 3000,
+      "judge": "cloud",
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 4500,
+      "secondStartsMs": 5663.5625,
+      "submitted": [
+        "我最近的。 agent是什么？",
+        "我最近的。 agent是什么？"
+      ],
+      "answer": "你最近的 Agent 是 TermBridge，正在执行任务「语音控制验证」，当前状态为运行中。需要我查看它的详细执行证据或最新结果吗？",
+      "outputBytes": 1063680,
+      "responseCount": 3,
+      "judgeCalls": 4,
+      "fixtureToolCompletions": 1,
+      "finished": true,
+      "prematureResponses": 0,
+      "accepted": false,
+      "checks": {
+        "noFailure": true,
+        "singleWholeUserTurn": true,
+        "noPrematureReply": true,
+        "realFixtureReceipt": false,
+        "groundedAnswer": true,
+        "finishedWithAudio": true,
+        "clarificationOnce": true,
+        "clarificationSpoken": true
+      },
+      "events": [
+        {
+          "ms": 430,
+          "event": "configured_tools",
+          "names": [
+            "fork_execution"
+          ],
+          "turnDetection": {
+            "type": "server_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 430,
+          "event": "session.updated"
+        },
+        {
+          "ms": 430,
+          "event": "ready"
+        },
+        {
+          "ms": 633,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 4193,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 4359,
+          "event": "conversation.item.created",
+          "id": "item_AGngXKbm3aOYiHJTvmnyp",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "input_audio"
+            }
+          ]
+        },
+        {
+          "ms": 4359,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 5209,
+          "event": "judge",
+          "decision": {
+            "decision": "wait",
+            "clarification": "您是想查询最近正在执行任务的 Agent 吗？"
+          },
+          "latencyMs": 847,
+          "segments": [
+            "我最近的。"
+          ]
+        },
+        {
+          "ms": 5209,
+          "event": "waiting",
+          "reason": "incomplete"
+        },
+        {
+          "ms": 6029,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 9891,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 10062,
+          "event": "conversation.item.created",
+          "id": "item_DapQBzTlEwF3IHyFxQbYU",
+          "previous": "item_AGngXKbm3aOYiHJTvmnyp",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "input_audio"
+            }
+          ]
+        },
+        {
+          "ms": 10062,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 10778,
+          "event": "judge",
+          "decision": {
+            "decision": "respond",
+            "intent": "查询 TermBridge 中最近正在执行任务的 Agent 的名称及任务详情"
+          },
+          "latencyMs": 714,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 10779,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 11000,
+          "event": "response.created"
+        },
+        {
+          "ms": 11000,
+          "event": "response_started"
+        },
+        {
+          "ms": 11001,
+          "event": "conversation.item.created",
+          "id": "item_WK2wjGszAgxCSc7zPmCgl",
+          "previous": "item_DapQBzTlEwF3IHyFxQbYU",
+          "type": "function_call",
+          "name": "fork_execution"
+        },
+        {
+          "ms": 11071,
+          "event": "fork_execution",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 11076,
+          "event": "response.output_item.done",
+          "id": "item_WK2wjGszAgxCSc7zPmCgl",
+          "type": "function_call",
+          "name": "fork_execution"
+        },
+        {
+          "ms": 11077,
+          "event": "response_result",
+          "id": "resp_CDXNGSbBPemP4KYxpEouh",
+          "status": "completed",
+          "output": [
+            {
+              "id": "item_WK2wjGszAgxCSc7zPmCgl",
+              "type": "function_call",
+              "name": "fork_execution"
+            }
+          ]
+        },
+        {
+          "ms": 11077,
+          "event": "response.done"
+        },
+        {
+          "ms": 11077,
+          "event": "usage",
+          "inputTokens": 1000,
+          "outputTokens": 30,
+          "totalTokens": 1030
+        },
+        {
+          "ms": 11077,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 11662,
+          "event": "fixture_tool_completed"
+        },
+        {
+          "ms": 12869,
+          "event": "fork_answer",
+          "text": "你最近的 Agent 是 **TermBridge**，正在执行任务「语音控制验证」，当前状态为**运行中（working）**。\n\n需要我查看它的详细执行证据或最新结果吗？"
+        },
+        {
+          "ms": 12938,
+          "event": "conversation.item.created",
+          "id": "item_ESTehXQHnIrykJSCsVkdw",
+          "previous": "item_WK2wjGszAgxCSc7zPmCgl",
+          "type": "function_call_output"
+        },
+        {
+          "ms": 13052,
+          "event": "response.created"
+        },
+        {
+          "ms": 13052,
+          "event": "response_started"
+        },
+        {
+          "ms": 13053,
+          "event": "conversation.item.created",
+          "id": "item_OQTc8rQ3719AzJpzD6jIe",
+          "previous": "item_ESTehXQHnIrykJSCsVkdw",
+          "type": "message",
+          "role": "assistant",
+          "content": []
+        },
+        {
+          "ms": 15144,
+          "event": "answer_final",
+          "text": "你最近的 Agent 是 TermBridge，正在执行任务「语音控制验证」，当前状态为运行中。需要我查看它的详细执行证据或最新结果吗？"
+        },
+        {
+          "ms": 15144,
+          "event": "response.output_item.done",
+          "id": "item_OQTc8rQ3719AzJpzD6jIe",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "audio"
+            }
+          ]
+        },
+        {
+          "ms": 15144,
+          "event": "response_result",
+          "id": "resp_S9CvsJ8nADC5Ve6dUCyMm",
+          "status": "completed",
+          "output": [
+            {
+              "id": "item_OQTc8rQ3719AzJpzD6jIe",
+              "type": "message",
+              "role": "assistant"
+            }
+          ]
+        },
+        {
+          "ms": 15144,
+          "event": "response.done"
+        },
+        {
+          "ms": 15144,
+          "event": "usage",
+          "inputTokens": 1098,
+          "outputTokens": 175,
+          "totalTokens": 1273
+        },
+        {
+          "ms": 15144,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 19261,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 22811,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 23013,
+          "event": "conversation.item.created",
+          "id": "item_GSgLLU7X8GSj8HNZzS32v",
+          "previous": "item_OQTc8rQ3719AzJpzD6jIe",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "input_audio"
+            }
+          ]
+        },
+        {
+          "ms": 23013,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 23764,
+          "event": "judge",
+          "decision": {
+            "decision": "wait",
+            "clarification": "您想查询最近正在执行任务的 Agent 吗？"
+          },
+          "latencyMs": 750,
+          "segments": [
+            "我最近的。"
+          ]
+        },
+        {
+          "ms": 23764,
+          "event": "waiting",
+          "reason": "incomplete"
+        },
+        {
+          "ms": 24546,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 28414,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 28588,
+          "event": "conversation.item.created",
+          "id": "item_I4GvdwGMcqTOffkHOJ6Mi",
+          "previous": "item_GSgLLU7X8GSj8HNZzS32v",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "input_audio"
+            }
+          ]
+        },
+        {
+          "ms": 28588,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 29270,
+          "event": "judge",
+          "decision": {
+            "decision": "respond",
+            "intent": "查询 TermBridge 中最近正在执行任务的 Agent 的名称及任务详情"
+          },
+          "latencyMs": 680,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 29270,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 29847,
+          "event": "response.created"
+        },
+        {
+          "ms": 29847,
+          "event": "response_started"
+        },
+        {
+          "ms": 29847,
+          "event": "conversation.item.created",
+          "id": "item_M6tqgVe3VUPZ6aZ1WAou2",
+          "previous": "item_I4GvdwGMcqTOffkHOJ6Mi",
+          "type": "message",
+          "role": "assistant",
+          "content": []
+        },
+        {
+          "ms": 31874,
+          "event": "answer_final",
+          "text": "你最近的 Agent 是 TermBridge，正在执行任务「语音控制验证」，当前状态为运行中。需要我查看它的详细执行证据或最新结果吗？"
+        },
+        {
+          "ms": 31875,
+          "event": "response.output_item.done",
+          "id": "item_M6tqgVe3VUPZ6aZ1WAou2",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "audio"
+            }
+          ]
+        },
+        {
+          "ms": 31875,
+          "event": "response_result",
+          "id": "resp_X3paKpIXpAklazeisNteW",
+          "status": "completed",
+          "output": [
+            {
+              "id": "item_M6tqgVe3VUPZ6aZ1WAou2",
+              "type": "message",
+              "role": "assistant"
+            }
+          ]
+        },
+        {
+          "ms": 31875,
+          "event": "response.done"
+        },
+        {
+          "ms": 31875,
+          "event": "usage",
+          "inputTokens": 1164,
+          "outputTokens": 176,
+          "totalTokens": 1340
+        },
+        {
+          "ms": 31875,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

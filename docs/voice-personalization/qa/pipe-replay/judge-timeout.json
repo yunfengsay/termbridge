@@ -1,0 +1,93 @@
+{
+  "label": "judge-timeout",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "ebf86111b601c0c8337531b383125a654b0e953c650a3c063c6f6b9a77808c16",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": true,
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3820.5625,
+      "submitted": [],
+      "answer": "",
+      "outputBytes": 0,
+      "responseCount": 0,
+      "judgeCalls": 2,
+      "fixtureToolCompletions": 0,
+      "finished": false,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 487,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 487,
+          "event": "session.updated"
+        },
+        {
+          "ms": 487,
+          "event": "ready"
+        },
+        {
+          "ms": 1317,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2637,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2782,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 4472,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 4472,
+          "event": "response.done"
+        },
+        {
+          "ms": 4472,
+          "event": "finished",
+          "status": "interrupted"
+        },
+        {
+          "ms": 4472,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6314,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6477,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 9219,
+          "event": "waiting",
+          "reason": "judge_unavailable"
+        }
+      ]
+    }
+  ]
+}

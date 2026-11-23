@@ -1,0 +1,54 @@
+{
+  "configVersion": "v3",
+  "app": {
+    "appType": "app",
+    "version": {
+      "code": 607,
+      "name": "0.6.7"
+    },
+    "appId": 1092345,
+    "appName": "TermBridge",
+    "icon": "icon.png",
+    "vender": "TermBridge",
+    "description": "TermBridge action inbox, phone handoff and contextual Global voice companion"
+  },
+  "runtime": {
+    "apiVersion": {
+      "compatible": "4.0",
+      "target": "4.0",
+      "minVersion": "4.0"
+    }
+  },
+  "targets": {
+    "trex3": {
+      "module": {
+        "page": {
+          "pages": ["page/home/index.page"]
+        },
+        "app-side": {
+          "path": "app-side/index"
+        },
+        "setting": {
+          "path": "setting/index"
+        }
+      },
+      "platforms": [
+        {
+          "st": "r",
+          "dw": 480
+        }
+      ]
+    }
+  },
+  "permissions": ["data:os.device.info", "device:os.local_storage", "device:os.mic"],
+  "i18n": {
+    "en-US": {
+      "name": "TermBridge"
+    },
+    "zh-CN": {
+      "name": "TermBridge"
+    }
+  },
+  "defaultLanguage": "zh-CN",
+  "debug": false
+}

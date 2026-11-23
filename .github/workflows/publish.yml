@@ -1,0 +1,59 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: macos-15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.28.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Use an OIDC-capable npm CLI
+        run: npm install --global npm@11.19.1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm test
+
+      - name: Verify tag matches package version
+        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+
+      - name: Test native desktop helper
+        run: swift test --package-path macos/TermBridgeDesktop
+
+      - name: Pack and verify release
+        run: |
+          npm pack
+          archive="agent-termbridge-$(node -p "require('./package.json').version").tgz"
+          mkdir -p "$RUNNER_TEMP/termbridge-package"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/termbridge-package"
+          package="$RUNNER_TEMP/termbridge-package/package"
+          test -x "$package/dist/native/termbridge-desktop"
+          lipo "$package/dist/native/termbridge-desktop" -verify_arch arm64 x86_64
+          test -s "$package/dist/desktop/desktop.js"
+          node "$package/dist/cli.js" screen --help
+
+      - name: Publish package
+        run: npm publish "agent-termbridge-$(node -p "require('./package.json').version").tgz" --ignore-scripts

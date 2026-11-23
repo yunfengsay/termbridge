@@ -1,0 +1,22 @@
+[project]
+name = "termbridge-livekit-turn-training"
+version = "0.1.0"
+description = "Full and LoRA fine-tuning of LiveKit turn-detector derivatives for LiveKit Agents"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "torch==2.8.0",
+  "transformers==4.56.2",
+  "peft==0.17.1",
+  "livekit-agents==1.8.0",
+  "livekit-plugins-turn-detector==1.8.0",
+  "onnxruntime==1.23.2",
+  "pytest==8.4.2",
+  "ruff==0.13.0",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

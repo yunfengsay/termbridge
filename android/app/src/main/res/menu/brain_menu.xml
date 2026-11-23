@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_brain_new"
+        android:icon="@drawable/ic_new_chat"
+        android:title="@string/brain_new_conversation"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_brain_history"
+        android:icon="@drawable/ic_history"
+        android:title="@string/brain_history"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_brain_clear"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/brain_clear_conversation"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_voice_profile"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/global_settings_title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_side_button_setup"
+        android:icon="@drawable/ic_side_button" android:title="@string/side_button_setup"
+        app:showAsAction="never" />
+</menu>

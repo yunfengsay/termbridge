@@ -1,0 +1,27 @@
+<resources>
+    <string name="voice_learning_previous">Newer observations</string>
+    <string name="voice_learning_next">Older observations</string>
+    <string name="voice_learning_waiting">Listening · continue your thought</string>
+    <string name="voice_learning_judge_unavailable">Pause check unavailable · still listening, nothing dispatched</string>
+    <string name="voice_learning_adaptive">Smart pauses and clarification · on by default, next call. Keeps context across pauses; asks once after about 8 seconds of unfinished silence, stopping when you resume. One check per new segment, one retry on failure. Not for silent calls or Doubao.</string>
+    <string name="voice_learning_title">Personal voice control</string>
+    <string name="voice_learning_shadow">Personal context learning · cloud ASR unchanged</string>
+    <string name="voice_learning_context_consent">Learn my expressions: separately allow short text and previous context (320 characters each), sync reviewed examples to this Host, and send relevant examples to the cloud turn judge. Not speaker identification or tool permission.</string>
+    <string name="voice_learning_assist_status">Host: %1$d context labels · %4$d learned wait/ignore rules · training %2$d ms\n%3$s · Rules require matching text/context and 3 reviewed calls. New contexts still use the model.</string>
+    <string name="voice_learning_detail">Collect control features, never audio. Text is stored only with the separate consent below. Keep up to 250 observations for 30 days. Only reviewed labels sync. Feedback immediately updates local calibration, then automatically syncs and trains the Host context index for subsequent judgements. Other Hosts sync when reconnected. Offline deletion is pending until acknowledged. The six-feature classifier stays in shadow mode; it does not block speech.</string>
+    <string name="voice_learning_version">%1$s · %2$d reviewed labels</string>
+    <string name="voice_learning_observation">%1$s · addressed %2$d%% / finished %3$d%% (uncalibrated)</string>
+    <string name="voice_learning_addressed">Was this speech addressed to the assistant?</string>
+    <string name="voice_learning_finished">Had you finished your thought at this pause?</string>
+    <string name="voice_learning_yes">Yes</string>
+    <string name="voice_learning_no">No</string>
+    <string name="voice_learning_skip">Unsure / undo</string>
+    <string name="voice_learning_sync">Retry feedback / deletion sync to current Host</string>
+    <string name="voice_learning_revoke">Disable and erase local control data</string>
+    <string name="voice_learning_revoke_pending">Local data changed. Sync with each previously used Host to remove its old data and weights.</string>
+    <string name="voice_learning_syncing">Syncing bounded features and training on Host…</string>
+    <string name="voice_learning_synced">Host acknowledged this revision · context assistance follows consent; six-feature classifier stays in shadow mode</string>
+    <string name="voice_learning_timeout">No receipt within 15 seconds. Nothing is assumed complete; retry sync.</string>
+    <string name="voice_learning_failed">Update not accepted. Check connection and current revision, then retry.</string>
+    <string name="voice_learning_host_old">This Host needs the voice personalization update.</string>
+</resources>

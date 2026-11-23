@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_desktop" android:icon="@drawable/ic_desktop" android:title="@string/remote_desktop" />
+    <item
+        android:id="@+id/action_new_session"
+        android:icon="@drawable/ic_new_chat"
+        android:title="@string/new_session">
+        <menu />
+    </item>
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/global_settings_title" />
+</menu>

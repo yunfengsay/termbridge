@@ -1,0 +1,795 @@
+{
+  "productionEnabled": false,
+  "status": "diagnostic-only",
+  "software": {
+    "torch": "2.8.0",
+    "transformers": "4.56.2",
+    "peft": "0.17.1",
+    "livekit-agents": "1.8.0",
+    "livekit-plugins-turn-detector": "1.8.0",
+    "onnxruntime": "1.23.2"
+  },
+  "verification": {
+    "status": "verified",
+    "inference": [
+      {
+        "artifact": "full-128-fixed",
+        "status": "verified",
+        "reloadAbsoluteError": 8.032657206058502e-09,
+        "cancelReceipt": "cancelled",
+        "workerReaped": true,
+        "subsequentInference": "completed"
+      },
+      {
+        "artifact": "lora-128-fixed",
+        "status": "verified",
+        "reloadAbsoluteError": 2.980232238769531e-07,
+        "cancelReceipt": "cancelled",
+        "workerReaped": true,
+        "subsequentInference": "completed"
+      }
+    ],
+    "trainingCancel": {
+      "status": "cancelled",
+      "steps": 1,
+      "exitCode": 130,
+      "processReaped": true
+    },
+    "audioDevicesOpened": false
+  },
+  "datasetSha256": "66b80095b37fd95d980c3cc6aedef13e3a72c98b797156f40b7c04b22571aad4",
+  "evaluations": [
+    {
+      "artifact": "baseline",
+      "backend": "torch",
+      "device": "cpu",
+      "binaryHalf": {
+        "count": 128,
+        "threshold": 0.5,
+        "unfinished": 64,
+        "finished": 64,
+        "earlyResponses": 1,
+        "wrongWaits": 11,
+        "earlyResponseRate": 0.015625,
+        "wrongWaitRate": 0.171875,
+        "earlyResponseRate95": [
+          0.002763541923337505,
+          0.08334101600094265
+        ],
+        "wrongWaitRate95": [
+          0.09877742301244645,
+          0.282132116226582
+        ],
+        "accuracy": 0.90625,
+        "auc": 0.987060546875,
+        "binaryLoss": 0.26385063019026184
+      },
+      "latencyMs": {
+        "p50": 76.82645856402814,
+        "p95": 160.90883291326463
+      },
+      "byLanguage": {
+        "en": {
+          "binaryHalf": {
+            "count": 64,
+            "threshold": 0.5,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 1,
+            "wrongWaits": 6,
+            "earlyResponseRate": 0.03125,
+            "wrongWaitRate": 0.1875,
+            "earlyResponseRate95": [
+              0.005537860164003122,
+              0.15744263820012558
+            ],
+            "wrongWaitRate95": [
+              0.08889544689565954,
+              0.3530915520137596
+            ],
+            "accuracy": 0.890625,
+            "auc": 0.9765625,
+            "binaryLoss": 0.2725419301238979
+          },
+          "originalThresholdDiagnostic": {
+            "count": 64,
+            "threshold": 0.011,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 8,
+            "wrongWaits": 0,
+            "earlyResponseRate": 0.25,
+            "wrongWaitRate": 0.0,
+            "earlyResponseRate95": [
+              0.1325240091850904,
+              0.4210655899424448
+            ],
+            "wrongWaitRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "accuracy": 0.875,
+            "auc": 0.9765625,
+            "binaryLoss": 0.2725419301238979
+          }
+        },
+        "zh": {
+          "binaryHalf": {
+            "count": 64,
+            "threshold": 0.5,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 0,
+            "wrongWaits": 5,
+            "earlyResponseRate": 0.0,
+            "wrongWaitRate": 0.15625,
+            "earlyResponseRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "wrongWaitRate95": [
+              0.0686442028250571,
+              0.3175414959753039
+            ],
+            "accuracy": 0.921875,
+            "auc": 0.9951171875,
+            "binaryLoss": 0.2551593302566258
+          },
+          "originalThresholdDiagnostic": {
+            "count": 64,
+            "threshold": 0.0066,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 14,
+            "wrongWaits": 0,
+            "earlyResponseRate": 0.4375,
+            "wrongWaitRate": 0.0,
+            "earlyResponseRate95": [
+              0.2816533111504036,
+              0.6067440886314801
+            ],
+            "wrongWaitRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "accuracy": 0.78125,
+            "auc": 0.9951171875,
+            "binaryLoss": 0.2551593302566258
+          }
+        }
+      },
+      "devCalibration": {
+        "en": {
+          "count": 64,
+          "threshold": 0.6054778099060059,
+          "unfinished": 32,
+          "finished": 32,
+          "earlyResponses": 0,
+          "wrongWaits": 12,
+          "earlyResponseRate": 0.0,
+          "wrongWaitRate": 0.375,
+          "earlyResponseRate95": [
+            0,
+            0.1071791982550706
+          ],
+          "wrongWaitRate95": [
+            0.22933887309454212,
+            0.5474559264692255
+          ],
+          "accuracy": 0.8125,
+          "auc": 0.9765625,
+          "binaryLoss": 0.2725419301238979,
+          "scope": "same-dev calibration only; NOT deployment authorization"
+        },
+        "zh": {
+          "count": 64,
+          "threshold": 0.5052016824483871,
+          "unfinished": 32,
+          "finished": 32,
+          "earlyResponses": 0,
+          "wrongWaits": 5,
+          "earlyResponseRate": 0.0,
+          "wrongWaitRate": 0.15625,
+          "earlyResponseRate95": [
+            0,
+            0.1071791982550706
+          ],
+          "wrongWaitRate95": [
+            0.0686442028250571,
+            0.3175414959753039
+          ],
+          "accuracy": 0.921875,
+          "auc": 0.9951171875,
+          "binaryLoss": 0.2551593302566258,
+          "scope": "same-dev calibration only; NOT deployment authorization"
+        }
+      }
+    },
+    {
+      "artifact": "baseline",
+      "backend": "onnx",
+      "device": "cpu",
+      "binaryHalf": {
+        "count": 128,
+        "threshold": 0.5,
+        "unfinished": 64,
+        "finished": 64,
+        "earlyResponses": 0,
+        "wrongWaits": 31,
+        "earlyResponseRate": 0.0,
+        "wrongWaitRate": 0.484375,
+        "earlyResponseRate95": [
+          0,
+          0.05662405979280534
+        ],
+        "wrongWaitRate95": [
+          0.3663355166543264,
+          0.6041839852141988
+        ],
+        "accuracy": 0.7578125,
+        "auc": 0.983154296875,
+        "binaryLoss": 0.3978528230377831
+      },
+      "latencyMs": {
+        "p50": 32.64762496110052,
+        "p95": 122.3388749640435
+      },
+      "byLanguage": {
+        "en": {
+          "binaryHalf": {
+            "count": 64,
+            "threshold": 0.5,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 0,
+            "wrongWaits": 17,
+            "earlyResponseRate": 0.0,
+            "wrongWaitRate": 0.53125,
+            "earlyResponseRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "wrongWaitRate95": [
+              0.3644951711897464,
+              0.6913061289193116
+            ],
+            "accuracy": 0.734375,
+            "auc": 0.9736328125,
+            "binaryLoss": 0.3927778039030793
+          },
+          "originalThresholdDiagnostic": {
+            "count": 64,
+            "threshold": 0.011,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 7,
+            "wrongWaits": 0,
+            "earlyResponseRate": 0.21875,
+            "wrongWaitRate": 0.0,
+            "earlyResponseRate95": [
+              0.11023836252604186,
+              0.3875499364924353
+            ],
+            "wrongWaitRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "accuracy": 0.890625,
+            "auc": 0.9736328125,
+            "binaryLoss": 0.3927778039030793
+          }
+        },
+        "zh": {
+          "binaryHalf": {
+            "count": 64,
+            "threshold": 0.5,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 0,
+            "wrongWaits": 14,
+            "earlyResponseRate": 0.0,
+            "wrongWaitRate": 0.4375,
+            "earlyResponseRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "wrongWaitRate95": [
+              0.2816533111504036,
+              0.6067440886314801
+            ],
+            "accuracy": 0.78125,
+            "auc": 0.990234375,
+            "binaryLoss": 0.40292784217248684
+          },
+          "originalThresholdDiagnostic": {
+            "count": 64,
+            "threshold": 0.0066,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 8,
+            "wrongWaits": 0,
+            "earlyResponseRate": 0.25,
+            "wrongWaitRate": 0.0,
+            "earlyResponseRate95": [
+              0.1325240091850904,
+              0.4210655899424448
+            ],
+            "wrongWaitRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "accuracy": 0.875,
+            "auc": 0.990234375,
+            "binaryLoss": 0.40292784217248684
+          }
+        }
+      },
+      "devCalibration": {
+        "en": {
+          "count": 64,
+          "threshold": 0.4934151768684387,
+          "unfinished": 32,
+          "finished": 32,
+          "earlyResponses": 0,
+          "wrongWaits": 15,
+          "earlyResponseRate": 0.0,
+          "wrongWaitRate": 0.46875,
+          "earlyResponseRate95": [
+            0,
+            0.1071791982550706
+          ],
+          "wrongWaitRate95": [
+            0.30869387108068835,
+            0.6355048288102536
+          ],
+          "accuracy": 0.765625,
+          "auc": 0.9736328125,
+          "binaryLoss": 0.3927778039030793,
+          "scope": "same-dev calibration only; NOT deployment authorization"
+        },
+        "zh": {
+          "count": 64,
+          "threshold": 0.2503715753555298,
+          "unfinished": 32,
+          "finished": 32,
+          "earlyResponses": 0,
+          "wrongWaits": 4,
+          "earlyResponseRate": 0.0,
+          "wrongWaitRate": 0.125,
+          "earlyResponseRate95": [
+            0,
+            0.1071791982550706
+          ],
+          "wrongWaitRate95": [
+            0.04970134387480073,
+            0.2806830548165022
+          ],
+          "accuracy": 0.9375,
+          "auc": 0.990234375,
+          "binaryLoss": 0.40292784217248684,
+          "scope": "same-dev calibration only; NOT deployment authorization"
+        }
+      }
+    },
+    {
+      "artifact": "full-128-fixed",
+      "backend": "torch",
+      "device": "cpu",
+      "binaryHalf": {
+        "count": 128,
+        "threshold": 0.5,
+        "unfinished": 64,
+        "finished": 64,
+        "earlyResponses": 7,
+        "wrongWaits": 1,
+        "earlyResponseRate": 0.109375,
+        "wrongWaitRate": 0.015625,
+        "earlyResponseRate95": [
+          0.05400113344416797,
+          0.20898641326896122
+        ],
+        "wrongWaitRate95": [
+          0.002763541923337505,
+          0.08334101600094265
+        ],
+        "accuracy": 0.9375,
+        "auc": 0.963134765625,
+        "binaryLoss": 0.4381580921158868
+      },
+      "latencyMs": {
+        "p50": 86.1611875006929,
+        "p95": 112.02299990691245
+      },
+      "byLanguage": {
+        "en": {
+          "binaryHalf": {
+            "count": 64,
+            "threshold": 0.5,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 2,
+            "wrongWaits": 0,
+            "earlyResponseRate": 0.0625,
+            "wrongWaitRate": 0.0,
+            "earlyResponseRate95": [
+              0.017310567031640967,
+              0.2014712314415458
+            ],
+            "wrongWaitRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "accuracy": 0.96875,
+            "auc": 0.9814453125,
+            "binaryLoss": 0.16281458383841935
+          },
+          "originalThresholdDiagnostic": {
+            "count": 64,
+            "threshold": 0.011,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 5,
+            "wrongWaits": 0,
+            "earlyResponseRate": 0.15625,
+            "wrongWaitRate": 0.0,
+            "earlyResponseRate95": [
+              0.0686442028250571,
+              0.3175414959753039
+            ],
+            "wrongWaitRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "accuracy": 0.921875,
+            "auc": 0.9814453125,
+            "binaryLoss": 0.16281458383841935
+          }
+        },
+        "zh": {
+          "binaryHalf": {
+            "count": 64,
+            "threshold": 0.5,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 5,
+            "wrongWaits": 1,
+            "earlyResponseRate": 0.15625,
+            "wrongWaitRate": 0.03125,
+            "earlyResponseRate95": [
+              0.0686442028250571,
+              0.3175414959753039
+            ],
+            "wrongWaitRate95": [
+              0.005537860164003122,
+              0.15744263820012558
+            ],
+            "accuracy": 0.90625,
+            "auc": 0.98046875,
+            "binaryLoss": 0.7135016003933542
+          },
+          "originalThresholdDiagnostic": {
+            "count": 64,
+            "threshold": 0.0066,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 7,
+            "wrongWaits": 1,
+            "earlyResponseRate": 0.21875,
+            "wrongWaitRate": 0.03125,
+            "earlyResponseRate95": [
+              0.11023836252604186,
+              0.3875499364924353
+            ],
+            "wrongWaitRate95": [
+              0.005537860164003122,
+              0.15744263820012558
+            ],
+            "accuracy": 0.875,
+            "auc": 0.98046875,
+            "binaryLoss": 0.7135016003933542
+          }
+        }
+      },
+      "devCalibration": {
+        "en": {
+          "count": 64,
+          "threshold": 0.9971654713153839,
+          "unfinished": 32,
+          "finished": 32,
+          "earlyResponses": 0,
+          "wrongWaits": 15,
+          "earlyResponseRate": 0.0,
+          "wrongWaitRate": 0.46875,
+          "earlyResponseRate95": [
+            0,
+            0.1071791982550706
+          ],
+          "wrongWaitRate95": [
+            0.30869387108068835,
+            0.6355048288102536
+          ],
+          "accuracy": 0.765625,
+          "auc": 0.9814453125,
+          "binaryLoss": 0.16281458383841935,
+          "scope": "same-dev calibration only; NOT deployment authorization"
+        },
+        "zh": {
+          "count": 64,
+          "threshold": 0.9999312162399292,
+          "unfinished": 32,
+          "finished": 32,
+          "earlyResponses": 0,
+          "wrongWaits": 6,
+          "earlyResponseRate": 0.0,
+          "wrongWaitRate": 0.1875,
+          "earlyResponseRate95": [
+            0,
+            0.1071791982550706
+          ],
+          "wrongWaitRate95": [
+            0.08889544689565954,
+            0.3530915520137596
+          ],
+          "accuracy": 0.90625,
+          "auc": 0.98046875,
+          "binaryLoss": 0.7135016003933542,
+          "scope": "same-dev calibration only; NOT deployment authorization"
+        }
+      }
+    },
+    {
+      "artifact": "lora-128-fixed",
+      "backend": "torch",
+      "device": "cpu",
+      "binaryHalf": {
+        "count": 128,
+        "threshold": 0.5,
+        "unfinished": 64,
+        "finished": 64,
+        "earlyResponses": 6,
+        "wrongWaits": 4,
+        "earlyResponseRate": 0.09375,
+        "wrongWaitRate": 0.0625,
+        "earlyResponseRate95": [
+          0.04367825258519838,
+          0.18982879599645597
+        ],
+        "wrongWaitRate95": [
+          0.024571201396618017,
+          0.14997485092208662
+        ],
+        "accuracy": 0.921875,
+        "auc": 0.964599609375,
+        "binaryLoss": 0.31427850380245365
+      },
+      "latencyMs": {
+        "p50": 45.89741595555097,
+        "p95": 85.08133399300277
+      },
+      "byLanguage": {
+        "en": {
+          "binaryHalf": {
+            "count": 64,
+            "threshold": 0.5,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 2,
+            "wrongWaits": 3,
+            "earlyResponseRate": 0.0625,
+            "wrongWaitRate": 0.09375,
+            "earlyResponseRate95": [
+              0.017310567031640967,
+              0.2014712314415458
+            ],
+            "wrongWaitRate95": [
+              0.032401551298366194,
+              0.24218154728387864
+            ],
+            "accuracy": 0.921875,
+            "auc": 0.9794921875,
+            "binaryLoss": 0.16732274062465596
+          },
+          "originalThresholdDiagnostic": {
+            "count": 64,
+            "threshold": 0.011,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 5,
+            "wrongWaits": 0,
+            "earlyResponseRate": 0.15625,
+            "wrongWaitRate": 0.0,
+            "earlyResponseRate95": [
+              0.0686442028250571,
+              0.3175414959753039
+            ],
+            "wrongWaitRate95": [
+              0,
+              0.1071791982550706
+            ],
+            "accuracy": 0.921875,
+            "auc": 0.9794921875,
+            "binaryLoss": 0.16732274062465596
+          }
+        },
+        "zh": {
+          "binaryHalf": {
+            "count": 64,
+            "threshold": 0.5,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 4,
+            "wrongWaits": 1,
+            "earlyResponseRate": 0.125,
+            "wrongWaitRate": 0.03125,
+            "earlyResponseRate95": [
+              0.04970134387480073,
+              0.2806830548165022
+            ],
+            "wrongWaitRate95": [
+              0.005537860164003122,
+              0.15744263820012558
+            ],
+            "accuracy": 0.921875,
+            "auc": 0.9775390625,
+            "binaryLoss": 0.46123426698025133
+          },
+          "originalThresholdDiagnostic": {
+            "count": 64,
+            "threshold": 0.0066,
+            "unfinished": 32,
+            "finished": 32,
+            "earlyResponses": 6,
+            "wrongWaits": 1,
+            "earlyResponseRate": 0.1875,
+            "wrongWaitRate": 0.03125,
+            "earlyResponseRate95": [
+              0.08889544689565954,
+              0.3530915520137596
+            ],
+            "wrongWaitRate95": [
+              0.005537860164003122,
+              0.15744263820012558
+            ],
+            "accuracy": 0.890625,
+            "auc": 0.9775390625,
+            "binaryLoss": 0.46123426698025133
+          }
+        }
+      },
+      "devCalibration": {
+        "en": {
+          "count": 64,
+          "threshold": 0.9883813560009003,
+          "unfinished": 32,
+          "finished": 32,
+          "earlyResponses": 0,
+          "wrongWaits": 17,
+          "earlyResponseRate": 0.0,
+          "wrongWaitRate": 0.53125,
+          "earlyResponseRate95": [
+            0,
+            0.1071791982550706
+          ],
+          "wrongWaitRate95": [
+            0.3644951711897464,
+            0.6913061289193116
+          ],
+          "accuracy": 0.734375,
+          "auc": 0.9794921875,
+          "binaryLoss": 0.16732274062465596,
+          "scope": "same-dev calibration only; NOT deployment authorization"
+        },
+        "zh": {
+          "count": 64,
+          "threshold": 0.9986764192581177,
+          "unfinished": 32,
+          "finished": 32,
+          "earlyResponses": 0,
+          "wrongWaits": 6,
+          "earlyResponseRate": 0.0,
+          "wrongWaitRate": 0.1875,
+          "earlyResponseRate95": [
+            0,
+            0.1071791982550706
+          ],
+          "wrongWaitRate95": [
+            0.08889544689565954,
+            0.3530915520137596
+          ],
+          "accuracy": 0.90625,
+          "auc": 0.9775390625,
+          "binaryLoss": 0.46123426698025133,
+          "scope": "same-dev calibration only; NOT deployment authorization"
+        }
+      }
+    }
+  ],
+  "training": [
+    {
+      "status": "completed",
+      "mode": "full",
+      "revision": "87e35fcb1e60a569bea70346191c4886ea92e281",
+      "baseSha256": "a5d992655d207afeb1fd7ec0538300561d406c0d29c4471418f79e4a3250c2c3",
+      "trainSha256": "d3934e994acec19e8b9b88e067eabb842e3b6b7e4d40778c359516f355d7e0e6",
+      "seed": 20260908,
+      "requestedSteps": 128,
+      "batchSize": 2,
+      "steps": 128,
+      "device": "mps",
+      "lr": 1e-05,
+      "maxTokens": 128,
+      "fixedLengthPadding": true,
+      "deadlineSeconds": 600,
+      "productionEnabled": false,
+      "parameters": 258692992,
+      "trainableParameters": 258692992,
+      "trainableTensors": 290,
+      "fitRows": 4731,
+      "samplesSeen": 256,
+      "uniqueSamplesSeen": 256,
+      "epochsEquivalent": 0.054111181568378776,
+      "meanLoss": 0.18078358681580697,
+      "changedTensorProbes": 290,
+      "unchangedFrozenProbes": 0,
+      "frozenChanged": [],
+      "probeProbabilityBeforeSave": 0.0012063828762620687,
+      "mpsObservedPeakAllocatedBytes": 4337920256,
+      "mpsObservedPeakDriverBytes": 6432129024,
+      "weightFiles": {
+        "model.safetensors": {
+          "bytes": 1034804016,
+          "sha256": "e55a1417ddf02da0388c42116f3760409393a4436ee266dffd0b3ee08b6c0130"
+        }
+      },
+      "warning": "Bounded experiment, not converged, not product acceptance",
+      "elapsedSeconds": 61.14280379191041,
+      "peakRssBytes": 2188836864
+    },
+    {
+      "status": "completed",
+      "mode": "lora",
+      "revision": "87e35fcb1e60a569bea70346191c4886ea92e281",
+      "baseSha256": "a5d992655d207afeb1fd7ec0538300561d406c0d29c4471418f79e4a3250c2c3",
+      "trainSha256": "d3934e994acec19e8b9b88e067eabb842e3b6b7e4d40778c359516f355d7e0e6",
+      "seed": 20260908,
+      "requestedSteps": 128,
+      "batchSize": 2,
+      "steps": 128,
+      "device": "mps",
+      "lr": 0.0001,
+      "maxTokens": 128,
+      "fixedLengthPadding": true,
+      "deadlineSeconds": 600,
+      "productionEnabled": false,
+      "parameters": 260990848,
+      "trainableParameters": 2297856,
+      "trainableTensors": 336,
+      "fitRows": 4731,
+      "samplesSeen": 256,
+      "uniqueSamplesSeen": 256,
+      "epochsEquivalent": 0.054111181568378776,
+      "meanLoss": 0.17913339302327813,
+      "changedTensorProbes": 336,
+      "unchangedFrozenProbes": 290,
+      "frozenChanged": [],
+      "probeProbabilityBeforeSave": 0.778205156326294,
+      "mpsObservedPeakAllocatedBytes": 1337618688,
+      "mpsObservedPeakDriverBytes": 1613561856,
+      "weightFiles": {
+        "adapter_model.safetensors": {
+          "bytes": 9234808,
+          "sha256": "3dad840b3fee1cc9a9a3d2bd4481ba0336b463f4a6f49af24fd4ada6c74a1acf"
+        }
+      },
+      "warning": "Bounded experiment, not converged, not product acceptance",
+      "elapsedSeconds": 23.809786999830976,
+      "peakRssBytes": 2069626880
+    }
+  ],
+  "limits": [
+    "128 known public dev samples, not a new blind test",
+    "Calibration scores are in-sample and optimistic",
+    "No personal audio or real phone turn-taking acceptance",
+    "Latency was measured with other local work, not an idle benchmark"
+  ]
+}

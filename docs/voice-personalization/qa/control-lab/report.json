@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "source": "synthetic-contrastive",
+  "realUserRecordings": 0,
+  "counts": {
+    "total": 160,
+    "train": 96,
+    "validation": 32,
+    "test": 32
+  },
+  "splitUnit": "whole conversation group, disjoint",
+  "seed": "deterministic-40-groups-v1",
+  "validation": {
+    "count": 32,
+    "accuracyAtHalf": 0.5,
+    "confidentCoverage": 0,
+    "brier": 0.25104957804815203
+  },
+  "test": {
+    "count": 32,
+    "accuracyAtHalf": 0.5,
+    "confidentCoverage": 0,
+    "brier": 0.25108075721292095
+  },
+  "trainingMs": 5.919582999999989,
+  "inferenceUs": {
+    "p50": 0.16699999999048032,
+    "p95": 0.20899999999812735,
+    "p99": 0.25000000000829914
+  },
+  "scoreChecksum": 10640.463352818573,
+  "parameterBytesFloat32": 56,
+  "modelJsonBytes": 379,
+  "acceptance": "shadow only: identical observations with opposite intentions cannot be separated by this feature head",
+  "requiredNextData": "opt-in real interaction corrections plus semantic/learned embeddings; never treat this accuracy as car-noise performance",
+  "baseline": {
+    "schema": 1,
+    "version": "base-v1",
+    "samples": 0,
+    "mode": "shadow",
+    "addressed": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "finished": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "golden": {
+    "schema": 1,
+    "version": "v1",
+    "samples": 1,
+    "mode": "shadow",
+    "addressed": [
+      0.3905160088653645,
+      0.3514644079788279,
+      0.19525800443268224,
+      0.3124128070922915,
+      0,
+      0.3905160088653645,
+      0.3905160088653645
+    ],
+    "finished": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

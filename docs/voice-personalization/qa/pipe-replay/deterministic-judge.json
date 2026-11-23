@@ -1,0 +1,163 @@
+{
+  "label": "deterministic-judge",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "da667a4cc7b671c5be614a8e0e467dda672c1e6a6a7369d2bf1722e6c6e5dfaa",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": true,
+      "judge": "fixture",
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3787.5625,
+      "submitted": [
+        "我最近的。 agent是什么？"
+      ],
+      "answer": "Agent 是一种自动化程序或智能体，通常用于执行特定任务。它可以是简单的脚本，也可以是复杂的系统，能够根据预设规则或人工智能算法自主决策、与用户或其他系统交互。在 TermBridge 中，Agent 可能指代正在你电脑上运行的具体任务程序，比如文件整理、数据分析等。如果你想知道最近运行的是哪个 Agent，我需要查看你的测试数据才能确认。",
+      "outputBytes": 1359360,
+      "responseCount": 1,
+      "judgeCalls": 2,
+      "fixtureToolCompletions": 0,
+      "finished": true,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 454,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 454,
+          "event": "session.updated"
+        },
+        {
+          "ms": 454,
+          "event": "ready"
+        },
+        {
+          "ms": 1285,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2594,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2742,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 4196,
+          "event": "judge",
+          "decision": "wait",
+          "latencyMs": 1,
+          "segments": [
+            "我最近的。"
+          ]
+        },
+        {
+          "ms": 4196,
+          "event": "waiting",
+          "reason": "incomplete"
+        },
+        {
+          "ms": 4551,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 4551,
+          "event": "response.done"
+        },
+        {
+          "ms": 4551,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6257,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6426,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 6660,
+          "event": "judge",
+          "decision": "respond",
+          "latencyMs": 0,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 6661,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 6733,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 6733,
+          "event": "session.updated"
+        },
+        {
+          "ms": 6854,
+          "event": "response.created"
+        },
+        {
+          "ms": 6854,
+          "event": "response_started"
+        },
+        {
+          "ms": 12068,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 12068,
+          "event": "response.done"
+        },
+        {
+          "ms": 12069,
+          "event": "usage",
+          "inputTokens": 850,
+          "outputTokens": 438,
+          "totalTokens": 1288
+        },
+        {
+          "ms": 12069,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

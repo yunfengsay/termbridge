@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_settings_voice">Voice, permissions and background behavior</string>
+    <string name="app_settings_voice_title">Voice and permissions</string>
+    <string name="app_update_title">App updates</string>
+    <string name="app_update_current">Installed: %1$s</string>
+    <string name="app_update_hint">Check the official release. No background downloads; Android asks before installation.</string>
+    <string name="app_update_check">Check for updates</string>
+    <string name="app_update_checking">Checking the official release…</string>
+    <string name="app_update_latest">No newer published version is available.</string>
+    <string name="app_update_available">Available: %1$s (%2$d) · %3$.1f MB</string>
+    <string name="app_update_unsupported">This release requires Android API %1$d or later.</string>
+    <string name="app_update_download">Download update</string>
+    <string name="app_update_progress">Downloading and verifying: %1$d%%</string>
+    <string name="app_update_ready">Download verified. Installation preserves app data and connection settings.</string>
+    <string name="app_update_install">Install update</string>
+    <string name="app_update_installing">Waiting for Android installation confirmation…</string>
+    <string name="app_update_error">Update failed. You can check and retry.\n%1$s</string>
+    <string name="app_update_permission_return">Allow installs from TermBridge in Android settings, then tap Install update again.</string>
+</resources>

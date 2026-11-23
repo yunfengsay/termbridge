@@ -1,0 +1,167 @@
+{
+  "label": "long-pause-first",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "0e1a4b3d347f37febde7dd9061a498a8503a1d708d39f1477610dbe6fc0d19d0",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": true,
+      "providerSilenceMs": 3000,
+      "judge": "cloud",
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 4500,
+      "secondStartsMs": 5467.5625,
+      "submitted": [
+        "我最近的。 agent是什么？"
+      ],
+      "answer": "Agent 是一种自动化程序或软件代理，通常运行在计算机上，能够执行特定任务、处理数据或与用户交互。它可以是简单的脚本，也可以是复杂的系统，具备感知环境、做出决策并行动的能力。在你的电脑环境中，Agent 可能指当前正在运行的某个自动化工具或后台服务。",
+      "outputBytes": 1056000,
+      "responseCount": 1,
+      "judgeCalls": 2,
+      "fixtureToolCompletions": 0,
+      "finished": true,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 234,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 234,
+          "event": "session.updated"
+        },
+        {
+          "ms": 234,
+          "event": "ready"
+        },
+        {
+          "ms": 1114,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 3995,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 4141,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 4674,
+          "event": "judge",
+          "decision": "wait",
+          "latencyMs": 531,
+          "segments": [
+            "我最近的。"
+          ]
+        },
+        {
+          "ms": 4674,
+          "event": "waiting",
+          "reason": "incomplete"
+        },
+        {
+          "ms": 6285,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 6285,
+          "event": "response.done"
+        },
+        {
+          "ms": 6288,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 9694,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 9863,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 10671,
+          "event": "judge",
+          "decision": {
+            "decision": "respond",
+            "intent": "查询最近正在执行任务的 Agent 的名称及任务详情"
+          },
+          "latencyMs": 808,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 10671,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 10736,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 10736,
+          "event": "session.updated"
+        },
+        {
+          "ms": 10853,
+          "event": "response.created"
+        },
+        {
+          "ms": 10854,
+          "event": "response_started"
+        },
+        {
+          "ms": 14947,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 14947,
+          "event": "response.done"
+        },
+        {
+          "ms": 14947,
+          "event": "usage",
+          "inputTokens": 877,
+          "outputTokens": 341,
+          "totalTokens": 1218
+        },
+        {
+          "ms": 14947,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

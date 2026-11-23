@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agent_chat_title">Chat</string>
+    <string name="agent_chat_terminal">Terminal</string>
+    <string name="agent_chat_load_earlier">Load earlier messages</string>
+    <string name="session_ui_setting">Session interface</string>
+    <string name="session_ui_auto">Automatic</string>
+    <string name="session_ui_value">Session interface: %1$s</string>
+    <string name="session_ui_summary">Choose the default view on this device. Automatic opens supported Agents in Chat. You can switch to Terminal inside each session.</string>
+    <string name="agent_chat_composer_hint">Message this Agent…</string>
+    <string name="agent_chat_send">Send</string>
+    <string name="agent_chat_too_long">A message can contain up to 16,000 characters. Your draft is preserved.</string>
+    <string name="agent_chat_retry">Retry rejected send</string>
+    <string name="agent_chat_retry_draft">Send or clear your current draft before retrying the rejected message.</string>
+    <string name="agent_chat_copy_unconfirmed">Copy unconfirmed message</string>
+    <string name="agent_chat_attachments_unsupported">This Host cannot take images in chat yet; use the terminal.</string>
+    <string name="agent_chat_host_update">This Host did not provide Chat. Update the Host, or use Terminal.</string>
+    <string name="agent_chat_unsupported">This session does not support Chat. Use Terminal instead.</string>
+    <string name="agent_chat_accepted">Host accepted the message…</string>
+    <string name="agent_chat_delivered">Input delivered; waiting for the Agent to record it…</string>
+    <string name="agent_chat_observed">Confirmed in this Agent’s conversation.</string>
+    <string name="agent_chat_uncertain">Delivery could not be confirmed. Check Terminal before sending this message again.</string>
+    <string name="agent_chat_not_sent">Message rejected before sending. You can retry.</string>
+    <string name="agent_chat_history_retry">History did not arrive. Tap load earlier to try again.</string>
+    <string name="session_host_missing">This session belongs to a Host that is no longer configured. Add that connection again, or reopen the session from the list.</string>
+</resources>

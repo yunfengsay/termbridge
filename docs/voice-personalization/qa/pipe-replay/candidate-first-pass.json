@@ -1,0 +1,163 @@
+{
+  "label": "candidate-first-pass",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "f516a57ab225addb096a9296b70e21a4ad25f534c5e446b7a05488ac1e0926d2",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": true,
+      "judge": "cloud",
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 4205.5625,
+      "submitted": [
+        "我最近的 agent 是什么？"
+      ],
+      "answer": "你最近的 Agent 是 TermBridge，正在执行语音控制验证任务。",
+      "outputBytes": 257280,
+      "responseCount": 2,
+      "judgeCalls": 1,
+      "fixtureToolCompletions": 1,
+      "finished": true,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 871,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 871,
+          "event": "session.updated"
+        },
+        {
+          "ms": 872,
+          "event": "ready"
+        },
+        {
+          "ms": 2065,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 8289,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 8483,
+          "event": "transcript",
+          "text": "我最近的 agent 是什么？"
+        },
+        {
+          "ms": 9137,
+          "event": "judge",
+          "decision": {
+            "decision": "respond",
+            "intent": "查询最近正在执行任务的 Agent 名称及任务详情"
+          },
+          "latencyMs": 651,
+          "segments": [
+            "我最近的 agent 是什么？"
+          ]
+        },
+        {
+          "ms": 9137,
+          "event": "submitted",
+          "text": "我最近的 agent 是什么？"
+        },
+        {
+          "ms": 9206,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 9206,
+          "event": "session.updated"
+        },
+        {
+          "ms": 9462,
+          "event": "response.created"
+        },
+        {
+          "ms": 9463,
+          "event": "response_started"
+        },
+        {
+          "ms": 9472,
+          "event": "fixture_tool_completed"
+        },
+        {
+          "ms": 9473,
+          "event": "output_item",
+          "type": "function_call",
+          "name": "inspect_fixture"
+        },
+        {
+          "ms": 9473,
+          "event": "response.done"
+        },
+        {
+          "ms": 9473,
+          "event": "usage",
+          "inputTokens": 902,
+          "outputTokens": 15,
+          "totalTokens": 917
+        },
+        {
+          "ms": 9473,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 9744,
+          "event": "response.created"
+        },
+        {
+          "ms": 9744,
+          "event": "response_started"
+        },
+        {
+          "ms": 10807,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 10808,
+          "event": "response.done"
+        },
+        {
+          "ms": 10808,
+          "event": "usage",
+          "inputTokens": 1047,
+          "outputTokens": 84,
+          "totalTokens": 1131
+        },
+        {
+          "ms": 10808,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

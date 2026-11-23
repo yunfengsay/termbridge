@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared action family: 24-unit grid, rounded 1.7-unit stroke, semantic foreground. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp" android:height="22dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="@android:color/transparent"
+        android:strokeColor="?attr/colorOnSurface" android:strokeWidth="1.7"
+        android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M9,5H6a2,2 0,0 0,-2 2v13h16V7a2,2 0,0 0,-2 -2h-3 M9,3h6v4H9Z M8,12h8M8,16h6" />
+</vector>

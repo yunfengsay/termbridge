@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        app:title="@string/global_settings_title" app:navigationIcon="@drawable/ic_arrow_back"
+        app:titleTextAppearance="@style/TextAppearance.Termbridge.Toolbar" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="20dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/connection_list" android:textStyle="bold" android:textSize="18sp" android:textColor="@color/ink" />
+            <LinearLayout android:id="@+id/connectionProfiles" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_marginVertical="8dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/addConnection"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="52dp" android:text="@string/connection_add" app:icon="@drawable/ic_add" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/connectionSettings"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp"
+                android:gravity="start|center_vertical" android:text="@string/connection_settings" app:icon="@drawable/ic_settings" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/voiceSettings"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp"
+                android:gravity="start|center_vertical" android:text="@string/app_settings_voice" app:icon="@drawable/ic_mic" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/toolPermissions"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp"
+                android:gravity="start|center_vertical" android:text="@string/phone_action_policy_open" app:icon="@drawable/ic_shield" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/watchSettings"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp"
+                android:gravity="start|center_vertical" android:text="@string/watch_settings" app:icon="@drawable/ic_termbridge_watch" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" android:text="@string/app_update_title"
+                android:textSize="18sp" android:textStyle="bold" android:textColor="@color/ink" />
+            <TextView android:id="@+id/currentVersion" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/ink_muted" />
+            <TextView android:id="@+id/updateStatus" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginVertical="12dp" android:textSize="14sp" android:textColor="@color/ink"
+                android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/updateProgress"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/checkUpdate"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                android:text="@string/app_update_check" app:icon="@drawable/ic_refresh" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/downloadUpdate"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/app_update_download" app:icon="@drawable/ic_download" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/cancelUpdate"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/cancel" app:icon="@drawable/ic_close" android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

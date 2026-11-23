@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net10.0-windows10.0.19041.0</TargetFramework><TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion><RootNamespace>TermBridge.App</RootNamespace><ApplicationManifest>app.manifest</ApplicationManifest><Platforms>x64;ARM64</Platforms><RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers><UseWinUI>true</UseWinUI><WindowsPackageType>None</WindowsPackageType><WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained><SelfContained>true</SelfContained><ApplicationIcon>../assets/icon.ico</ApplicationIcon></PropertyGroup>
+  <ItemGroup><PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" /><PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2270" /><ProjectReference Include="../TermBridge.Core/TermBridge.Core.csproj" /></ItemGroup>
+  <ItemGroup><Content Include="Terminal/**" CopyToOutputDirectory="PreserveNewest" /><Content Include="Chat/**" CopyToOutputDirectory="PreserveNewest" /><Content Include="../assets/logo.png" Link="Assets/logo.png" CopyToOutputDirectory="PreserveNewest" /><Content Include="../assets/icon.ico" Link="Assets/icon.ico" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+  <!-- Unpackaged SDK publishing omits the application PRI (WindowsAppSDK #6720). -->
+  <Target Name="PublishNativeXamlResources" BeforeTargets="ComputeResolvedFilesToPublishList" DependsOnTargets="$(GenerateProjectPriFile)">
+    <Error Condition="!Exists('$(ProjectPriFullPath)')" Text="The application resource index was not generated." />
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(ProjectPriFullPath)"><RelativePath>$(ProjectPriFileName)</RelativePath><CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory></ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+</Project>

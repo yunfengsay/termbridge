@@ -1,0 +1,336 @@
+{
+  "at": "2026-09-08T05:08:10.972Z",
+  "openYap": {
+    "name": "Open Yap 1K public sample",
+    "manifest": {
+      "revision": "9f69ffe0d7d7f97543f5b63d67811c1d6686a38d",
+      "files": [
+        {
+          "name": "LICENSE.txt",
+          "bytes": 19507,
+          "sha256": "5207183619ef6bb25ac7c16f3358d76a6678b0a8c7c13888e92f4cf04b17d198"
+        },
+        {
+          "name": "metadata.jsonl",
+          "bytes": 4579,
+          "sha256": "5b5392f28b93863f193da20780360540b199fe1453c2a7ebf34cf8ab41616a59"
+        },
+        {
+          "name": "conv_bcff0c2a0be7.json",
+          "bytes": 964286,
+          "sha256": "bb2c9fc6e0c79f2b0f112475dbd5b58cbd8064decfd7d0f7348bedf674f01001"
+        },
+        {
+          "name": "conv_756ee444d825.json",
+          "bytes": 1963161,
+          "sha256": "e6f58dcdfbaaa85f8d1523915e4a5bfd6a45f12a2f216fc06e3f58a7e1cf8f05"
+        },
+        {
+          "name": "conv_d4005da6db98.json",
+          "bytes": 582052,
+          "sha256": "5dd1cebd37ad4d54798c11a0af74fbeeffa703aa2ba1534374ac1ec4e1689609"
+        },
+        {
+          "name": "conv_31bedfc99b53.json",
+          "bytes": 430217,
+          "sha256": "079e08b54836ff0fa6aa62a28204784d14d4c7f3be92302b4964a91397335a5c"
+        },
+        {
+          "name": "conv_cb37687ec915.json",
+          "bytes": 955508,
+          "sha256": "5dfee1ecea5bd063efd2774066e4bce09be55e77b49e6ad39a26c0252b398d89"
+        },
+        {
+          "name": "conv_0c917fc63b3b.json",
+          "bytes": 350184,
+          "sha256": "139270e79965fe9b5b9fd62612089397ce098d670b831c678ed09928c320e161"
+        },
+        {
+          "name": "conv_10cf7f6ff081.json",
+          "bytes": 388722,
+          "sha256": "9538740b7b95d3734b7c328ae6217bf18e01ec21bee1f580c768b27ba9f5f430"
+        },
+        {
+          "name": "conv_e11edcca8521.json",
+          "bytes": 571953,
+          "sha256": "b80143ac838824f5c8c48d8491a12027ec9e77e8b282407ba54729289c568198"
+        },
+        {
+          "name": "conv_04692967d40e.json",
+          "bytes": 314628,
+          "sha256": "7e3a4154d9de033ac86954868ed3ff81fa8b6418ba0e59801caa6c504ffc9812"
+        },
+        {
+          "name": "conv_5a798c657bb0.json",
+          "bytes": 553442,
+          "sha256": "1dbf4e08b269fe9729605fa7620f9dbdd002ce22f4a95fe081147a1d5b78baa6"
+        },
+        {
+          "name": "conv_2e4aec4666d8.json",
+          "bytes": 331376,
+          "sha256": "86375d7043741fb2bf22d2db7199e377e2ee03f4e661067d77610b25b1abd539"
+        },
+        {
+          "name": "conv_aa4777220a1e.json",
+          "bytes": 1503560,
+          "sha256": "007b3090c115246d0a0690f968d5d88a1e425f5226cef3cd6359b558af50412f"
+        },
+        {
+          "name": "conv_b98b64206aee.json",
+          "bytes": 334263,
+          "sha256": "a08bda4d9b114962d01dab3cf97558525f042a8629e406b81d1693deb9acc9db"
+        },
+        {
+          "name": "conv_31982da49c73.json",
+          "bytes": 1120879,
+          "sha256": "a4e7ad1c184aa38375969c7371f36be5fd33cc98033b0eb1d822c82a0fb7e6cf"
+        },
+        {
+          "name": "conv_14f897f75018.json",
+          "bytes": 439867,
+          "sha256": "aa2c0d1a62e3588e75baf3fca583f079a5887b238402bd1230146bb6aa80ca91"
+        },
+        {
+          "name": "conv_f5c0b02f01e2.json",
+          "bytes": 1098230,
+          "sha256": "80a83f2d4c833b738217ce914d19d7e726cc315e55a2f10e505f6f6c3f3f620c"
+        }
+      ]
+    },
+    "conversations": 16,
+    "speakers": 8,
+    "hours": 8.922399444629631,
+    "words": 89677,
+    "sameSpeakerPausesWithoutOtherTranscript": 3468,
+    "pauseMs": {
+      "p50": 560,
+      "p95": 1755
+    },
+    "longerThan3s": 25,
+    "longerThan8s": 1,
+    "stateMachineReplays": 25,
+    "replaysPassed": 25,
+    "caveat": "English two-person phone calls, machine transcripts; timing proxies are not semantic/device-directed labels. Replay judge is scripted, not cloud inference."
+  },
+  "semantic": {
+    "repository": "KE-Team/SemanticVAD-Dataset",
+    "revision": "b5b536e96076a156e79b7e6db9ca8fd100d3f976",
+    "sha256": "598d875a05017fee24b3b15aa7f45fe9664da793fa3aea7128ddf195f1af1ee0",
+    "model": "qwen3.8-flash",
+    "tested": 80,
+    "passed": 68,
+    "errors": 4,
+    "latencyMs": {
+      "p50": 678,
+      "p95": 10001
+    },
+    "caveat": "Agreement with publisher Qwen2.5-72B-corrected labels, not independent human truth. No test samples were trained into personal profiles. No audio ASR or noise test."
+  },
+  "personalization": {
+    "model": "qwen3.8-flash",
+    "fixtures": 11,
+    "passed": 11,
+    "provenance": "Authored paired fixtures, not user feedback or a held-out accuracy claim. Retrieval on reviewed wording is intentional.",
+    "ablation": [
+      {
+        "case": 0,
+        "baseline": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "ignore",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "wait",
+        "afterRevocation": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 1,
+        "baseline": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "ignore",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "respond",
+        "afterRevocation": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 2,
+        "baseline": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "ignore",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "ignore",
+        "afterRevocation": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 3,
+        "baseline": {
+          "decision": "wait",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "ignore",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "ignore",
+        "afterRevocation": {
+          "decision": "wait",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 4,
+        "baseline": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "ignore",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "ignore",
+        "afterRevocation": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 5,
+        "baseline": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "ignore",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "ignore",
+        "afterRevocation": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 6,
+        "baseline": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "ignore",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "ignore",
+        "afterRevocation": {
+          "decision": "wait",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 7,
+        "baseline": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "respond",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "respond",
+        "afterRevocation": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 8,
+        "baseline": {
+          "decision": "wait",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "wait",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "wait",
+        "afterRevocation": {
+          "decision": "wait",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 9,
+        "baseline": {
+          "decision": "wait",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "wait",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "wait",
+        "afterRevocation": {
+          "decision": "wait",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      },
+      {
+        "case": 10,
+        "baseline": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "learned": {
+          "decision": "respond",
+          "hintCount": 3
+        },
+        "unrelatedExamples": "respond",
+        "afterRevocation": {
+          "decision": "respond",
+          "hintCount": 0
+        },
+        "receipt": "revoked",
+        "passed": true
+      }
+    ],
+    "caveat": "Engineered exact-context negative rules, not a generalized DDSD accuracy benchmark. Three fixture groups are not three real user conversations."
+  }
+}

@@ -1,0 +1,9 @@
+<resources>
+    <string name="completion_confirm">向此 Agent 发送只读校验任务？不授权修改代码或发布。</string>
+    <string name="completion_approve">确认委派</string>
+    <string name="completion_sent">请求已接受，请查看卡片中的最新回执。</string>
+    <string name="content_copy_link">复制链接</string>
+    <string name="content_loading">正在加载预览…</string>
+    <string name="content_failed">无法打开此内容</string>
+    <string name="content_unsupported">此文件不能作为文本显示</string>
+</resources>

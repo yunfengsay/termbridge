@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Derived from vscode-icons file_type_kotlin.svg (MIT); gradient reduced for Android VectorDrawable. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    <path
+        android:fillColor="#7F52FF"
+        android:pathData="M30,30H2V2H30L15.711,15.794Z" />
+</vector>

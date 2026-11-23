@@ -1,0 +1,327 @@
+{
+  "label": "lease-race",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "bf4d025ff4d8470bf56518856bd56e3eb0bb944bafe06f97c0bd5dccc426edde",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": false,
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3781.5625,
+      "submitted": [
+        "我最近的。",
+        "agent是什么？"
+      ],
+      "answer": "Agent 可以理解成是你电脑上的一个智能助手程序，它能帮你自动完成一些任务，比如查资料、写代码或者控制其他软件。你刚才看到的那个 TermBridge 就是一个 Agent，它正在帮你做语音控制验证。",
+      "outputBytes": 898560,
+      "responseCount": 3,
+      "judgeCalls": 0,
+      "fixtureToolCompletions": 1,
+      "finished": true,
+      "prematureResponses": 2,
+      "events": [
+        {
+          "ms": 447,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": true,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 447,
+          "event": "session.updated"
+        },
+        {
+          "ms": 448,
+          "event": "ready"
+        },
+        {
+          "ms": 1371,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2600,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2742,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 2742,
+          "event": "submitted",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 2799,
+          "event": "response.created"
+        },
+        {
+          "ms": 2799,
+          "event": "response_started"
+        },
+        {
+          "ms": 2810,
+          "event": "fixture_tool_completed"
+        },
+        {
+          "ms": 2810,
+          "event": "output_item",
+          "type": "function_call",
+          "name": "inspect_fixture"
+        },
+        {
+          "ms": 2811,
+          "event": "response.done"
+        },
+        {
+          "ms": 2811,
+          "event": "usage",
+          "inputTokens": 799,
+          "outputTokens": 15,
+          "totalTokens": 814
+        },
+        {
+          "ms": 2811,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 3081,
+          "event": "response.created"
+        },
+        {
+          "ms": 3081,
+          "event": "response_started"
+        },
+        {
+          "ms": 3912,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 3913,
+          "event": "response.done"
+        },
+        {
+          "ms": 3913,
+          "event": "usage",
+          "inputTokens": 853,
+          "outputTokens": 65,
+          "totalTokens": 918
+        },
+        {
+          "ms": 3913,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 4525,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6265,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6410,
+          "event": "response.created"
+        },
+        {
+          "ms": 6410,
+          "event": "response_started"
+        },
+        {
+          "ms": 6434,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 6434,
+          "event": "submitted",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 9270,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 9270,
+          "event": "response.done"
+        },
+        {
+          "ms": 9270,
+          "event": "usage",
+          "inputTokens": 889,
+          "outputTokens": 235,
+          "totalTokens": 1124
+        },
+        {
+          "ms": 9270,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "adaptive": true,
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3637.5625,
+      "submitted": [
+        "我最近的。 agent是什么？"
+      ],
+      "answer": "",
+      "outputBytes": 61440,
+      "responseCount": 1,
+      "judgeCalls": 1,
+      "fixtureToolCompletions": 0,
+      "finished": false,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 304,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 304,
+          "event": "session.updated"
+        },
+        {
+          "ms": 304,
+          "event": "ready"
+        },
+        {
+          "ms": 1156,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2467,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2619,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 4364,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 4364,
+          "event": "response.done"
+        },
+        {
+          "ms": 4364,
+          "event": "finished",
+          "status": "interrupted"
+        },
+        {
+          "ms": 4364,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6128,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6294,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 8791,
+          "event": "judge",
+          "decision": "respond",
+          "latencyMs": 861,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 8791,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 8878,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 1400,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 8878,
+          "event": "session.updated"
+        },
+        {
+          "ms": 9024,
+          "event": "response.created"
+        },
+        {
+          "ms": 9024,
+          "event": "response_started"
+        },
+        {
+          "ms": 9640,
+          "event": "response.created"
+        },
+        {
+          "ms": 9640,
+          "event": "waiting",
+          "reason": "provider_auto_response"
+        },
+        {
+          "ms": 9725,
+          "event": "output_item",
+          "type": "function_call",
+          "name": "inspect_fixture"
+        },
+        {
+          "ms": 9726,
+          "event": "response.done"
+        },
+        {
+          "ms": 19027,
+          "event": "finished",
+          "status": "interrupted"
+        }
+      ]
+    }
+  ]
+}

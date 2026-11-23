@@ -1,0 +1,11 @@
+bin/
+obj/
+build/
+dist/
+.cache/
+vm/
+evidence/
+*.user
+*.suo
+
+__pycache__/

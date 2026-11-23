@@ -1,0 +1,37 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import net from 'node:net';
+import { SystemSharing } from './systemSharing.js';
+const tick = () => new Promise(resolve => setTimeout(resolve, 20));
+test('system sharing passes opaque auth and frame bytes with backpressure, and closes the exact socket', async t => {
+  let peer: net.Socket | undefined;
+  const received: Buffer[] = [];
+  const server = net.createServer(socket => { peer = socket; socket.on('data', bytes => received.push(bytes)); });
+  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+  const sharing = new SystemSharing();
+  t.after(() => { sharing.close(); peer?.destroy(); server.close(); });
+  let release: (() => void) | undefined;
+  const frames: Buffer[] = [];
+  let disconnects = 0;
+  const connected = await sharing.connect(async bytes => { frames.push(Buffer.from(bytes)); if (frames.length === 1) await new Promise<void>(r => { release = r; }); }, () => disconnects++, (server.address() as net.AddressInfo).port);
+  assert.equal(connected, true);
+  peer!.write('RFB 003.889\n'); await tick();
+  assert.equal(frames[0].toString(), 'RFB 003.889\n');
+  peer!.write(Buffer.from([30, 1, 2, 3])); await tick(); assert.equal(frames.length, 1);
+  sharing.receive(Buffer.from('client handshake')); await tick(); assert.equal(Buffer.concat(received).toString(), 'client handshake');
+  release!(); await tick(); assert.deepEqual(frames[1], Buffer.from([30, 1, 2, 3]));
+  sharing.close(); await tick(); assert.equal(peer!.destroyed, true); assert.equal(disconnects, 0);
+  assert.throws(() => sharing.receive(Buffer.from([1])), /disconnected/);
+});
+test('connection refusal is recoverable, while remote disconnect notifies the owner once', async t => {
+  const server = net.createServer(socket => socket.end());
+  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+  const port = (server.address() as net.AddressInfo).port;
+  const sharing = new SystemSharing(); let closed = 0;
+  t.after(() => { sharing.close(); server.close(); });
+  assert.equal(await sharing.connect(async () => {}, () => closed++, port), true);
+  await tick(); assert.equal(closed, 1); sharing.close();
+  await new Promise<void>(resolve => server.close(() => resolve()));
+  const missing = new SystemSharing();
+  assert.equal(await missing.connect(async () => {}, () => assert.fail('No established session'), port), false); missing.close();
+});

@@ -1,0 +1,186 @@
+{
+  "label": "long-pause-strict-fail",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "2974e58b003c3d0af746a1ea1e9125e022fe4256cb4de77c08bf91927da93aae",
+  "at": "2026-09-07T18:30:47.982Z",
+  "model": "qwen3.5-omni-flash-realtime",
+  "pcm": {
+    "rate": 16000,
+    "channels": 1,
+    "bits": 16,
+    "endian": "little",
+    "bytes": 583468,
+    "sha256": "3e14b6e073e3c9c9d3e342d06c0ef7858977a0b77dd32dc7d67b61747d7ce9ff"
+  },
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": true,
+      "providerSilenceMs": 3000,
+      "judge": "cloud",
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 4500,
+      "secondStartsMs": 5676.5625,
+      "submitted": [
+        "我最近的。 agent是什么？"
+      ],
+      "answer": "Agent 是一种自动化的智能程序，能够根据指令或用户输入执行特定任务。在 TermBridge 中，Agent 通常负责处理具体的工作流，比如数据分析、文件操作或与其他系统交互等。你可以通过查看最近的 Agent 测试数据来了解当前正在运行的 Agent 及其任务详情。需要我帮你查询吗？",
+      "outputBytes": 1113600,
+      "responseCount": 1,
+      "judgeCalls": 2,
+      "fixtureToolCompletions": 0,
+      "finished": true,
+      "prematureResponses": 0,
+      "accepted": false,
+      "checks": {
+        "noFailure": true,
+        "singleWholeUserTurn": true,
+        "noPrematureReply": true,
+        "realFixtureReceipt": false,
+        "groundedAnswer": false,
+        "finishedWithAudio": true
+      },
+      "events": [
+        {
+          "ms": 443,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 443,
+          "event": "session.updated"
+        },
+        {
+          "ms": 443,
+          "event": "ready"
+        },
+        {
+          "ms": 1288,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 4234,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 4377,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 4933,
+          "event": "judge",
+          "decision": "wait",
+          "latencyMs": 553,
+          "segments": [
+            "我最近的。"
+          ]
+        },
+        {
+          "ms": 4933,
+          "event": "waiting",
+          "reason": "incomplete"
+        },
+        {
+          "ms": 6401,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 6401,
+          "event": "response.done"
+        },
+        {
+          "ms": 6403,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 9934,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 10104,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 11393,
+          "event": "judge",
+          "decision": {
+            "decision": "respond",
+            "intent": "查询 TermBridge 中最近正在执行任务的 Agent 名称及任务详情"
+          },
+          "latencyMs": 1287,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 11394,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 11470,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 11470,
+          "event": "session.updated"
+        },
+        {
+          "ms": 11600,
+          "event": "response.created"
+        },
+        {
+          "ms": 11600,
+          "event": "response_started"
+        },
+        {
+          "ms": 15995,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 15996,
+          "event": "response.done"
+        },
+        {
+          "ms": 15996,
+          "event": "usage",
+          "inputTokens": 881,
+          "outputTokens": 361,
+          "totalTokens": 1242
+        },
+        {
+          "ms": 15996,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

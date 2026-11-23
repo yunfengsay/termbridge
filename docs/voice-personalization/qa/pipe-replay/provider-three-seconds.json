@@ -1,0 +1,121 @@
+{
+  "label": "provider-three-seconds",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "b7600c3c2f744d02452192b0f9e8daac1c03657f164f6ac6ec1c701e378e0d99",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": false,
+      "providerSilenceMs": 3000,
+      "judge": "none",
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3812.5625,
+      "submitted": [],
+      "answer": "你最近的 Agent 是 TermBridge，它正在执行语音控制验证任务。",
+      "outputBytes": 199680,
+      "responseCount": 2,
+      "judgeCalls": 0,
+      "fixtureToolCompletions": 1,
+      "finished": true,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 479,
+          "event": "configured_tools",
+          "names": [
+            "inspect_fixture"
+          ],
+          "turnDetection": {
+            "type": "semantic_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": true,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 479,
+          "event": "session.updated"
+        },
+        {
+          "ms": 479,
+          "event": "ready"
+        },
+        {
+          "ms": 1338,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 7951,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 8111,
+          "event": "response.created"
+        },
+        {
+          "ms": 8111,
+          "event": "response_started"
+        },
+        {
+          "ms": 8121,
+          "event": "fixture_tool_completed"
+        },
+        {
+          "ms": 8121,
+          "event": "output_item",
+          "type": "function_call",
+          "name": "inspect_fixture"
+        },
+        {
+          "ms": 8122,
+          "event": "response.done"
+        },
+        {
+          "ms": 8122,
+          "event": "usage",
+          "inputTokens": 831,
+          "outputTokens": 15,
+          "totalTokens": 846
+        },
+        {
+          "ms": 8122,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 8324,
+          "event": "response.created"
+        },
+        {
+          "ms": 8324,
+          "event": "response_started"
+        },
+        {
+          "ms": 9205,
+          "event": "output_item",
+          "type": "message"
+        },
+        {
+          "ms": 9205,
+          "event": "response.done"
+        },
+        {
+          "ms": 9205,
+          "event": "usage",
+          "inputTokens": 885,
+          "outputTokens": 70,
+          "totalTokens": 955
+        },
+        {
+          "ms": 9205,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

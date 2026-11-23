@@ -1,0 +1,83 @@
+{
+  "date": "2026-09-08",
+  "scope": "optional Host-local LiveKit text turn-detector training pipeline",
+  "status": "engineering-verified-not-deployed",
+  "modelParameters": 258692992,
+  "upstreamRevision": "87e35fcb1e60a569bea70346191c4886ea92e281",
+  "productionEnabled": false,
+  "hostRestarted": false,
+  "phoneInstalled": false,
+  "committed": false,
+  "audioDevicesOpened": false,
+  "privatePhoneFeedbackRead": false,
+  "paidTeacherCalled": false,
+  "defaultCadence": {
+    "loraNewFeedback": 32,
+    "loraMinimumIntervalSeconds": 600,
+    "loraMaximumSteps": 32,
+    "fullNewFeedback": 200,
+    "fullMinimumIntervalSeconds": 604800,
+    "fullMaximumSteps": 512,
+    "onlyWhileHostIdleAndNoCall": true
+  },
+  "tests": {
+    "pythonPassed": 30,
+    "pythonWarnings": [
+      "LiveKit 1.8.0 text plugin is deprecated; this pipeline deliberately pins the public trainable text checkpoint",
+      "PEFT fixture has no pretrained config path and assumes unchanged vocabulary"
+    ],
+    "hostPipelinePassed": 6,
+    "hostPipelineSchedulerUnitUsesMockWorker": true,
+    "ruff": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "pnpmTest": {
+      "mainUnitPassed": 264,
+      "mainUnitSkipped": 1,
+      "homePassed": 18,
+      "silentCallPassed": 4,
+      "voiceControlPassed": 51,
+      "cloudflarePassed": 5,
+      "integrationScenariosPassed": 30,
+      "integrationRetry": "First repeated port range collided with existing listeners; reran all tests on verified-free ports 34180-34219 without stopping those listeners"
+    },
+    "documentationCheck": "passed",
+    "diffCheck": "passed"
+  },
+  "realWeights": {
+    "source": "training/livekit-turn/artifacts/pipeline-final/report.json (gitignored)",
+    "data": "public KE training/calibration fixture only",
+    "lora": {
+      "id": "voice-fit:0887cfd2-ea64-4864-8be3-e1b43e7fbe3a",
+      "steps": 2,
+      "status": "awaiting_check"
+    },
+    "full": {
+      "id": "voice-fit:5dd82261-f98b-4d49-bd3a-fa7682dd315e",
+      "steps": 2,
+      "status": "awaiting_check",
+      "cadence": "compressed to one second in isolated test, not a real week of operation"
+    },
+    "fullFoundationThenFreshAdapterSteps": 2,
+    "resumedAdapterSteps": 2,
+    "resumedReloadAbsoluteError": 0.0000016689300537109375,
+    "pipelineCancellation": {
+      "id": "voice-fit:84bd7e29-764d-4eaa-bfc9-da79a17fa1e4",
+      "status": "cancelled",
+      "exitCode": 130,
+      "realOptimizerStepReached": true,
+      "nativeWorkerReaped": true,
+      "builtCliStatusReadback": "cancelled"
+    },
+    "revocationPurgedGeneratedWeights": true,
+    "activeModelPromoted": false
+  },
+  "acceptanceBoundary": [
+    "Release gates including non-regression were tested with controlled unit fixtures; no real candidate was promoted",
+    "No new blind data or phone conversation demonstrated personal quality improvement",
+    "Earlier full/LoRA 128-step candidates increased early interruption and remain rejected",
+    "Inference and training stay on Host; no mobile transformer deployment or ASR retraining",
+    "No DDSD, speaker identity or automotive noise quality claims",
+    "Explicit environment configuration, new held-out validation and actual phone acceptance remain necessary"
+  ]
+}

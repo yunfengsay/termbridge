@@ -1,0 +1,8 @@
+/.gradle/
+/.idea/
+/local.properties
+/**/build/
+/web/node_modules/
+*.iml
+# Keep local voice/wake-word audio fixtures out of version control
+/app/src/androidTest/assets/wake/*.pcm

@@ -1,0 +1,337 @@
+import { Agent, type AgentMessage, type AgentTool, type StreamFn } from '@earendil-works/pi-agent-core';
+import { DEFAULT_GLOBAL_EXECUTION_MODEL } from './models.js';
+import {
+  type AssistantMessage,
+  type Message,
+  type Model,
+  type TSchema,
+  type Usage,
+} from '@earendil-works/pi-ai';
+import { streamSimple as streamOpenAICompletions } from '@earendil-works/pi-ai/api/openai-completions';
+import type {
+  BrainConversationInput,
+  BrainConversationResult,
+  BrainConversationService,
+  BrainConversationToolResult,
+} from './conversation.js';
+import type {
+  BrainToolCall,
+  BrainToolDefinition,
+  ExecutionForkEvent,
+} from './executionFork.js';
+
+export interface PiBailianBrainConversationOptions {
+  apiKey: string;
+  baseUrl?: string;
+  model?: string;
+  timeoutMs?: number;
+  maxToolRounds?: number;
+  enableThinking?: boolean;
+  request?: typeof fetch;
+  /** Deterministic provider injection for tests. */
+  streamFn?: StreamFn;
+}
+
+const DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+const MAX_TOOL_OUTPUT_CHARS = 64_000;
+const MAX_TOTAL_TOOL_CALLS = 40;
+const EMPTY_USAGE: Usage = {
+  input: 0,
+  output: 0,
+  cacheRead: 0,
+  cacheWrite: 0,
+  totalTokens: 0,
+  cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+};
+
+/** Pi owns the text Brain's conversation and tool loop; Bailian remains the model provider. */
+export class PiBailianBrainConversationService implements BrainConversationService {
+  readonly provider = 'bailian' as const;
+  readonly runtime = 'pi' as const;
+  readonly model: string;
+  private readonly apiKey: string;
+  private readonly baseUrl: string;
+  private readonly timeoutMs: number;
+  private readonly maxToolRounds: number;
+  private readonly request: typeof fetch;
+  private readonly injectedStreamFn?: StreamFn;
+  private readonly enableThinking?: boolean;
+
+  constructor(options: PiBailianBrainConversationOptions) {
+    this.apiKey = options.apiKey.trim();
+    if (!this.apiKey) throw new Error('DASHSCOPE_API_KEY is empty');
+    this.baseUrl = (options.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, '');
+    this.model = options.model?.trim() || DEFAULT_GLOBAL_EXECUTION_MODEL;
+    this.timeoutMs = options.timeoutMs ?? 45_000;
+    this.maxToolRounds = options.maxToolRounds ?? 10;
+    this.request = options.request ?? fetch;
+    this.injectedStreamFn = options.streamFn;
+    this.enableThinking = options.enableThinking ?? false;
+  }
+
+  async respond(input: BrainConversationInput): Promise<BrainConversationResult> {
+    const signal = AbortSignal.any([AbortSignal.timeout(this.timeoutMs), ...(input.signal ? [input.signal] : [])]);
+    signal.throwIfAborted();
+    const instructions = input.instructions.trim();
+    if (!instructions) throw new Error('Global Brain instructions are empty');
+    const conversation = input.messages
+      .map((message) => ({ ...message, content: message.content.trim() }))
+      .filter((message) => message.content);
+    if (conversation.length === 0) throw new Error('Global Brain conversation is empty');
+
+    const latest = conversation.at(-1);
+    if (!latest || latest.role !== 'user') {
+      throw new Error('Global Brain conversation must end with a user message');
+    }
+
+    const model = createBailianModel(this.model, this.baseUrl);
+    const toolCalls: BrainConversationToolResult[] = [];
+    let toolRounds = 0;
+    let toolCallCount = 0;
+    let limitError: Error | undefined;
+    const repeatedFailures = new Map<string, number>();
+    const tools = input.tools.map((tool) => createPiTool(tool, async (call) => {
+      signal.throwIfAborted();
+      const output = (await input.onToolCall(call, signal)).slice(0, MAX_TOOL_OUTPUT_CHARS);
+      signal.throwIfAborted();
+      toolCalls.push({ call, output });
+      const key = toolAttemptKey(call.name, call.arguments);
+      if (isFailedToolOutput(output)) {
+        repeatedFailures.set(key, (repeatedFailures.get(key) ?? 0) + 1);
+      } else {
+        repeatedFailures.delete(key);
+      }
+      return output;
+    }));
+    const streamFn = this.injectedStreamFn ?? ((requestModel, context, options) => (
+      streamOpenAICompletions(requestModel as Model<'openai-completions'>, context, {
+        ...options,
+        apiKey: this.apiKey,
+        fetch: this.request,
+        timeoutMs: this.timeoutMs,
+        maxRetries: 0,
+        temperature: 0.2,
+        maxTokens: requestModel.maxTokens,
+      })
+    ));
+    const agent = new Agent({
+      initialState: {
+        systemPrompt: instructions,
+        model,
+        thinkingLevel: 'off',
+        tools,
+        messages: toPiHistory(conversation.slice(0, -1), model),
+      },
+      streamFn: (requestModel, context, options) => {
+        signal.throwIfAborted();
+        return streamFn(requestModel, context, options);
+      },
+      onPayload: this.enableThinking === undefined ? undefined : (payload) => ({
+        ...payload as Record<string, unknown>, enable_thinking: this.enableThinking,
+      }),
+      toolExecution: 'sequential',
+      beforeToolCall: async ({ toolCall, args }) => {
+        signal.throwIfAborted();
+        if (toolRounds >= this.maxToolRounds) {
+          limitError = new Error('Bailian Global Brain exceeded the tool-call limit');
+          return { block: true, reason: limitError.message, terminate: true };
+        }
+        if (toolCallCount >= MAX_TOTAL_TOOL_CALLS) {
+          limitError = new Error('Bailian Global Brain returned too many tool calls');
+          return { block: true, reason: limitError.message, terminate: true };
+        }
+        if ((repeatedFailures.get(toolAttemptKey(toolCall.name, args)) ?? 0) >= 2) {
+          return {
+            block: true,
+            reason: 'The identical tool call already failed twice. Choose another tool or report the definitive blocker.',
+          };
+        }
+        toolCallCount += 1;
+        return undefined;
+      },
+      shouldStopAfterTurn: ({ toolResults }) => {
+        if (toolResults.length > 0) toolRounds += 1;
+        return signal.aborted || limitError !== undefined;
+      },
+    });
+
+    let eventSequence = 0;
+    let turn = 0;
+    const emit = async (
+      phase: ExecutionForkEvent['phase'],
+      details: Partial<Pick<ExecutionForkEvent, 'turn' | 'summary'>> = {},
+    ) => {
+      if (!input.execution?.observer) return;
+      eventSequence += 1;
+      await input.execution.observer.onEvent({
+        eventId: `${input.execution.forkId}:${eventSequence}`,
+        forkId: input.execution.forkId,
+        requestId: input.execution.requestId,
+        phase,
+        createdAt: Date.now(),
+        model: this.model,
+        ...details,
+      });
+    };
+    agent.subscribe(async (event) => {
+      if (signal.aborted) return;
+      if (event.type === 'turn_start') {
+        turn += 1;
+        await emit('model_started', { turn });
+      } else if (event.type === 'turn_end') {
+        await emit('model_completed', { turn });
+      }
+    });
+
+    await emit('fork_started');
+    let rejectAbort: (reason: Error) => void = () => {};
+    const aborted = new Promise<never>((_resolve, reject) => { rejectAbort = reject; });
+    const onAbort = () => {
+      agent.abort();
+      rejectAbort(new Error(input.signal?.aborted ? 'Execution cancelled by user' : 'Execution timed out'));
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    try {
+      if (signal.aborted) { onAbort(); await aborted; }
+      else await Promise.race([agent.prompt(latest.content), aborted]);
+      signal.throwIfAborted();
+      if (limitError) throw limitError;
+      if (agent.state.errorMessage) {
+        throw new Error(`Bailian Global Brain failed: ${agent.state.errorMessage}`);
+      }
+      const message = lastAssistantMessage(agent.state.messages);
+      if (!message) throw new Error('Bailian Global Brain returned no message');
+      if (message.stopReason === 'error' || message.stopReason === 'aborted') {
+        throw new Error(`Bailian Global Brain failed: ${message.errorMessage || message.stopReason}`);
+      }
+      const text = assistantText(message);
+      if (!text) throw new Error('Bailian Global Brain returned no text');
+      await emit('fork_completed');
+      return { text, provider: 'bailian', model: this.model, toolCalls };
+    } catch (error) {
+      await emit(input.signal?.aborted ? 'fork_cancelled' : 'fork_failed', { summary: safeErrorSummary(error) });
+      throw error;
+    } finally {
+      signal.removeEventListener('abort', onAbort);
+    }
+  }
+}
+
+function createBailianModel(id: string, baseUrl: string): Model<'openai-completions'> {
+  return {
+    id,
+    name: id,
+    api: 'openai-completions',
+    provider: 'bailian',
+    baseUrl,
+    reasoning: true,
+    input: ['text'],
+    cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+    contextWindow: 131_072,
+    maxTokens: 4_096,
+    compat: {
+      supportsStore: false,
+      supportsDeveloperRole: false,
+      supportsReasoningEffort: false,
+      supportsUsageInStreaming: true,
+      supportsFinishReason: true,
+      maxTokensField: 'max_tokens',
+      requiresToolResultName: false,
+      requiresAssistantAfterToolResult: false,
+      requiresThinkingAsText: false,
+      requiresReasoningContentOnAssistantMessages: false,
+      thinkingFormat: 'qwen',
+      supportsStrictMode: false,
+      supportsLongCacheRetention: false,
+    },
+  };
+}
+
+function createPiTool(
+  definition: BrainToolDefinition,
+  execute: (call: BrainToolCall) => Promise<string>,
+): AgentTool<TSchema, Record<string, never>> {
+  return {
+    name: definition.name,
+    label: definition.name,
+    description: definition.description,
+    parameters: definition.parameters as TSchema,
+    executionMode: 'sequential',
+    execute: async (toolCallId, params) => {
+      const output = await execute({
+        callId: toolCallId,
+        name: definition.name,
+        arguments: params as Record<string, unknown>,
+      });
+      return {
+        content: [{ type: 'text', text: output }],
+        details: {},
+      };
+    },
+  };
+}
+
+function safeErrorSummary(error: unknown): string {
+  return (error instanceof Error ? error.message : 'Execution fork failed')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 512);
+}
+
+function isFailedToolOutput(output: string): boolean {
+  try {
+    const value = JSON.parse(output) as { ok?: unknown };
+    return value.ok === false;
+  } catch {
+    return false;
+  }
+}
+
+function toolAttemptKey(name: string, args: unknown): string {
+  return `${name}:${stableJson(args)}`;
+}
+
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, item]) => `${JSON.stringify(key)}:${stableJson(item)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'undefined';
+}
+
+function toPiHistory(
+  messages: BrainConversationInput['messages'],
+  model: Model<'openai-completions'>,
+): Message[] {
+  const startedAt = Date.now() - messages.length;
+  return messages.map((message, index) => message.role === 'user'
+    ? { role: 'user', content: message.content, timestamp: startedAt + index }
+    : {
+        role: 'assistant',
+        content: [{ type: 'text', text: message.content }],
+        api: model.api,
+        provider: model.provider,
+        model: model.id,
+        usage: EMPTY_USAGE,
+        stopReason: 'stop',
+        timestamp: startedAt + index,
+      });
+}
+
+function lastAssistantMessage(messages: AgentMessage[]): AssistantMessage | undefined {
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const message = messages[index];
+    if (message?.role === 'assistant') return message;
+  }
+  return undefined;
+}
+
+function assistantText(message: AssistantMessage): string {
+  return message.content
+    .flatMap((content) => content.type === 'text' ? [content.text] : [])
+    .join('')
+    .trim();
+}

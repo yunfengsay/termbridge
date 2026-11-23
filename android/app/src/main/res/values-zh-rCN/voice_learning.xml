@@ -1,0 +1,27 @@
+<resources>
+    <string name="voice_learning_previous">较新的片段</string>
+    <string name="voice_learning_next">更早的片段</string>
+    <string name="voice_learning_waiting">继续倾听 · 你可以接着说</string>
+    <string name="voice_learning_judge_unavailable">停顿判断暂不可用 · 仍在倾听，尚未派发</string>
+    <string name="voice_learning_adaptive">智能停顿与追问 · 默认开启，下次通话生效。结合前后文判断；未说完且静默约 8 秒时只追问一次，续说时立即停止追问。每个新片段检查一次，失败最多重试一次。不适用于文字执行通话或豆包。</string>
+    <string name="voice_learning_title">个人语音控制</string>
+    <string name="voice_learning_shadow">个人语境学习 · 云端 ASR 保持不变</string>
+    <string name="voice_learning_context_consent">学习我的表达习惯：另行同意保存短句及上一句（各最多 320 字），将我确认的例子同步到当前 Host，允许把相似例子交给云端停顿判断。不是音色识别，不会授权工具。</string>
+    <string name="voice_learning_assist_status">当前 Host：%1$d 个语境标签 · %4$d 条已学会的等待/忽略规则 · 训练 %2$d ms\n%3$s · 相同表达及前文，至少 3 次不同通话确认才形成规则；新语境仍交给模型。无标签时使用通用判断。</string>
+    <string name="voice_learning_detail">默认只收集控制特征，不存录音。另开「学习我的表达习惯」后才保存短句，便于回看纠错。最多 250 个片段、30 天；未确认的片段不上传训练。分别确认「对它说」「说完了」，不确定就跳过。反馈立即更新本地参数，自动同步当前 Host 并训练语境索引；下次判断即可参考。其他 Host 在下次连接时同步，离线删除未回执前不算完成。六特征分类器仍是影子模式，不用于屏蔽讲话。</string>
+    <string name="voice_learning_version">%1$s · %2$d 个确认标签</string>
+    <string name="voice_learning_observation">%1$s · 对它说 %2$d%% / 说完了 %3$d%%（未校准）</string>
+    <string name="voice_learning_addressed">这个片段是在对助手说话吗？</string>
+    <string name="voice_learning_finished">这个停顿处，你的意思说完了吗？</string>
+    <string name="voice_learning_yes">是</string>
+    <string name="voice_learning_no">不是</string>
+    <string name="voice_learning_skip">不确定 / 撤销</string>
+    <string name="voice_learning_sync">重新同步反馈 / 删除到当前 Host</string>
+    <string name="voice_learning_revoke">关闭并清除本地控制数据</string>
+    <string name="voice_learning_revoke_pending">本地数据已更改；请向每个曾同步的 Host 再同步一次，移除其旧数据和参数。</string>
+    <string name="voice_learning_syncing">正在同步已确认反馈，并在 Host 训练与验证…</string>
+    <string name="voice_learning_synced">Host 已确认此版本 · 语境学习随授权生效，六特征分类仍为影子模式</string>
+    <string name="voice_learning_timeout">15 秒内未收到回执，不视为完成；请重试同步。</string>
+    <string name="voice_learning_failed">更新未被接受，请检查连接及当前版本后重试。</string>
+    <string name="voice_learning_host_old">当前 Host 尚不支持，请先更新 Host。</string>
+</resources>

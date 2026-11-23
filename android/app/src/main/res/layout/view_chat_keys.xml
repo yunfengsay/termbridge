@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Terminal's key row, offered in the chat view too.
+
+  These are not text. Each button names a key and the Host turns it into bytes
+  for this conversation's own pane, so nothing here can become a chat message or
+  an arbitrary escape sequence. Ctrl and Alt arm the next supported key; checked
+  state and keycap appearance come from the shared TerminalKey style.
+-->
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:background="?attr/composerBarBackground"
+    android:fillViewport="false"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:id="@+id/chatExtraKeys"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp">
+
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyEsc" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_esc" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyCtrl" style="@style/Widget.Termbridge.TerminalKey" android:checkable="true" android:text="@string/key_ctrl" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyAlt" style="@style/Widget.Termbridge.TerminalKey" android:checkable="true" android:text="@string/key_alt" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyTab" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_tab" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyCtrlC" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_ctrl_c" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyUp" style="@style/Widget.Termbridge.TerminalKey.Wide" android:text="@string/key_up" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyDown" style="@style/Widget.Termbridge.TerminalKey.Wide" android:text="@string/key_down" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyLeft" style="@style/Widget.Termbridge.TerminalKey.Wide" android:text="@string/key_left" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyRight" style="@style/Widget.Termbridge.TerminalKey.Wide" android:text="@string/key_right" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyHome" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_home" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyEnd" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_end" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/chatKeyEnter" style="@style/Widget.Termbridge.TerminalKey" android:text="@string/key_enter" />
+    </LinearLayout>
+</HorizontalScrollView>

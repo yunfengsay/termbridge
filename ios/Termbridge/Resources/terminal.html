@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <link rel="stylesheet" href="terminal.css" />
+    <style>
+      html, body, #terminal { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #0d100e; }
+      #terminal { position: relative; box-sizing: border-box; padding: 8px 8px 4px; touch-action: none; }
+      .xterm, .xterm-screen, .xterm-screen canvas { touch-action: none; }
+      .xterm { height: 100%; }
+      .xterm .xterm-viewport { scrollbar-width: thin; scrollbar-color: #3c473f transparent; }
+      #mobile-transcript {
+        position: absolute;
+        inset: 0;
+        display: none;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+        overflow-anchor: none;
+        padding: 10px 12px 22px;
+        background: #0d100e;
+        color: #dde5db;
+        font: 400 14px/1.42 'Roboto Mono', 'Noto Sans Mono CJK SC', monospace;
+        overflow-wrap: anywhere;
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+      }
+      #mobile-transcript .transcript-line { min-height: 1.42em; white-space: pre-wrap; }
+      #mobile-transcript a { color: inherit; text-decoration: underline; text-underline-offset: 0.12em; }
+      #terminal.mobile-reading .xterm { visibility: hidden; pointer-events: none; }
+      #terminal.mobile-reading #mobile-transcript { display: block; }
+      * { -webkit-tap-highlight-color: transparent; }
+    </style>
+  </head>
+  <body>
+    <div id="terminal">
+      <div id="mobile-transcript" role="log" aria-live="off"></div>
+    </div>
+    <script src="terminal.js"></script>
+  </body>
+</html>

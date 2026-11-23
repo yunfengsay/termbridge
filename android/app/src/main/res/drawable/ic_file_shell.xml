@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Derived from vscode-icons file_type_shell.svg (MIT). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    <path android:fillColor="#B99A18" android:pathData="M29.4,27.6H2.5V4.5H29.4ZM3.5,26.6H28.4V7.4H3.5ZM6.077,19.316L5.522,18.484L10.366,15.255L5.479,11.184L6.12,10.416L12.035,15.344ZM12.7,18.2H20.5V19.2H12.7Z" />
+</vector>

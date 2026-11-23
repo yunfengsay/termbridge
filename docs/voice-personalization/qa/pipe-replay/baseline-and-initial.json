@@ -1,0 +1,221 @@
+{
+  "label": "baseline-and-initial",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "ed380b75a1688646dd60bd4d9950900e8e2fdf46a218fae31d055048d55b391b",
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": false,
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3811.5625,
+      "submitted": [
+        "我最近的。",
+        "agent是什么？"
+      ],
+      "answer": "Agent是用于执行任务的程序，我帮您查询了最近的测试数据。",
+      "outputBytes": 376320,
+      "responseCount": 2,
+      "judgeCalls": 0,
+      "fixtureToolCompletions": 0,
+      "finished": true,
+      "prematureResponses": 1,
+      "events": [
+        {
+          "ms": 477,
+          "event": "session.updated"
+        },
+        {
+          "ms": 478,
+          "event": "ready"
+        },
+        {
+          "ms": 1343,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2623,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2739,
+          "event": "response.created"
+        },
+        {
+          "ms": 2740,
+          "event": "response_started"
+        },
+        {
+          "ms": 2769,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 2769,
+          "event": "submitted",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 3398,
+          "event": "response.done"
+        },
+        {
+          "ms": 3398,
+          "event": "usage",
+          "inputTokens": 775,
+          "outputTokens": 49,
+          "totalTokens": 824
+        },
+        {
+          "ms": 3398,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 4493,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6281,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6403,
+          "event": "response.created"
+        },
+        {
+          "ms": 6403,
+          "event": "response_started"
+        },
+        {
+          "ms": 6448,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 6448,
+          "event": "submitted",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 7374,
+          "event": "response.done"
+        },
+        {
+          "ms": 7374,
+          "event": "usage",
+          "inputTokens": 810,
+          "outputTokens": 77,
+          "totalTokens": 887
+        },
+        {
+          "ms": 7374,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "adaptive": true,
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 733.5625,
+      "pauseMs": 2600,
+      "secondStartsMs": 3552.5625,
+      "submitted": [
+        "我最近的。 agent是什么？"
+      ],
+      "answer": "Agent 是正在执行任务的智能程序，我无法解释其概念，但可以通过 inspect_fixture 查看最近的数据。",
+      "outputBytes": 407040,
+      "responseCount": 1,
+      "judgeCalls": 1,
+      "fixtureToolCompletions": 0,
+      "finished": true,
+      "prematureResponses": 0,
+      "events": [
+        {
+          "ms": 219,
+          "event": "session.updated"
+        },
+        {
+          "ms": 219,
+          "event": "ready"
+        },
+        {
+          "ms": 1065,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 2347,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 2505,
+          "event": "transcript",
+          "text": "我最近的。"
+        },
+        {
+          "ms": 4257,
+          "event": "response.done"
+        },
+        {
+          "ms": 4257,
+          "event": "finished",
+          "status": "interrupted"
+        },
+        {
+          "ms": 4257,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 6004,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 6175,
+          "event": "transcript",
+          "text": "agent是什么？"
+        },
+        {
+          "ms": 8440,
+          "event": "judge",
+          "decision": "respond",
+          "latencyMs": 634,
+          "segments": [
+            "我最近的。",
+            "agent是什么？"
+          ]
+        },
+        {
+          "ms": 8440,
+          "event": "submitted",
+          "text": "我最近的。 agent是什么？"
+        },
+        {
+          "ms": 8629,
+          "event": "response.created"
+        },
+        {
+          "ms": 8629,
+          "event": "response_started"
+        },
+        {
+          "ms": 10237,
+          "event": "response.done"
+        },
+        {
+          "ms": 10237,
+          "event": "usage",
+          "inputTokens": 782,
+          "outputTokens": 131,
+          "totalTokens": 913
+        },
+        {
+          "ms": 10237,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

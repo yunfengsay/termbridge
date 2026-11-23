@@ -1,0 +1,9 @@
+<resources>
+    <string name="completion_confirm">Send a read-only review task to this Agent? This does not approve code changes or deployment.</string>
+    <string name="completion_approve">Send review</string>
+    <string name="completion_sent">Request accepted. Check the receipt card for the current result.</string>
+    <string name="content_copy_link">Copy link</string>
+    <string name="content_loading">Loading preview…</string>
+    <string name="content_failed">Could not open this content</string>
+    <string name="content_unsupported">This file cannot be displayed as text</string>
+</resources>

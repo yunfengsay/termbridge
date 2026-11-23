@@ -1,0 +1,11 @@
+msgid "title"
+msgstr "Pair with TermBridge"
+
+msgid "instructions"
+msgstr "On the phone, open TermBridge > Connection settings > TermBridge Watch. Copy the Zepp pairing code and paste it below."
+
+msgid "pairingCode"
+msgstr "Pairing code"
+
+msgid "privacy"
+msgstr "This code only grants read-only access to the local status bridge on this phone."

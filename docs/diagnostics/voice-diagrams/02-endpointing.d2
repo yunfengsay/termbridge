@@ -1,0 +1,31 @@
+direction: down
+classes: {
+  action: {style.fill: "#E8EFF8"; style.stroke: "#58799C"; style.font-size: 22}
+  decide: {shape: diamond; style.fill: "#FFF0D8"; style.stroke: "#B18943"; style.font-size: 21}
+  safe: {style.fill: "#E4EFEB"; style.stroke: "#4C7770"; style.font-size: 22}
+}
+listen: "持续采音 / 实时字幕\n当前 turnId + revision" {class: action}
+pause: "出现停顿候选\n约 0.5–0.8s 起测，非固定 3s" {class: action}
+context: "判断材料\n当前完整原话 + 最近相关 History\n语调 / 停顿 / 助手是否在等补充" {class: action}
+check: "小模型检查\n只分类，不回答、不调工具" {class: action}
+stale: "期间又说话了\n或 revision 已变化？" {class: decide}
+drop: "废弃旧结果\n追加新语音，继续听" {class: safe}
+addressed: "明确需要助手回应？" {class: decide}
+silent: "附和 / 非对助手说\n不发起任务" {class: safe}
+complete: "这句话完整吗？" {class: decide}
+wait: "动态延长等待\n明显残缺的指令不猜着执行" {class: safe}
+uncertain: "持续不确定 / 判断超时\n保留草稿，等待或澄清" {class: safe}
+commit: "统一提交\n回答或派发一次任务" {class: action}
+listen -> pause -> check -> stale
+context -> check
+stale -> drop: "是"
+drop -> listen
+stale -> addressed: "否"
+addressed -> silent: "明确不是"
+addressed -> uncertain: "不确定"
+addressed -> complete: "是"
+complete -> wait: "没说完"
+complete -> commit: "完整"
+complete -> uncertain: "不确定"
+wait -> listen
+example: "示例：我最近的…… [停 3 秒] Agent 是什么？\n前半句留在当前话轮；不能先提交“我最近的”。\n全部为设计方案，时间阈值需消融验证。" {class: safe}

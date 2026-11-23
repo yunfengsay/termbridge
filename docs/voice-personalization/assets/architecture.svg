@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="650" viewBox="0 0 1080 650" role="img" aria-labelledby="title desc">
+  <title id="title">手机守住边界，Host 管理训练，云端按需参与</title>
+  <desc id="desc">上方是已授权语音进入 Host 和 Omni，再交给执行 Fork 的路径。下方是用户纠错在手机即时更新，获准样本同步给 Host 训练，以及可选云端教师的独立学习路径。所有内容是拟议架构。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#547468" stroke-width="1.4"/></marker>
+    <style>
+      text{font-family:'PingFang SC','Noto Sans CJK SC',sans-serif;fill:#243b35}
+      .label{font-size:13px;letter-spacing:2px;fill:#5c776d}.name{font-size:23px;font-weight:600}.body{font-size:17px}.sub{font-size:14px;fill:#60736d}.node{fill:#fffdf8;stroke:#658676;stroke-opacity:.25;stroke-width:1.2}.link{fill:none;stroke:#547468;stroke-width:1.6;marker-end:url(#arrow)}.learn{stroke-dasharray:5 5}
+    </style>
+  </defs>
+  <rect width="1080" height="650" rx="25" fill="#f6f7f0"/>
+  <rect x="24" y="25" width="305" height="553" rx="20" fill="#e5eee5"/>
+  <rect x="380" y="25" width="305" height="553" rx="20" fill="#f1ede2"/>
+  <rect x="736" y="25" width="320" height="553" rx="20" fill="#e8edf2"/>
+  <text x="46" y="60" class="label">01 / ON DEVICE</text><text x="46" y="96" class="name">手机：决定是否进入交互</text>
+  <text x="402" y="60" class="label">02 / YOUR HOST</text><text x="402" y="96" class="name">Mac mini：执行与训练</text>
+  <text x="758" y="60" class="label">03 / ON DEMAND</text><text x="758" y="96" class="name">云端：交流与辅助标注</text>
+  <rect x="46" y="137" width="260" height="92" rx="14" class="node"/>
+  <text x="64" y="173" class="body">唤醒 / 人声 / DDSD</text><text x="64" y="202" class="sub">候选留在本机，接受后才上送</text>
+  <rect x="402" y="137" width="260" height="92" rx="14" class="node"/>
+  <text x="420" y="173" class="body">语音网关 / TurnCoordinator</text><text x="420" y="202" class="sub">身份、修订、唯一提交点</text>
+  <rect x="758" y="137" width="272" height="92" rx="14" class="node"/>
+  <text x="776" y="173" class="body">Omni 低延迟语音</text><text x="776" y="202" class="sub">保留连续交互，不全天上传</text>
+  <path d="M307 170H400" class="link"/><text x="354" y="151" text-anchor="middle" class="sub">已授权</text>
+  <path d="M663 170H756" class="link"/>
+  <path d="M758 209H665" class="link"/><text x="710" y="252" text-anchor="middle" class="sub">字幕 / 提案</text>
+  <rect x="46" y="287" width="260" height="82" rx="14" class="node"/>
+  <text x="64" y="321" class="body">冻结底座 + 个人小层</text><text x="64" y="349" class="sub">下一话语边界切换版本</text>
+  <path d="M175 286V233" class="link"/>
+  <rect x="402" y="287" width="260" height="82" rx="14" class="node"/>
+  <text x="420" y="321" class="body">Pi / Fork → 工具与 Worker</text><text x="420" y="349" class="sub">批准、取消、进度、结果回执</text>
+  <path d="M532 230V284" class="link"/>
+  <text x="783" y="310" class="sub">工具完成可通知</text><text x="783" y="337" class="sub">但不能重新打开麦克风</text>
+  <path d="M44 402H1030" stroke="#859589" stroke-opacity=".25" stroke-dasharray="3 7"/>
+  <rect x="46" y="434" width="260" height="96" rx="14" class="node"/>
+  <text x="64" y="469" class="body">明确纠错 / 有界样本</text><text x="64" y="499" class="sub">本机立即学习，上传另行授权</text>
+  <path d="M175 433V373" class="link learn"/>
+  <rect x="402" y="434" width="260" height="96" rx="14" class="node"/>
+  <text x="420" y="469" class="body">训练 → 留出评测 → 模型包</text><text x="420" y="499" class="sub">可取消、可追溯、可撤销</text>
+  <path d="M308 457H400" class="link learn"/>
+  <path d="M401 506H309" class="link learn"/><text x="354" y="551" text-anchor="middle" class="sub">授权同步 / 下发</text>
+  <rect x="758" y="434" width="272" height="96" rx="14" class="node"/>
+  <text x="776" y="469" class="body">可选大模型教师</text><text x="776" y="499" class="sub">样本复核；无业务工具权限</text>
+  <path d="M664 457H756" class="link learn"/><path d="M757 506H665" class="link learn"/>
+  <text x="45" y="615" class="sub">实线：实时交互</text><path d="M198 609H246" class="link"/>
+  <text x="282" y="615" class="sub">虚线：异步学习</text><path d="M438 609H486" class="link learn"/>
+  <text x="1033" y="615" class="sub" text-anchor="end">目标架构 · 非已部署能力</text>
+</svg>

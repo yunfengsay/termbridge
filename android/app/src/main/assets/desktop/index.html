@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'">
+<link rel="stylesheet" href="desktop.css"><title>远程桌面</title></head><body>
+<nav aria-label="桌面控制"><select id="displays" aria-label="显示器"></select><button id="previous" aria-label="上一个桌面">‹</button><button id="overview">所有桌面</button><button id="next" aria-label="下一个桌面">›</button><button id="fit">100%</button><button id="keyboard">键盘</button></nav>
+<main id="viewport"><div id="empty"><div class="display-symbol" aria-hidden="true"></div><h1>电脑桌面</h1><p id="empty-message">正在准备连接…</p></div><div id="screen"><div id="highlight" hidden></div></div><div id="touch" aria-label="远程桌面操作区域"></div></main>
+<div id="typing" hidden><form id="type"><input id="text" type="text" placeholder="输入文字，支持中文" autocomplete="off"><button type="submit">发送</button></form><div class="keys"><button id="escape">Esc</button><button id="tab">Tab</button><button id="backspace">⌫</button><button id="enter">Enter</button></div></div>
+<footer><button id="drag" aria-pressed="false">拖动</button><button id="scroll">双指滚动</button><select id="fps" aria-label="刷新率"><option value="10">10 FPS · 省流</option><option value="20">20 FPS · 均衡</option><option value="30">30 FPS · 流畅</option></select><span id="status" role="status">正在准备桌面…</span><button id="reconnect" hidden>重连</button></footer>
+<script src="desktop.js"></script></body></html>

@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "TermBridge",
+  "version": "0.1.0",
+  "description": "在你允许时，让 TermBridge Agent 读取和操作 Chrome 网页。",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0r+2ExL6Nbz8JrmBhzPmHk/DxgJec+3TRgOrmuLFQBJ79iXhQY2kaidGoy7hEyf+pIe1BW/KZPF3gv2Rl4KgA4SBA6KQPrv4VG1l1b5+Y3mCYXOUNSAGgyGtQxZBN2mRxPygFLU7JaXgpZ6NyprLzdl+Xm+zSBzlMrCQs8tAjmkXN0O5w9XE2tPr6HAg6GvFe6pMp9UZ2sUA0dMcRspyldKaKePWFuqL0vcwuyTNrIAdEwoGaz0j/EboioWv/fBLWQVTjMgeEjlEfCBaOAyEPqm6bQvQnl+3SY3jYz5JAiKK2GYOR8OXsg5OiggEb2O+7deDio0Oj5EAYXwUWOccIQIDAQAB",
+  "permissions": [
+    "nativeMessaging",
+    "storage",
+    "tabs",
+    "scripting",
+    "activeTab"
+  ],
+  "optional_host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "128": "icon.png"
+  }
+}

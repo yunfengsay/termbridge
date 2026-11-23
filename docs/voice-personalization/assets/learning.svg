@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="490" viewBox="0 0 1080 490" role="img" aria-labelledby="title desc">
+  <title id="title">一次明确纠正，进入两条学习路径</title>
+  <desc id="desc">快路径在手机执行小步更新并校验，下一句话使用新参数。慢路径经授权同步到 Host 训练和评测，再把兼容版本下发手机。删除和撤销贯穿所有阶段。</desc>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#587569" stroke-width="1.4"/></marker>
+    <style>text{font-family:'PingFang SC','Noto Sans CJK SC',sans-serif;fill:#243b35}.head{font-size:22px;font-weight:600}.sub{font-size:15px;fill:#60736d}.eyebrow{font-size:13px;letter-spacing:2px;fill:#698173}.line{fill:none;stroke:#587569;stroke-width:1.7;marker-end:url(#a)}.slow{stroke-dasharray:5 5}</style>
+  </defs>
+  <rect width="1080" height="490" rx="24" fill="#f6f7f0"/>
+  <text x="42" y="43" class="eyebrow">FAST LOOP / 本机即时适应</text>
+  <g fill="#e2eee4"><rect x="40" y="70" width="275" height="115" rx="15"/><rect x="400" y="70" width="275" height="115" rx="15"/><rect x="760" y="70" width="275" height="115" rx="15"/></g>
+  <text x="61" y="109" class="head">明确纠正这一次</text><text x="61" y="142" class="sub">片段 ID + 标签 + 同意版本</text><text x="61" y="164" class="sub">不是“用户没投诉就算正确”</text>
+  <text x="421" y="109" class="head">小步更新个人层</text><text x="421" y="142" class="sub">冻结底座 / 去重 / 限幅 / 校验</text><text x="421" y="164" class="sub">不需要等 Host 在线</text>
+  <text x="781" y="109" class="head">下一句话生效</text><text x="781" y="142" class="sub">显示实际版本；支持撤销</text><text x="781" y="164" class="sub">不在半句话中替换参数</text>
+  <path d="M317 127H397" class="line"/><path d="M677 127H757" class="line"/>
+  <text x="42" y="266" class="eyebrow">SLOW LOOP / HOST 训练与验证</text>
+  <g fill="#eee9dc"><rect x="40" y="290" width="275" height="115" rx="15"/><rect x="400" y="290" width="275" height="115" rx="15"/><rect x="760" y="290" width="275" height="115" rx="15"/></g>
+  <text x="61" y="329" class="head">获准样本增量同步</text><text x="61" y="362" class="sub">特征优先 / 原音单独授权</text><text x="61" y="384" class="sub">隐私数据只给选定训练 Host</text>
+  <text x="421" y="329" class="head">训练 + 独立留出评测</text><text x="421" y="362" class="sub">可选教师建议；不覆盖人工标签</text><text x="421" y="384" class="sub">任务有 ID、进度与取消回执</text>
+  <text x="781" y="329" class="head">版本下发 + 影子运行</text><text x="781" y="362" class="sub">验签 / 兼容性 / 未同步事件重放</text><text x="781" y="384" class="sub">没有验证收益，就不自动晋升</text>
+  <path d="M317 347H397" class="line slow"/><path d="M677 347H757" class="line slow"/>
+  <path d="M178 187V232H120V287" class="line slow"/>
+  <path d="M899 289V189" class="line slow"/><text x="919" y="239" class="sub">兼容候选</text>
+  <path d="M40 438H1035" stroke="#668070" stroke-opacity=".18"/>
+  <text x="43" y="466" class="sub">撤销不是只删一条记录：还要撤销它对个人参数、同步队列和派生模型的影响。</text>
+</svg>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f4">
+  <meta name="description" content="TermBridge 把电脑上的 Agent 终端带到手机和另一台 Mac。下载 CLI、Android 和 macOS App，扫码连接，接着工作。">
+  <meta property="og:title" content="TermBridge — 终端在电脑，掌控在手边。">
+  <meta property="og:description" content="连接你的 Agent 终端。CLI、Android、macOS，一处下载。">
+  <meta property="og:type" content="website">
+  <title>TermBridge — 终端在电脑，掌控在手边。</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要内容</a>
+  <header class="header wrap">
+    <a class="brand" href="/" aria-label="TermBridge 首页"><img class="brand-logo" src="/favicon.svg" width="36" height="36" alt="">TermBridge</a>
+    <nav aria-label="主要导航"><a href="#how">如何连接</a><a href="#faq">常见问题</a><a class="nav-download" href="#downloads">下载 <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">TERMBRIDGE / 远程 Agent 终端</p>
+        <h1 id="hero-title">终端在电脑，<br>掌控在手边。</h1>
+        <p class="lede">用手机或另一台 Mac，直接接入电脑上的 Codex、Claude Code 和终端会话。查看进度、输入命令，接着工作。</p>
+        <div class="hero-actions"><a class="button primary" href="#downloads">下载 TermBridge <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-note">Android · macOS · CLI</p>
+      </div>
+      <figure class="connection-preview" aria-label="电脑终端连接到手机的示意，包含 CLI 实际输出">
+        <div class="terminal-window">
+          <div class="terminal-titlebar"><span class="window-controls" aria-hidden="true"><i></i><i></i><i></i></span><span>Mac mini — TermBridge</span></div>
+          <div class="terminal-sessionbar"><span>bash</span><span>CLI 0.1.24</span></div>
+          <div class="terminal-screen"><div class="shell-command"><span>$</span> tb ls</div><pre>╭───┬─────────┬────────┬────────┬─────────┬──────────╮
+│ # │ session │ source │ id     │ viewers │ status   │
+├───┼─────────┼────────┼────────┼─────────┼──────────┤
+│ 1 │ bash    │ PTY    │ sess-1 │ 1       │ ● active │
+╰───┴─────────┴────────┴────────┴─────────┴──────────╯
+  attach tb &lt;#|id&gt;   ·   kill owned PTY tb kill &lt;#&gt;</pre><div class="shell-command attach-command"><span>$</span> tb 1<span class="terminal-caret" aria-hidden="true"></span></div><p class="terminal-caption">进入同一个会话，继续输入。</p></div>
+        </div>
+        <div class="device-connector" aria-hidden="true"><span></span><b>同一会话</b><span></span></div>
+        <div class="phone-shell" aria-hidden="true">
+          <div class="phone-camera"></div><div class="mobile-brand">TermBridge</div><div class="mobile-host">Mac mini <span>⌄</span></div><div class="mobile-session">bash <span>PTY</span></div><div class="mobile-terminal"><span class="mobile-prompt">$</span> tb --version<br>0.1.24<br><br><span class="mobile-prompt">$</span><span class="terminal-caret"></span></div><div class="mobile-toolbar"><span>esc</span><span>ctrl</span><span>tab</span><span>↑</span><span>↓</span></div><div class="mobile-composer">输入到终端…<span>↵</span></div><div class="phone-home"></div>
+        </div>
+        <figcaption>连接示意 · CLI 使用测试会话的实际输出</figcaption>
+      </figure>
+    </section>
+    <section class="downloads-section" id="downloads" aria-labelledby="downloads-title">
+      <div class="wrap">
+        <div class="section-heading"><div><p class="eyebrow">下载与安装</p><h2 id="downloads-title">先连接电脑，再选择客户端。</h2></div></div>
+        <div class="download-grid">
+          <article class="cli-download" id="cli"><div class="platform-label"><span class="platform-icon" aria-hidden="true">&gt;_</span><span>01 / 运行 Agent 的电脑</span></div><h3>安装 CLI，启动 Host</h3><p>在 Mac 或 Linux 上运行。安装后，按下方连接指南生成配对码。</p><div class="command-block"><code id="install-command">npm install -g agent-termbridge</code><button class="copy-command" type="button" data-copy="npm install -g agent-termbridge">复制安装命令 <span aria-hidden="true">↗</span></button></div><div class="download-meta">v{{CLI_VERSION}} · 建议 Node.js 24 LTS</div><div class="cli-links"><a href="{{CLI_URL}}">下载 npm 安装包 ↗</a><a href="https://www.npmjs.com/package/agent-termbridge">查看 npm ↗</a></div><div class="platform-notes"><p class="platform-note">Host 推荐 macOS / Linux；Windows 请使用 WSL2。</p><p class="platform-note">{{CLI_APP_INSTALL_NOTE}}</p></div></article>
+          <div class="client-step"><span>02 / 用来连接的设备</span><h3>下载你需要的 App</h3></div><div class="app-downloads">
+            <article class="app-download" id="android"><div class="app-heading"><img class="download-app-icon" src="/favicon.svg" width="56" height="56" alt=""><div><h3>Android</h3><span>手机端 · Android 7.0 及以上</span></div><span class="release-pill">测试版</span></div><p>扫码连接，查看 Agent 状态，操作终端，或通过 Global 文字与语音交互。此版本新增设置里的「会话界面」：自动选择 / 对话 / 终端，默认自动选择，会话内也能切换。对话视图还需要运行中的 Host 支持 Agent 对话，当前已发布的 CLI 尚未包含，终端不受影响，可正常使用。</p><div class="download-action"><a class="button secondary" href="{{ANDROID_URL}}" download>下载 Android APK <span aria-hidden="true">↓</span></a><span>v{{ANDROID_VERSION}}<br>{{ANDROID_SIZE}} · APK</span></div></article>
+            <article class="app-download" id="macos"><div class="app-heading"><img class="download-app-icon" src="/favicon.svg" width="56" height="56" alt=""><div><h3>macOS</h3><span>电脑端 · macOS 13+ · Apple Silicon</span></div><span class="release-pill">{{MACOS_CHANNEL}}</span></div><p>{{MACOS_FEATURES}}</p><div class="download-action"><a class="button secondary" href="{{MACOS_URL}}" download>下载 Mac App <span aria-hidden="true">↓</span></a><span>v{{MACOS_VERSION}}<br>{{MACOS_SIZE}} · {{MACOS_FORMAT}}</span></div><p class="app-note">{{MACOS_RELEASE_NOTE}}</p><p class="app-note">{{MACOS_SIGNING_SUMMARY}}<a href="#mac-install">查看安装说明 ↗</a></p></article>
+<!--WINDOWS_CARD_START--><article class="app-download" id="windows"><div class="app-heading"><img class="download-app-icon" src="/favicon.svg" width="56" height="56" alt=""><div><h3>Windows</h3><span>电脑端 · Windows 11 x64 · 需要 WebView2</span></div><span class="release-pill">预览版</span></div><p>原生客户端：电脑列表、会话列表、配对、设置都是 Windows 原生控件，终端画面用 WebView2。安装到当前用户目录，不需要管理员权限，并附带离线 CLI 作为本机桥接。在这台电脑上运行 Host 仍建议使用 WSL2。</p><div class="download-action"><a class="button secondary" href="{{WINDOWS_URL}}" download>下载 Windows 安装包 <span aria-hidden="true">↓</span></a><span>v{{WINDOWS_VERSION}}<br>{{WINDOWS_SIZE}} · EXE</span></div><p class="app-note">{{WINDOWS_BUNDLED_CLI}}</p><p class="app-note">安装包未做 Authenticode 签名，SmartScreen 可能提示「未知发布者」，请对照 <a href="/downloads/checksums.txt">SHA-256 校验</a> 后再运行。</p></article><!--WINDOWS_CARD_END-->
+          </div>
+        </div>
+        <div class="availability"><p><strong>iPhone / iPad</strong><span>客户端开发中，暂无公开 IPA、TestFlight 或 App Store 下载。</span></p><a href="/downloads/checksums.txt">安装包 SHA-256 校验 ↗</a></div>
+      </div>
+    </section>
+    <section class="product wrap" aria-labelledby="product-title">
+      <div class="product-copy"><p class="eyebrow">MAC APP</p><h2 id="product-title">每一台电脑，<br>都有自己的连接。</h2><p>在设置中添加配对码，再通过 Host 标签切换。终端和连接设置都在 App 里。</p></div>
+      <figure class="product-shot"><img src="/mac-settings.png" width="1420" height="1140" loading="lazy" alt="TermBridge macOS 原生连接设置：左侧选择本机或其他连接，右侧填写连接信息或粘贴配对码。"><figcaption>macOS 原生设置界面 · 使用示例连接，非实时会话</figcaption></figure>
+    </section>
+    <section class="setup wrap" id="how" aria-labelledby="setup-title"><div class="setup-intro"><p class="eyebrow">FIRST CONNECTION</p><h2 id="setup-title">三步，把终端<br>带到手边。</h2><p>以 Mac + Android 为例。<br>配对一次，下次直接连接。</p></div><ol class="steps"><li><span class="step-number">01</span><div><h3>在电脑上安装 CLI</h3><p>{{CLI_SETUP_INTRO}}</p><div class="step-command"><code>npm install -g agent-termbridge</code><button type="button" data-copy="npm install -g agent-termbridge" aria-label="复制第一步安装命令">复制</button></div></div></li><li><span class="step-number">02</span><div><h3>生成配对码，启动 Host</h3><p>{{PAIRING_SETUP_INTRO}}</p><div class="step-command"><code>tb cloudflare pair<br>tb host enable</code><button type="button" data-copy="tb cloudflare pair&#10;tb host enable" aria-label="复制配对与启动命令">复制</button></div></div></li><li><span class="step-number">03</span><div><h3>在手机上扫码，选择会话</h3><p>安装 Android App，在连接设置中选择「Scan pairing QR」。Mac App 可以在设置中粘贴同一配对码。重复配对其他电脑，就能通过标签切换。</p></div></li></ol></section>
+    <section class="faq wrap" id="faq" aria-labelledby="faq-title"><div><p class="eyebrow">GOOD TO KNOW</p><h2 id="faq-title">连接之前，<br>你可能想知道。</h2></div><div class="questions"><details><summary>电脑和手机需要在同一 Wi-Fi 下吗？<span>+</span></summary><p>使用官方 TermBridge Cloud 中继时不需要。电脑与手机客户端分别建立 WSS 出站连接；电脑需要保持开机、联网且 Host 正在运行。你也可以自行部署 Relay。</p></details><details><summary>终端内容会经过中继吗？<span>+</span></summary><p>会。WSS 加密传输链路，但目前不是端到端加密，终端内容会在中继中解密和转发。配对码包含连接密钥，请不要公开分享。需要自己管理中继时，可以使用 CLI 的自建 Relay 配置。</p></details><details id="mac-install"><summary>如何安装 Mac 客户端？<span>+</span></summary><p>{{MACOS_INSTALL_STEP}}旧版名为 TermBridge Control Center，请先退出旧版，安装新版后移走旧 App；连接设置会保留。{{MACOS_INSTALL_SECURITY}}</p><p>打开后点击齿轮或按 ⌘, 进入连接设置，可粘贴配对码或点击「导入 TB 命令行配置」。如果 CLI 使用自定义配置位置，点击「选择配置文件」导入对应的 JSON 文件。运行 Agent 的电脑仍需启动 CLI Host。远程直接接入 Herdr 需要 Host 0.1.24 或更新版本。</p></details><details><summary>Android 是正式商店版吗？<span>+</span></summary><p>目前提供可直接安装的 Debug 签名测试 APK，适合体验和反馈。按 Android 的提示允许浏览器安装此应用；如果已有不同签名的版本，不要直接卸载，以免丢失数据。</p></details><details id="session-ui"><summary>「会话界面」的自动 / 对话 / 终端是什么？<span>+</span></summary><p>{{SESSION_UI_PLATFORMS}}它是这台设备上的本机设置，不会同步到其他设备，也不会改变电脑上的 Agent。自动会让可识别的 Codex / Claude 会话开在对话视图，其余开在终端；对话和终端则固定用某一种打开。每个会话内都有切换开关，切换只换这台设备的视图，不会重启或接管 Agent。</p><p>对话视图还需要所连接的那台 Host 支持 Agent 对话，也就是真正在跑 Agent 的电脑。{{SESSION_UI_HOST_NOTE}}{{SESSION_UI_WINDOWS_NOTE}}Host 不支持时，对话视图会说明原因并回到终端，终端本身不受影响。附件、停止和审批一律在终端操作。</p></details><details><summary>关闭客户端，会结束 Agent 吗？<span>+</span></summary><p>断开终端连接不会销毁已有 Herdr 会话。CLI 终端连接中，Ctrl+C 发给远端任务；Ctrl+] 打开断开提示，再按 D 退出当前连接。Host 服务与终端客户端分别管理。</p></details></div></section>
+  </main>
+  <footer class="wrap footer"><a class="brand" href="/"><img class="brand-logo" src="/favicon.svg" width="36" height="36" alt="">TermBridge</a><p>你的电脑。你的终端。随手可达。</p><a href="#downloads">开始连接 ↗</a></footer>
+  <div id="copy-status" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

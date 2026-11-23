@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_settings_voice">语音、系统授权与后台行为</string>
+    <string name="app_settings_voice_title">语音与授权</string>
+    <string name="app_update_title">应用更新</string>
+    <string name="app_update_current">当前版本：%1$s</string>
+    <string name="app_update_hint">检查官网发布版本。不在后台自动下载，安装前由 Android 系统确认。</string>
+    <string name="app_update_check">检查更新</string>
+    <string name="app_update_checking">正在检查官网版本…</string>
+    <string name="app_update_latest">当前没有更新的已发布版本。</string>
+    <string name="app_update_available">发现新版本：%1$s（%2$d）· %3$.1f MB</string>
+    <string name="app_update_unsupported">该版本需要 Android API %1$d 或更高版本。</string>
+    <string name="app_update_download">下载新版本</string>
+    <string name="app_update_progress">正在下载并校验：%1$d%%</string>
+    <string name="app_update_ready">安装包校验通过。更新保留应用数据和连接设置。</string>
+    <string name="app_update_install">安装更新</string>
+    <string name="app_update_installing">等待 Android 系统安装确认…</string>
+    <string name="app_update_error">更新失败，可重新检查并重试。\n%1$s</string>
+    <string name="app_update_permission_return">请在系统设置中允许 TermBridge 安装应用，返回后再次点击「安装更新」。</string>
+</resources>

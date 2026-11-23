@@ -1,0 +1,11 @@
+msgid "title"
+msgstr "与 TermBridge 配对"
+
+msgid "instructions"
+msgstr "在手机打开 TermBridge > 连接设置 > TermBridge 手表，复制 Zepp 配对码并粘贴到下面。"
+
+msgid "pairingCode"
+msgstr "配对码"
+
+msgid "privacy"
+msgstr "此配对码只能读取这台手机上的精简状态，不能访问终端或连接密钥。"

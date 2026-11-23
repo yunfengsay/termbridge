@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TermBridge action icon: 24-unit grid, 1.7-unit rounded stroke. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp" android:height="22dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="@android:color/transparent"
+        android:strokeColor="?attr/colorOnSurface" android:strokeWidth="1.7"
+        android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M8,3H4a1,1 0,0 0,-1 1v4M16,3h4a1,1 0,0 1,1 1v4M21,16v4a1,1 0,0 1,-1 1h-4M8,21H4a1,1 0,0 1,-1 -1v-4M7,8h10v8H7Z" />
+</vector>

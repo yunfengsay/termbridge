@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "rawPersonalRecordings": 0,
+  "realDeviceTests": 0,
+  "note": "Small development set; failed experiments retained. Not an independent accuracy benchmark.",
+  "manifest": [
+    {
+      "label": "baseline-and-initial",
+      "sha256": "ed380b75a1688646dd60bd4d9950900e8e2fdf46a218fae31d055048d55b391b",
+      "rows": 2
+    },
+    {
+      "label": "lease-race",
+      "sha256": "bf4d025ff4d8470bf56518856bd56e3eb0bb944bafe06f97c0bd5dccc426edde",
+      "rows": 2
+    },
+    {
+      "label": "joined-context",
+      "sha256": "9f00a214fd404f1c7b02d94542821fd7739f335fc74a1498a3f431ee6e2a8205",
+      "rows": 2
+    },
+    {
+      "label": "judge-timeout",
+      "sha256": "ebf86111b601c0c8337531b383125a654b0e953c650a3c063c6f6b9a77808c16",
+      "rows": 1
+    },
+    {
+      "label": "deterministic-judge",
+      "sha256": "da667a4cc7b671c5be614a8e0e467dda672c1e6a6a7369d2bf1722e6c6e5dfaa",
+      "rows": 1
+    },
+    {
+      "label": "intent-context",
+      "sha256": "2fb1809d7d245d670ed3cd4de5306363ae5338362fae2481ec728c326e631d54",
+      "rows": 1
+    },
+    {
+      "label": "candidate-first-pass",
+      "sha256": "f516a57ab225addb096a9296b70e21a4ad25f534c5e446b7a05488ac1e0926d2",
+      "rows": 1
+    },
+    {
+      "label": "provider-three-seconds",
+      "sha256": "b7600c3c2f744d02452192b0f9e8daac1c03657f164f6ac6ec1c701e378e0d99",
+      "rows": 1
+    },
+    {
+      "label": "long-pause-first",
+      "sha256": "0e1a4b3d347f37febde7dd9061a498a8503a1d708d39f1477610dbe6fc0d19d0",
+      "rows": 1
+    },
+    {
+      "label": "candidate-strict-pass",
+      "sha256": "063e2c69317558f8afb59793522d0b72e6f7880294244eddc888b6b5eccaf824",
+      "rows": 1
+    },
+    {
+      "label": "long-pause-strict-fail",
+      "sha256": "2974e58b003c3d0af746a1ea1e9125e022fe4256cb4de77c08bf91927da93aae",
+      "rows": 1
+    },
+    {
+      "label": "second-turn-before-fallback",
+      "sha256": "74db1a4dc8ad9f3c4cd3fd80d5e89b67bfe7fd781464552fd7fad2d7ea46870e",
+      "rows": 1
+    },
+    {
+      "label": "server-vad-4500-pass",
+      "sha256": "10e48d152ce706dab2f8f1e3ddb3034342c223f7eae06042da8f20e302946c64",
+      "rows": 1
+    },
+    {
+      "label": "two-turns-fallback-pass",
+      "sha256": "834ee63b0a129ca042d7681429ac072e8f76cbb60227c31d7f0eda835775668e",
+      "rows": 1
+    },
+    {
+      "label": "long-pause-clarification-pass",
+      "sha256": "8a96ba60f31bf4eb276d08ce4ddb47e76907def18a3a7e316bc8d8857b2d6b67",
+      "rows": 1
+    },
+    {
+      "label": "communication-judge-before",
+      "sha256": "cbda899a807d026bef01b561a471883b4de87fae28f4b15c9f5a93602e6e7518",
+      "rows": 12
+    },
+    {
+      "label": "communication-judge-after",
+      "sha256": "c92ca3f7ee311b72112bbd4c30715bc2322f0a5a0ef19d8b8e2ace5d6602ce64",
+      "rows": 13
+    },
+    {
+      "label": "communication-continuation-pass",
+      "sha256": "d22f1ba366713e46fb7b1616cf0c9a0a7d8aa99ba7484544d00d519aee063194",
+      "rows": 1
+    },
+    {
+      "label": "communication-early-reply-boundary",
+      "sha256": "a693cb477a5ade4cae7a5a92a81dc3588027a56d6080cc5959ad4027dfa62411",
+      "rows": 1
+    },
+    {
+      "label": "communication-judge-repeat",
+      "sha256": "99e15ec386a5bbc6c10e5182c07e00b8fb99c726eca2cc5ee8afa3b4221dca00",
+      "rows": 13
+    },
+    {
+      "label": "agent-continuation-recheck",
+      "sha256": "537b54a05fac47a5148799d71ed3787c32199ee6e4c94e3b608dbf0acb9185ab",
+      "rows": 1
+    }
+  ]
+}

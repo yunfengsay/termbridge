@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The composer is one layout used by two screens with different palettes, so its
+  colours come from the effective theme rather than from fixed values. The
+  terminal keeps its dark bar; the chat view follows the app's day/night theme
+  like the toolbar and the transcript above it.
+-->
+<resources>
+    <attr name="composerKeyBackground" format="color" />
+    <attr name="composerKeyStroke" format="color" />
+    <attr name="composerBarBackground" format="color" />
+    <attr name="composerFieldBackground" format="color" />
+    <attr name="composerFieldStroke" format="color" />
+    <attr name="composerText" format="color" />
+    <attr name="composerHintText" format="color" />
+    <attr name="composerIconTint" format="color" />
+    <attr name="composerSendTint" format="color" />
+    <attr name="composerStatusText" format="color" />
+    <attr name="composerSendEnabled" format="color" />
+    <attr name="composerSendDisabled" format="color" />
+</resources>

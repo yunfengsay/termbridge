@@ -1,0 +1,16 @@
+{
+  "name": "@termbridge/downloads-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-release.mjs",
+    "check": "node scripts/verify-release.mjs",
+    "test": "node --test test/*.test.mjs",
+    "dev": "wrangler pages dev dist --port 8794",
+    "deploy": "npm run check && wrangler pages deploy dist --project-name termbridge --branch master",
+    "build:web": "node scripts/render-site.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.127.1"
+  }
+}

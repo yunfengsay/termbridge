@@ -1,0 +1,205 @@
+{
+  "result": "pass",
+  "at": "2026-09-07T18:48:55.951Z",
+  "browser": "152.0.7977.82",
+  "externalRequests": 0,
+  "runtimeErrors": 0,
+  "cases": [
+    {
+      "name": "desktop-1440",
+      "viewport": 1440,
+      "content": 1440,
+      "images": [
+        {
+          "loaded": true,
+          "file": "assets/interaction.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/learning.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/architecture.svg"
+        }
+      ],
+      "panels": [
+        {
+          "width": 932,
+          "scrollWidth": 932,
+          "labelled": true
+        },
+        {
+          "width": 932,
+          "scrollWidth": 932,
+          "labelled": true
+        },
+        {
+          "width": 932,
+          "scrollWidth": 932,
+          "labelled": true
+        }
+      ]
+    },
+    {
+      "name": "synthetic-feedback",
+      "negative": 52.2,
+      "positive": "increases",
+      "undo": "pass",
+      "reset": "pass",
+      "budget": 8,
+      "refresh": "clears",
+      "cssTransform": "pass",
+      "keyboardSkipLink": "pass"
+    },
+    {
+      "name": "print-media",
+      "viewport": 1440,
+      "content": 1440,
+      "images": [
+        {
+          "loaded": true,
+          "file": "assets/interaction.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/learning.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/architecture.svg"
+        }
+      ],
+      "panels": [
+        {
+          "width": 1428,
+          "scrollWidth": 1428,
+          "labelled": true
+        },
+        {
+          "width": 1428,
+          "scrollWidth": 1428,
+          "labelled": true
+        },
+        {
+          "width": 1428,
+          "scrollWidth": 1428,
+          "labelled": true
+        }
+      ]
+    },
+    {
+      "name": "mobile-390",
+      "viewport": 390,
+      "content": 390,
+      "images": [
+        {
+          "loaded": true,
+          "file": "assets/interaction.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/learning.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/architecture.svg"
+        }
+      ],
+      "panels": [
+        {
+          "width": 350,
+          "scrollWidth": 680,
+          "labelled": true
+        },
+        {
+          "width": 350,
+          "scrollWidth": 680,
+          "labelled": true
+        },
+        {
+          "width": 350,
+          "scrollWidth": 680,
+          "labelled": true
+        }
+      ]
+    },
+    {
+      "name": "mobile-320",
+      "viewport": 320,
+      "content": 320,
+      "images": [
+        {
+          "loaded": true,
+          "file": "assets/interaction.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/learning.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/architecture.svg"
+        }
+      ],
+      "panels": [
+        {
+          "width": 280,
+          "scrollWidth": 680,
+          "labelled": true
+        },
+        {
+          "width": 280,
+          "scrollWidth": 680,
+          "labelled": true
+        },
+        {
+          "width": 280,
+          "scrollWidth": 680,
+          "labelled": true
+        }
+      ]
+    },
+    {
+      "name": "no-javascript",
+      "viewport": 390,
+      "content": 390,
+      "images": [
+        {
+          "loaded": true,
+          "file": "assets/interaction.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/learning.svg"
+        },
+        {
+          "loaded": true,
+          "file": "assets/architecture.svg"
+        }
+      ],
+      "panels": [
+        {
+          "width": 350,
+          "scrollWidth": 680,
+          "labelled": true
+        },
+        {
+          "width": 350,
+          "scrollWidth": 680,
+          "labelled": true
+        },
+        {
+          "width": 350,
+          "scrollWidth": 680,
+          "labelled": true
+        }
+      ]
+    },
+    {
+      "name": "progressive-reveal",
+      "intersectionObserver": "pass"
+    }
+  ],
+  "scope": "Static article only; no production DDSD, microphone or phone tested"
+}

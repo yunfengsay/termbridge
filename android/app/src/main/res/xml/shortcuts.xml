@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="global_call"
+        android:enabled="true"
+        android:icon="@drawable/ic_global"
+        android:shortcutLongLabel="@string/global_call_shortcut_long"
+        android:shortcutShortLabel="@string/global_call_shortcut_short">
+        <intent
+            android:action="com.termbridge.android.action.GLOBAL_CALL"
+            android:targetClass="com.termbridge.android.brain.GlobalCallEntryActivity"
+            android:targetPackage="com.termbridge.android" />
+    </shortcut>
+</shortcuts>

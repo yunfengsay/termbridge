@@ -1,0 +1,150 @@
+/**
+ * The conversation surface's styles, inlined so the shell ships one file and no
+ * request leaves the WebView. Spacing stays compact to match TermBridge, and
+ * every colour is a token that follows the system theme.
+ */
+export const TRANSCRIPT_CSS = `
+:root {
+  color-scheme: light dark;
+  --tb-bg: #fbfbfd;
+  --tb-surface: #ffffff;
+  --tb-border: #e3e3e8;
+  --tb-text: #1b1b1f;
+  --tb-muted: #6a6a75;
+  --tb-user: #eef2ff;
+  --tb-accent: #3b5bdb;
+  --tb-error: #c0392b;
+  --tb-error-bg: #fdeeec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --tb-bg: #161618;
+    --tb-surface: #1e1e21;
+    --tb-border: #2e2e33;
+    --tb-text: #eceaf0;
+    --tb-muted: #9a99a3;
+    --tb-user: #23283a;
+    --tb-accent: #8ea2ff;
+    --tb-error: #ff8a7a;
+    --tb-error-bg: #2c1d1b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+    --tb-bg: #161618;
+    --tb-surface: #1e1e21;
+    --tb-border: #2e2e33;
+    --tb-text: #eceaf0;
+    --tb-muted: #9a99a3;
+    --tb-user: #23283a;
+    --tb-accent: #8ea2ff;
+    --tb-error: #ff8a7a;
+    --tb-error-bg: #2c1d1b;
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--tb-bg);
+  color: var(--tb-text);
+  font: 13px/1.55 "Segoe UI Variable Text", "Segoe UI", "PingFang SC", "Microsoft YaHei UI", system-ui, sans-serif;
+}
+.tb-scroll { height: 100%; overflow-y: auto; overflow-x: hidden; overflow-anchor: none; padding: 10px 14px 16px; }
+.tb-earlier { display: block; margin: 0 auto 8px; padding: 3px 12px; border: 1px solid var(--tb-border); border-radius: 999px; background: var(--tb-surface); color: var(--tb-muted); font: inherit; font-size: 11px; cursor: pointer; }
+.tb-earlier[hidden] { display: none; }
+.tb-row { margin: 0 0 8px; }
+.tb-prose { white-space: pre-wrap; overflow-wrap: anywhere; }
+.tb-user .tb-prose { background: var(--tb-user); border-radius: 8px; padding: 7px 10px; margin-left: 32px; }
+.tb-assistant .tb-prose { padding: 1px 0; }
+.tb-status { color: var(--tb-muted); font-size: 12px; border-left: 2px solid var(--tb-border); padding-left: 8px; }
+.tb-tool { border: 1px solid var(--tb-border); border-radius: 7px; background: var(--tb-surface); overflow: hidden; }
+.tb-tool[data-state="failed"] { border-color: var(--tb-error); background: var(--tb-error-bg); }
+.tb-tool[data-state="running"] .tb-tool-state { color: var(--tb-accent); }
+.tb-tool[data-state="unknown"] .tb-tool-state { color: var(--tb-muted); font-style: italic; }
+.tb-tool > summary { cursor: pointer; padding: 5px 9px; display: flex; gap: 7px; align-items: baseline; list-style: none; }
+.tb-tool > summary::-webkit-details-marker { display: none; }
+.tb-tool-name { color: var(--tb-accent); font-weight: 600; white-space: nowrap; }
+.tb-tool[data-state="failed"] .tb-tool-name { color: var(--tb-error); }
+.tb-tool-summary { color: var(--tb-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: 12px; }
+.tb-tool-state { margin-left: auto; color: var(--tb-muted); font-size: 11px; white-space: nowrap; }
+.tb-tool-body { border-top: 1px solid var(--tb-border); padding: 7px 9px; }
+.tb-pre { margin: 0 0 6px; max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: 12px; color: var(--tb-text); }
+.tb-pre:last-child { margin-bottom: 0; }
+.tb-pre-label { color: var(--tb-muted); font-size: 11px; margin: 0 0 2px; }
+.tb-json { white-space: pre; overflow-x: auto; }
+.tb-json-key { color: var(--tb-accent); }
+.tb-json-string { color: #2f7d4f; }
+.tb-json-number, .tb-json-boolean, .tb-json-null { color: #a25b1e; }
+.tb-json-punct { color: var(--tb-muted); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tb-json-string { color: #8fd3a5; }
+  :root:not([data-theme="light"]) .tb-json-number,
+  :root:not([data-theme="light"]) .tb-json-boolean,
+  :root:not([data-theme="light"]) .tb-json-null { color: #e0b06a; }
+}
+:root[data-theme="dark"] .tb-json-string { color: #8fd3a5; }
+:root[data-theme="dark"] .tb-json-number,
+:root[data-theme="dark"] .tb-json-boolean,
+:root[data-theme="dark"] .tb-json-null { color: #e0b06a; }
+.tb-image { display: inline-flex; align-items: center; gap: 6px; border: 1px dashed var(--tb-border); border-radius: 6px; padding: 4px 8px; color: var(--tb-muted); font-size: 12px; }
+.tb-image img { max-width: 260px; max-height: 200px; border-radius: 4px; display: block; }
+.tb-notice { margin: 0 0 8px; padding: 6px 9px; border-radius: 6px; background: var(--tb-error-bg); color: var(--tb-error); font-size: 12px; }
+.tb-notice[hidden] { display: none; }
+.tb-empty { color: var(--tb-muted); text-align: center; padding: 28px 12px; }
+
+/* The Agent is working. No text, ~18dp tall, and it stops the moment the
+   status says so — it never stands in for a connection or a send receipt. */
+.tb-working { display: flex; gap: 4px; align-items: center; height: 18px; padding-left: 2px; }
+.tb-working-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--tb-accent); animation: tb-wave 1.1s ease-in-out infinite; }
+/* A restrained gradient across the three, so it reads as motion rather than as
+   three identical grey dots. The row height is unchanged. */
+.tb-working-dot[data-index="1"] { animation-delay: .15s; background: color-mix(in srgb, var(--tb-accent) 68%, var(--tb-muted)); }
+.tb-working-dot[data-index="2"] { animation-delay: .3s; background: color-mix(in srgb, var(--tb-accent) 36%, var(--tb-muted)); }
+@keyframes tb-wave { 0%, 60%, 100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+/* A tool that is actually running gets the same mark, before its name. */
+.tb-tool[data-state="running"] .tb-tool-state::after { content: ""; display: inline-block; width: 10px; height: 10px; vertical-align: -1px; border-radius: 50%; border: 1.5px solid var(--tb-accent); border-top-color: transparent; animation: tb-spin .8s linear infinite; }
+@keyframes tb-spin { to { transform: rotate(360deg); } }
+:root[data-hidden="1"] .tb-working-dot,
+:root[data-hidden="1"] .tb-tool .tb-tool-state::after { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .tb-working-dot, .tb-tool .tb-tool-state::after { animation: none; }
+  .tb-working-dot { opacity: .6; }
+}
+
+/* The receipt for one send, on that send. Never in the shared status strip. */
+.tb-pending .tb-prose { opacity: .75; }
+.tb-receipt { display: flex; gap: 6px; align-items: baseline; justify-content: flex-end; margin: 3px 0 0 32px; font-size: 11px; color: var(--tb-muted); }
+.tb-receipt-chip { border: 1px solid var(--tb-border); border-radius: 999px; padding: 0 6px; white-space: nowrap; }
+.tb-pending[data-state="observed"] .tb-receipt-chip { border-color: var(--tb-accent); color: var(--tb-accent); }
+.tb-pending[data-state="failed"] .tb-receipt-chip,
+.tb-pending[data-state="uncertain"] .tb-receipt-chip { border-color: var(--tb-error); color: var(--tb-error); }
+.tb-receipt-detail { overflow: hidden; text-overflow: ellipsis; }
+
+/* Markdown. Long lines and wide tables scroll inside their own box: the
+   conversation column never widens, so the page has no horizontal scroll. */
+.tb-assistant .tb-prose { white-space: normal; }
+.tb-md-p { margin: 0 0 6px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tb-md-p:last-child { margin-bottom: 0; }
+.tb-md-h { margin: 10px 0 5px; font-size: 1.05em; line-height: 1.35; }
+.tb-md-h:first-child { margin-top: 0; }
+.tb-md-list { margin: 0 0 6px; padding-left: 20px; }
+.tb-md-list .tb-md-list { margin-bottom: 0; }
+.tb-md-list li { margin: 1px 0; }
+.tb-md-task { list-style: none; margin-left: -16px; }
+.tb-md-check { margin-right: 4px; color: var(--tb-muted); }
+.tb-md-quote { margin: 0 0 6px; padding: 1px 0 1px 8px; border-left: 2px solid var(--tb-border); color: var(--tb-muted); }
+.tb-md-rule { border: 0; border-top: 1px solid var(--tb-border); margin: 8px 0; }
+.tb-md-codewrap { margin: 0 0 6px; border: 1px solid var(--tb-border); border-radius: 6px; background: var(--tb-surface); }
+.tb-md-code { margin: 0; padding: 7px 9px; max-height: 320px; overflow: auto; }
+.tb-md-code code { white-space: pre; font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: 12px; }
+.tb-md-inline-code { padding: 0 3px; border-radius: 3px; background: var(--tb-user); font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: .92em; overflow-wrap: anywhere; }
+.tb-md-link { color: var(--tb-accent); text-decoration: underline; overflow-wrap: anywhere; }
+.tb-md-tablewrap { margin: 0 0 6px; overflow-x: auto; border: 1px solid var(--tb-border); border-radius: 6px; }
+.tb-md-table { border-collapse: collapse; min-width: 100%; font-size: 12px; }
+.tb-md-table th, .tb-md-table td { border-bottom: 1px solid var(--tb-border); padding: 4px 8px; text-align: left; white-space: nowrap; }
+.tb-md-table th { background: var(--tb-surface); font-weight: 600; }
+.tb-md-table tr:last-child td { border-bottom: 0; }
+.tb-md-table [data-align="right"] { text-align: right; }
+.tb-md-table [data-align="center"] { text-align: center; }
+`;

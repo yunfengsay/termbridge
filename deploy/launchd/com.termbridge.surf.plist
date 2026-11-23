@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  termbridge surf — one LaunchAgent that runs relay + host together (`tb surf`).
+  最简单的常驻方式（单台 Mac mini）。装法见 docs/deploy.md。
+  改：仓库路径、PORT、SHELL、PATH。
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.termbridge.surf</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/path/to/termbridge/node_modules/.bin/tsx</string>
+    <string>/path/to/termbridge/packages/cli/src/index.ts</string>
+    <string>surf</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/path/to/termbridge</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PORT</key>
+    <string>7400</string>
+    <!-- agent 会话用交互式 zsh，会加载 ~/.zshrc（别名/proxy/PATH 都在） -->
+    <key>SHELL</key>
+    <string>/bin/zsh</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/Users/YOUR_USER/.local/bin:/usr/bin:/bin</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/termbridge-surf.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/termbridge-surf.log</string>
+</dict>
+</plist>

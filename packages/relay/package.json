@@ -1,0 +1,12 @@
+{
+  "name": "@termbridge/relay",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@termbridge/protocol": "workspace:*",
+    "@termbridge/settings": "workspace:*",
+    "ws": "^8.18.0"
+  }
+}

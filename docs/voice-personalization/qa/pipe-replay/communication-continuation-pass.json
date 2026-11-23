@@ -1,0 +1,280 @@
+{
+  "label": "communication-continuation-pass",
+  "provenance": "synthetic file-only experiment, not user/car recordings",
+  "sourceSha256": "d22f1ba366713e46fb7b1616cf0c9a0a7d8aa99ba7484544d00d519aee063194",
+  "at": "2026-09-08T02:02:10.260Z",
+  "model": "qwen3.5-omni-flash-realtime",
+  "pcm": {
+    "rate": 16000,
+    "channels": 1,
+    "bits": 16,
+    "endian": "little",
+    "bytes": 854320,
+    "sha256": "5550639d33ea12a4f7aba15d068884d85b40d49b0e66c9d83010593487c1d64a"
+  },
+  "outputPolicy": "discarded; never played",
+  "rows": [
+    {
+      "adaptive": true,
+      "productionFork": true,
+      "turns": 1,
+      "communicationCheck": true,
+      "replayInitialWait": true,
+      "forks": 1,
+      "providerSilenceMs": 3000,
+      "judge": "cloud-after-replayed-wait",
+      "fixture": "synthetic-Tingting",
+      "firstAudioMs": 1259.9375,
+      "pauseMs": 12000,
+      "secondStartsMs": 13689.9375,
+      "submitted": [
+        "你现在在听。 在听我说话吗？"
+      ],
+      "answer": "在听。你说，我在。有什么需要我帮忙的？",
+      "outputBytes": 272640,
+      "responseCount": 3,
+      "judgeCalls": 2,
+      "fixtureToolCompletions": 0,
+      "finished": true,
+      "prematureResponses": 0,
+      "accepted": true,
+      "checks": {
+        "noFailure": true,
+        "singleWholeUserTurn": true,
+        "noPrematureReply": true,
+        "realFixtureReceipt": true,
+        "groundedAnswer": true,
+        "finishedWithAudio": true,
+        "clarificationOnce": true,
+        "clarificationSpoken": true
+      },
+      "events": [
+        {
+          "ms": 429,
+          "event": "configured_tools",
+          "names": [
+            "fork_execution"
+          ],
+          "turnDetection": {
+            "type": "server_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 3000,
+            "create_response": false,
+            "interrupt_response": true
+          }
+        },
+        {
+          "ms": 429,
+          "event": "session.updated"
+        },
+        {
+          "ms": 430,
+          "event": "ready"
+        },
+        {
+          "ms": 635,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 4708,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 4887,
+          "event": "conversation.item.created",
+          "id": "item_E6L1Bnub4Xh3oKPbWYkr8",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "input_audio"
+            }
+          ]
+        },
+        {
+          "ms": 4887,
+          "event": "transcript",
+          "text": "你现在在听。"
+        },
+        {
+          "ms": 4889,
+          "event": "initial_wait_replayed"
+        },
+        {
+          "ms": 4889,
+          "event": "judge",
+          "decision": {
+            "decision": "wait",
+            "clarification": "您想让我做什么呢？"
+          },
+          "latencyMs": 0,
+          "segments": [
+            "你现在在听。"
+          ]
+        },
+        {
+          "ms": 4889,
+          "event": "waiting",
+          "reason": "incomplete"
+        },
+        {
+          "ms": 9708,
+          "event": "clarification_requested",
+          "question": "您想让我做什么呢？"
+        },
+        {
+          "ms": 9708,
+          "event": "response_started"
+        },
+        {
+          "ms": 9708,
+          "event": "answer_final",
+          "text": "您想让我做什么呢？"
+        },
+        {
+          "ms": 10754,
+          "event": "clarification_audio_ready",
+          "bytes": 88320
+        },
+        {
+          "ms": 10754,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 14191,
+          "event": "input_audio_buffer.speech_started"
+        },
+        {
+          "ms": 18456,
+          "event": "input_audio_buffer.speech_stopped"
+        },
+        {
+          "ms": 18639,
+          "event": "conversation.item.created",
+          "id": "item_Tj9Puf6Udtupsla5jVzN7",
+          "previous": "item_E6L1Bnub4Xh3oKPbWYkr8",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "input_audio"
+            }
+          ]
+        },
+        {
+          "ms": 18639,
+          "event": "transcript",
+          "text": "在听我说话吗？"
+        },
+        {
+          "ms": 19460,
+          "event": "judge",
+          "decision": {
+            "decision": "respond",
+            "intent": "确认助手是否在听"
+          },
+          "latencyMs": 819,
+          "segments": [
+            "你现在在听。",
+            "在听我说话吗？"
+          ]
+        },
+        {
+          "ms": 19460,
+          "event": "submitted",
+          "text": "你现在在听。 在听我说话吗？"
+        },
+        {
+          "ms": 19649,
+          "event": "response.created"
+        },
+        {
+          "ms": 19649,
+          "event": "response_started"
+        },
+        {
+          "ms": 19649,
+          "event": "conversation.item.created",
+          "id": "item_EGURzCD28yMWks5mkp1MW",
+          "previous": "item_Tj9Puf6Udtupsla5jVzN7",
+          "type": "message",
+          "role": "assistant",
+          "content": []
+        },
+        {
+          "ms": 20155,
+          "event": "response.output_item.done",
+          "id": "item_EGURzCD28yMWks5mkp1MW",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "audio"
+            }
+          ]
+        },
+        {
+          "ms": 20155,
+          "event": "response_result",
+          "id": "resp_JLaezy2DfARN7WZ2uKSiU",
+          "status": "completed",
+          "output": [
+            {
+              "id": "item_EGURzCD28yMWks5mkp1MW",
+              "type": "message",
+              "role": "assistant"
+            }
+          ]
+        },
+        {
+          "ms": 20155,
+          "event": "response.done"
+        },
+        {
+          "ms": 20155,
+          "event": "usage",
+          "inputTokens": 1007,
+          "outputTokens": 37,
+          "totalTokens": 1044
+        },
+        {
+          "ms": 20155,
+          "event": "finished",
+          "status": "completed"
+        },
+        {
+          "ms": 20155,
+          "event": "fork_execution",
+          "text": "你现在在听。 在听我说话吗？",
+          "origin": "host_control"
+        },
+        {
+          "ms": 21239,
+          "event": "fork_answer",
+          "text": "在听。你说，我在。有什么需要我帮忙的？"
+        },
+        {
+          "ms": 21239,
+          "event": "response_started"
+        },
+        {
+          "ms": 21239,
+          "event": "answer_final",
+          "text": "在听。你说，我在。有什么需要我帮忙的？"
+        },
+        {
+          "ms": 22676,
+          "event": "clarification_audio_ready",
+          "bytes": 184320
+        },
+        {
+          "ms": 22676,
+          "event": "finished",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

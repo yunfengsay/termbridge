@@ -1,0 +1,4290 @@
+{
+  "at": "2026-09-08T05:58:24.226Z",
+  "candidateFits": 18,
+  "uniqueWeights": 6,
+  "independentChecks": 2,
+  "reports": [
+    {
+      "manifest": {
+        "schema": 1,
+        "createdAt": "2026-09-08T05:38:33.004Z",
+        "dataset": "KE-Team/SemanticVAD-Dataset",
+        "revision": "b5b536e96076a156e79b7e6db9ca8fd100d3f976",
+        "sourceSha": {
+          "train": "c43efde49c8a2d632095bc0e7dcd47080a5f0ea198d34a7c3b24a117cfc0eb3d",
+          "test": "598d875a05017fee24b3b15aa7f45fe9664da793fa3aea7128ddf195f1af1ee0"
+        },
+        "license": "publisher Apache-2.0; Ke synthetic completion text only; no third-party weights/audio",
+        "excluded": {
+          "trainTestOverlap": 55,
+          "previouslySeenAndRelated": 82,
+          "duplicates": 231,
+          "conflictingInputs": 0
+        },
+        "caveat": "Exact/context/24-character prefix grouping, not proof of absence of semantic paraphrases across splits.",
+        "splits": {
+          "train": {
+            "count": 4731,
+            "groups": 4066,
+            "sha256": "0ace5928e766957d9cfd44e15650c2ba6ad623c29175bf8ebe9f30c73fce81f1",
+            "idsHash": "31c39c51fe58dee47be0e51e4ed6bfa44043271022e1576cef09d45bf583b0c6"
+          },
+          "dev": {
+            "count": 1056,
+            "groups": 1012,
+            "sha256": "034d1d978efcbefcc2d90f6a987fa5a03c750e27f948cea3a37a4adb83ecdac1",
+            "idsHash": "8f0da810a43e346f21e2302a137292bb0d34b3ced55d8ff39e8e858376fce25e"
+          },
+          "holdout": {
+            "count": 2045,
+            "groups": 2039,
+            "sha256": "f542b37c0bcae8975818c0dff2b3a6d77fdd32d8c65f18cdfbdbcf5a4de59c01",
+            "idsHash": "a66da4ddc8db626e17ac475ea894b0e665372f9f780bfafb4bd574fc650f0dc8"
+          }
+        }
+      },
+      "frozen": {
+        "phase": "frozen",
+        "gates": {
+          "early": 0.02,
+          "late": 0.05,
+          "coverage": 0.3,
+          "minDirection": 50,
+          "p95Ms": 10,
+          "bytes": 2097152
+        },
+        "selected": "context-8",
+        "modelHash": "1f8c8a241f2716d850f3697de250752368b285fcc314ce865bc7d6ece3bfc315",
+        "thresholds": {
+          "wait": 0.26,
+          "respond": 0.91
+        },
+        "developmentAccepted": true,
+        "candidates": [
+          {
+            "name": "context-8",
+            "trainingMs": 436.24958300000003,
+            "thresholds": {
+              "wait": 0.26,
+              "respond": 0.91
+            },
+            "metrics": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 207,
+              "wait": 314,
+              "fallback": 535,
+              "early": 4,
+              "late": 15,
+              "coverage": 0.4933712121212121,
+              "earlyRate": 0.008,
+              "lateRate": 0.02697841726618705,
+              "respondError": 0.01932367149758454,
+              "waitError": 0.04777070063694268,
+              "ci95": {
+                "earlyRate": [
+                  0.0031152647975077885,
+                  0.020387359836901122
+                ],
+                "lateRate": [
+                  0.01641609691072799,
+                  0.04403242995830068
+                ],
+                "respondError": [
+                  0.007539504087121007,
+                  0.04862398547091687
+                ],
+                "waitError": [
+                  0.029160127144223152,
+                  0.07731303432991996
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.04320800000004965,
+              "p95Ms": 0.13141700000005585,
+              "weightBytes": 131072,
+              "jsonBytes": 817880
+            },
+            "accepted": true,
+            "byLanguage": {
+              "zh": {
+                "total": 793,
+                "finished": 412,
+                "unfinished": 381,
+                "respond": 183,
+                "wait": 240,
+                "fallback": 370,
+                "early": 2,
+                "late": 9,
+                "coverage": 0.5334174022698613,
+                "earlyRate": 0.005249343832020997,
+                "lateRate": 0.021844660194174758,
+                "respondError": 0.01092896174863388,
+                "waitError": 0.0375,
+                "ci95": {
+                  "earlyRate": [
+                    0.0014407116023125548,
+                    0.018935463946276786
+                  ],
+                  "lateRate": [
+                    0.011534134525574799,
+                    0.04098971109256441
+                  ],
+                  "respondError": [
+                    0.003002187140958061,
+                    0.03896705311388883
+                  ],
+                  "waitError": [
+                    0.019851917405050365,
+                    0.06972098565989014
+                  ]
+                }
+              },
+              "en": {
+                "total": 263,
+                "finished": 144,
+                "unfinished": 119,
+                "respond": 24,
+                "wait": 74,
+                "fallback": 165,
+                "early": 2,
+                "late": 6,
+                "coverage": 0.3726235741444867,
+                "earlyRate": 0.01680672268907563,
+                "lateRate": 0.041666666666666664,
+                "respondError": 0.08333333333333333,
+                "waitError": 0.08108108108108109,
+                "ci95": {
+                  "earlyRate": [
+                    0.004621078613443866,
+                    0.059213974007166756
+                  ],
+                  "lateRate": [
+                    0.01923362439471795,
+                    0.0879188955996544
+                  ],
+                  "respondError": [
+                    0.023158327842973503,
+                    0.258492152014506
+                  ],
+                  "waitError": [
+                    0.03768933680933338,
+                    0.16582138239479394
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 263,
+              "wait": 275,
+              "fallback": 518,
+              "early": 8,
+              "late": 9,
+              "coverage": 0.509469696969697,
+              "earlyRate": 0.016,
+              "lateRate": 0.01618705035971223,
+              "respondError": 0.030418250950570342,
+              "waitError": 0.03272727272727273,
+              "ci95": {
+                "earlyRate": [
+                  0.008129155320203278,
+                  0.03125147541771118
+                ],
+                "lateRate": [
+                  0.008538887053341595,
+                  0.03047500544768013
+                ],
+                "respondError": [
+                  0.015492213860800727,
+                  0.058865007801788605
+                ],
+                "waitError": [
+                  0.017311507102405175,
+                  0.061018268655587904
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 564,
+              "wait": 488,
+              "fallback": 4,
+              "early": 86,
+              "late": 74,
+              "coverage": 0.9962121212121212,
+              "earlyRate": 0.172,
+              "lateRate": 0.13309352517985612,
+              "respondError": 0.1524822695035461,
+              "waitError": 0.15163934426229508,
+              "ci95": {
+                "earlyRate": [
+                  0.1414536049779883,
+                  0.20754814477828426
+                ],
+                "lateRate": [
+                  0.10736113550515711,
+                  0.16386129598260665
+                ],
+                "respondError": [
+                  0.12517168562440625,
+                  0.18449495380461758
+                ],
+                "waitError": [
+                  0.12254513302079678,
+                  0.18617539814208167
+                ]
+              }
+            },
+            "modelHash": "1f8c8a241f2716d850f3697de250752368b285fcc314ce865bc7d6ece3bfc315"
+          },
+          {
+            "name": "suffix-8",
+            "trainingMs": 202.094875,
+            "thresholds": {
+              "wait": 0.27,
+              "respond": 0.93
+            },
+            "metrics": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 167,
+              "wait": 328,
+              "fallback": 561,
+              "early": 3,
+              "late": 16,
+              "coverage": 0.46875,
+              "earlyRate": 0.006,
+              "lateRate": 0.02877697841726619,
+              "respondError": 0.017964071856287425,
+              "waitError": 0.04878048780487805,
+              "ci95": {
+                "earlyRate": [
+                  0.002042559297638913,
+                  0.017490563810893606
+                ],
+                "lateRate": [
+                  0.017789406861594713,
+                  0.04623155906876845
+                ],
+                "respondError": [
+                  0.006127793507236419,
+                  0.051478784750049855
+                ],
+                "waitError": [
+                  0.03024589060163344,
+                  0.07776226750753673
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.018916999999987638,
+              "p95Ms": 0.05979200000001583,
+              "weightBytes": 131072,
+              "jsonBytes": 797917
+            },
+            "accepted": true,
+            "byLanguage": {
+              "zh": {
+                "total": 793,
+                "finished": 412,
+                "unfinished": 381,
+                "respond": 152,
+                "wait": 250,
+                "fallback": 391,
+                "early": 1,
+                "late": 8,
+                "coverage": 0.5069356872635561,
+                "earlyRate": 0.0026246719160104987,
+                "lateRate": 0.019417475728155338,
+                "respondError": 0.006578947368421052,
+                "waitError": 0.032,
+                "ci95": {
+                  "earlyRate": [
+                    0.0004634574653101693,
+                    0.014715774717489196
+                  ],
+                  "lateRate": [
+                    0.009871135911064003,
+                    0.03784318608077134
+                  ],
+                  "respondError": [
+                    0.0011622614078393885,
+                    0.036321953333282364
+                  ],
+                  "waitError": [
+                    0.016302169731072406,
+                    0.061863111294575085
+                  ]
+                }
+              },
+              "en": {
+                "total": 263,
+                "finished": 144,
+                "unfinished": 119,
+                "respond": 15,
+                "wait": 78,
+                "fallback": 170,
+                "early": 2,
+                "late": 8,
+                "coverage": 0.35361216730038025,
+                "earlyRate": 0.01680672268907563,
+                "lateRate": 0.05555555555555555,
+                "respondError": 0.13333333333333333,
+                "waitError": 0.10256410256410256,
+                "ci95": {
+                  "earlyRate": [
+                    0.004621078613443866,
+                    0.059213974007166756
+                  ],
+                  "lateRate": [
+                    0.02841626714922487,
+                    0.10579223708774224
+                  ],
+                  "respondError": [
+                    0.0373604698913593,
+                    0.3788249920651624
+                  ],
+                  "waitError": [
+                    0.05289271527803498,
+                    0.18954633772190638
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 167,
+              "wait": 328,
+              "fallback": 561,
+              "early": 3,
+              "late": 16,
+              "coverage": 0.46875,
+              "earlyRate": 0.006,
+              "lateRate": 0.02877697841726619,
+              "respondError": 0.017964071856287425,
+              "waitError": 0.04878048780487805,
+              "ci95": {
+                "earlyRate": [
+                  0.002042559297638913,
+                  0.017490563810893606
+                ],
+                "lateRate": [
+                  0.017789406861594713,
+                  0.04623155906876845
+                ],
+                "respondError": [
+                  0.006127793507236419,
+                  0.051478784750049855
+                ],
+                "waitError": [
+                  0.03024589060163344,
+                  0.07776226750753673
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 564,
+              "wait": 488,
+              "fallback": 4,
+              "early": 81,
+              "late": 69,
+              "coverage": 0.9962121212121212,
+              "earlyRate": 0.162,
+              "lateRate": 0.12410071942446044,
+              "respondError": 0.14361702127659576,
+              "waitError": 0.1413934426229508,
+              "ci95": {
+                "earlyRate": [
+                  0.13230129007093688,
+                  0.19685295205595382
+                ],
+                "lateRate": [
+                  0.09924757479189211,
+                  0.15411266138919916
+                ],
+                "respondError": [
+                  0.11708187033344955,
+                  0.17497422418304945
+                ],
+                "waitError": [
+                  0.11327404135087513,
+                  0.17511474072855857
+                ]
+              }
+            },
+            "modelHash": "fb3be522f7c5503b523013eee21ca0643514b13f9a46541ed9f1dd711e3fb481"
+          },
+          {
+            "name": "suffix-20",
+            "trainingMs": 359.40362500000015,
+            "thresholds": {
+              "wait": 0.23,
+              "respond": 0.96
+            },
+            "metrics": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 151,
+              "wait": 334,
+              "fallback": 571,
+              "early": 3,
+              "late": 16,
+              "coverage": 0.45928030303030304,
+              "earlyRate": 0.006,
+              "lateRate": 0.02877697841726619,
+              "respondError": 0.019867549668874173,
+              "waitError": 0.04790419161676647,
+              "ci95": {
+                "earlyRate": [
+                  0.002042559297638913,
+                  0.017490563810893606
+                ],
+                "lateRate": [
+                  0.017789406861594713,
+                  0.04623155906876845
+                ],
+                "respondError": [
+                  0.00677927946976414,
+                  0.056779867426160466
+                ],
+                "waitError": [
+                  0.02969862071709664,
+                  0.07639133386516915
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.01974999999993088,
+              "p95Ms": 0.06112499999994725,
+              "weightBytes": 131072,
+              "jsonBytes": 791774
+            },
+            "accepted": true,
+            "byLanguage": {
+              "zh": {
+                "total": 793,
+                "finished": 412,
+                "unfinished": 381,
+                "respond": 138,
+                "wait": 250,
+                "fallback": 405,
+                "early": 1,
+                "late": 8,
+                "coverage": 0.489281210592686,
+                "earlyRate": 0.0026246719160104987,
+                "lateRate": 0.019417475728155338,
+                "respondError": 0.007246376811594203,
+                "waitError": 0.032,
+                "ci95": {
+                  "earlyRate": [
+                    0.0004634574653101693,
+                    0.014715774717489196
+                  ],
+                  "lateRate": [
+                    0.009871135911064003,
+                    0.03784318608077134
+                  ],
+                  "respondError": [
+                    0.001280277832255268,
+                    0.03990369076369965
+                  ],
+                  "waitError": [
+                    0.016302169731072406,
+                    0.061863111294575085
+                  ]
+                }
+              },
+              "en": {
+                "total": 263,
+                "finished": 144,
+                "unfinished": 119,
+                "respond": 13,
+                "wait": 84,
+                "fallback": 166,
+                "early": 2,
+                "late": 8,
+                "coverage": 0.3688212927756654,
+                "earlyRate": 0.01680672268907563,
+                "lateRate": 0.05555555555555555,
+                "respondError": 0.15384615384615385,
+                "waitError": 0.09523809523809523,
+                "ci95": {
+                  "earlyRate": [
+                    0.004621078613443866,
+                    0.059213974007166756
+                  ],
+                  "lateRate": [
+                    0.02841626714922487,
+                    0.10579223708774224
+                  ],
+                  "respondError": [
+                    0.04325726318273798,
+                    0.4223517050863101
+                  ],
+                  "waitError": [
+                    0.049051123189484375,
+                    0.17682818684129828
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 151,
+              "wait": 334,
+              "fallback": 571,
+              "early": 3,
+              "late": 16,
+              "coverage": 0.45928030303030304,
+              "earlyRate": 0.006,
+              "lateRate": 0.02877697841726619,
+              "respondError": 0.019867549668874173,
+              "waitError": 0.04790419161676647,
+              "ci95": {
+                "earlyRate": [
+                  0.002042559297638913,
+                  0.017490563810893606
+                ],
+                "lateRate": [
+                  0.017789406861594713,
+                  0.04623155906876845
+                ],
+                "respondError": [
+                  0.00677927946976414,
+                  0.056779867426160466
+                ],
+                "waitError": [
+                  0.02969862071709664,
+                  0.07639133386516915
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 569,
+              "wait": 483,
+              "fallback": 4,
+              "early": 83,
+              "late": 66,
+              "coverage": 0.9962121212121212,
+              "earlyRate": 0.166,
+              "lateRate": 0.11870503597122302,
+              "respondError": 0.14586994727592267,
+              "waitError": 0.13664596273291926,
+              "ci95": {
+                "earlyRate": [
+                  0.13595723820567882,
+                  0.20113600697296466
+                ],
+                "lateRate": [
+                  0.09440117356779472,
+                  0.14824174542929303
+                ],
+                "respondError": [
+                  0.119241710697342,
+                  0.17724792971983447
+                ],
+                "waitError": [
+                  0.10886781266034418,
+                  0.17015846611287488
+                ]
+              }
+            },
+            "modelHash": "58be6141737b6f81b24362fc482eb9448ed89668685425751bb0be345c4070d5"
+          },
+          {
+            "name": "context-20",
+            "trainingMs": 656.8678750000004,
+            "thresholds": {
+              "wait": 0.19,
+              "respond": 0.95
+            },
+            "metrics": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 177,
+              "wait": 292,
+              "fallback": 587,
+              "early": 3,
+              "late": 13,
+              "coverage": 0.4441287878787879,
+              "earlyRate": 0.006,
+              "lateRate": 0.023381294964028777,
+              "respondError": 0.01694915254237288,
+              "waitError": 0.04452054794520548,
+              "ci95": {
+                "earlyRate": [
+                  0.002042559297638913,
+                  0.017490563810893606
+                ],
+                "lateRate": [
+                  0.013714046043910784,
+                  0.039589602702448906
+                ],
+                "respondError": [
+                  0.005780598394886531,
+                  0.048640508253141354
+                ],
+                "waitError": [
+                  0.026199631174864825,
+                  0.07467056422699886
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.04133300000012241,
+              "p95Ms": 0.12458300000025702,
+              "weightBytes": 131072,
+              "jsonBytes": 811543
+            },
+            "accepted": true,
+            "byLanguage": {
+              "zh": {
+                "total": 793,
+                "finished": 412,
+                "unfinished": 381,
+                "respond": 159,
+                "wait": 221,
+                "fallback": 413,
+                "early": 1,
+                "late": 7,
+                "coverage": 0.4791929382093317,
+                "earlyRate": 0.0026246719160104987,
+                "lateRate": 0.01699029126213592,
+                "respondError": 0.006289308176100629,
+                "waitError": 0.03167420814479638,
+                "ci95": {
+                  "earlyRate": [
+                    0.0004634574653101693,
+                    0.014715774717489196
+                  ],
+                  "lateRate": [
+                    0.008253830876084346,
+                    0.03465096748944714
+                  ],
+                  "respondError": [
+                    0.0011110528093918985,
+                    0.034761844533793135
+                  ],
+                  "waitError": [
+                    0.015425869270221718,
+                    0.06392599444183159
+                  ]
+                }
+              },
+              "en": {
+                "total": 263,
+                "finished": 144,
+                "unfinished": 119,
+                "respond": 18,
+                "wait": 71,
+                "fallback": 174,
+                "early": 2,
+                "late": 6,
+                "coverage": 0.33840304182509506,
+                "earlyRate": 0.01680672268907563,
+                "lateRate": 0.041666666666666664,
+                "respondError": 0.1111111111111111,
+                "waitError": 0.08450704225352113,
+                "ci95": {
+                  "earlyRate": [
+                    0.004621078613443866,
+                    0.059213974007166756
+                  ],
+                  "lateRate": [
+                    0.01923362439471795,
+                    0.0879188955996544
+                  ],
+                  "respondError": [
+                    0.031018868453582787,
+                    0.3280024486660421
+                  ],
+                  "waitError": [
+                    0.039305972354112026,
+                    0.17236240459133007
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 234,
+              "wait": 257,
+              "fallback": 565,
+              "early": 7,
+              "late": 9,
+              "coverage": 0.4649621212121212,
+              "earlyRate": 0.014,
+              "lateRate": 0.01618705035971223,
+              "respondError": 0.029914529914529916,
+              "waitError": 0.03501945525291829,
+              "ci95": {
+                "earlyRate": [
+                  0.006797703071787358,
+                  0.02861342614025071
+                ],
+                "lateRate": [
+                  0.008538887053341595,
+                  0.03047500544768013
+                ],
+                "respondError": [
+                  0.014564481197171963,
+                  0.060450150389564763
+                ],
+                "waitError": [
+                  0.018531072387113233,
+                  0.0652040373499839
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 562,
+              "wait": 490,
+              "fallback": 4,
+              "early": 85,
+              "late": 75,
+              "coverage": 0.9962121212121212,
+              "earlyRate": 0.17,
+              "lateRate": 0.13489208633093525,
+              "respondError": 0.1512455516014235,
+              "waitError": 0.15306122448979592,
+              "ci95": {
+                "earlyRate": [
+                  0.13961985448969885,
+                  0.2054123937406974
+                ],
+                "lateRate": [
+                  0.10898899841564666,
+                  0.16580587213345158
+                ],
+                "respondError": [
+                  0.12399683504966179,
+                  0.18322978102098417
+                ],
+                "waitError": [
+                  0.12388995015400506,
+                  0.18763018099736006
+                ]
+              }
+            },
+            "modelHash": "17c38f94c61bef58b3d813b42bebbe4404bd8f35f64542b3ee42649e843ed74f"
+          },
+          {
+            "name": "body-20",
+            "trainingMs": 298.35662500000007,
+            "thresholds": {
+              "wait": 0.18,
+              "respond": 2
+            },
+            "metrics": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 0,
+              "wait": 224,
+              "fallback": 832,
+              "early": 0,
+              "late": 9,
+              "coverage": 0.21212121212121213,
+              "earlyRate": 0,
+              "lateRate": 0.01618705035971223,
+              "respondError": 0,
+              "waitError": 0.04017857142857143,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.007624618530903363
+                ],
+                "lateRate": [
+                  0.008538887053341595,
+                  0.03047500544768013
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.021279450007190844,
+                  0.07458364084189029
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.014250000000060936,
+              "p95Ms": 0.0522080000000642,
+              "weightBytes": 131072,
+              "jsonBytes": 762254
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 793,
+                "finished": 412,
+                "unfinished": 381,
+                "respond": 0,
+                "wait": 163,
+                "fallback": 630,
+                "early": 0,
+                "late": 4,
+                "coverage": 0.2055485498108449,
+                "earlyRate": 0,
+                "lateRate": 0.009708737864077669,
+                "respondError": 0,
+                "waitError": 0.024539877300613498,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.009982288817009388
+                  ],
+                  "lateRate": [
+                    0.0037817723807832444,
+                    0.024694455105836656
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.009583366662591221,
+                    0.06139173786769379
+                  ]
+                }
+              },
+              "en": {
+                "total": 263,
+                "finished": 144,
+                "unfinished": 119,
+                "respond": 0,
+                "wait": 61,
+                "fallback": 202,
+                "early": 0,
+                "late": 5,
+                "coverage": 0.23193916349809887,
+                "earlyRate": 0,
+                "lateRate": 0.034722222222222224,
+                "respondError": 0,
+                "waitError": 0.08196721311475409,
+                "ci95": {
+                  "earlyRate": [
+                    3.469446951953614e-18,
+                    0.03127279358132749
+                  ],
+                  "lateRate": [
+                    0.014920522321761262,
+                    0.0787040055513137
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.035519042911066306,
+                    0.177948854241379
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 0,
+              "wait": 224,
+              "fallback": 832,
+              "early": 0,
+              "late": 9,
+              "coverage": 0.21212121212121213,
+              "earlyRate": 0,
+              "lateRate": 0.01618705035971223,
+              "respondError": 0,
+              "waitError": 0.04017857142857143,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.007624618530903363
+                ],
+                "lateRate": [
+                  0.008538887053341595,
+                  0.03047500544768013
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.021279450007190844,
+                  0.07458364084189029
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 601,
+              "wait": 451,
+              "fallback": 4,
+              "early": 132,
+              "late": 83,
+              "coverage": 0.9962121212121212,
+              "earlyRate": 0.264,
+              "lateRate": 0.14928057553956833,
+              "respondError": 0.21963394342762063,
+              "waitError": 0.18403547671840353,
+              "ci95": {
+                "earlyRate": [
+                  0.22726719286500013,
+                  0.3043316270815863
+                ],
+                "lateRate": [
+                  0.12206912159264682,
+                  0.18130526144712733
+                ],
+                "respondError": [
+                  0.18837270732564074,
+                  0.2544566218739381
+                ],
+                "waitError": [
+                  0.15099095816873703,
+                  0.22241727889665008
+                ]
+              }
+            },
+            "modelHash": "f458eedd5161d37406cd8e0f2ef7f0b45fcf2c15e110a0b05d5c868d4449e381"
+          },
+          {
+            "name": "body-8",
+            "trainingMs": 187.59658299999998,
+            "thresholds": {
+              "wait": 0.23,
+              "respond": 2
+            },
+            "metrics": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 0,
+              "wait": 223,
+              "fallback": 833,
+              "early": 0,
+              "late": 10,
+              "coverage": 0.21117424242424243,
+              "earlyRate": 0,
+              "lateRate": 0.017985611510791366,
+              "respondError": 0,
+              "waitError": 0.04484304932735426,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.007624618530903363
+                ],
+                "lateRate": [
+                  0.009798105821828506,
+                  0.03278822574052771
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.02453718874340906,
+                  0.08056522633389597
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.015499999999974534,
+              "p95Ms": 0.054957999999999174,
+              "weightBytes": 131072,
+              "jsonBytes": 768679
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 793,
+                "finished": 412,
+                "unfinished": 381,
+                "respond": 0,
+                "wait": 158,
+                "fallback": 635,
+                "early": 0,
+                "late": 4,
+                "coverage": 0.19924337957124844,
+                "earlyRate": 0,
+                "lateRate": 0.009708737864077669,
+                "respondError": 0,
+                "waitError": 0.02531645569620253,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.009982288817009388
+                  ],
+                  "lateRate": [
+                    0.0037817723807832444,
+                    0.024694455105836656
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.009887970714336322,
+                    0.06327986746818287
+                  ]
+                }
+              },
+              "en": {
+                "total": 263,
+                "finished": 144,
+                "unfinished": 119,
+                "respond": 0,
+                "wait": 65,
+                "fallback": 198,
+                "early": 0,
+                "late": 6,
+                "coverage": 0.24714828897338403,
+                "earlyRate": 0,
+                "lateRate": 0.041666666666666664,
+                "respondError": 0,
+                "waitError": 0.09230769230769231,
+                "ci95": {
+                  "earlyRate": [
+                    3.469446951953614e-18,
+                    0.03127279358132749
+                  ],
+                  "lateRate": [
+                    0.01923362439471795,
+                    0.0879188955996544
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.04299450413746196,
+                    0.18712216950173294
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 0,
+              "wait": 223,
+              "fallback": 833,
+              "early": 0,
+              "late": 10,
+              "coverage": 0.21117424242424243,
+              "earlyRate": 0,
+              "lateRate": 0.017985611510791366,
+              "respondError": 0,
+              "waitError": 0.04484304932735426,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.007624618530903363
+                ],
+                "lateRate": [
+                  0.009798105821828506,
+                  0.03278822574052771
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.02453718874340906,
+                  0.08056522633389597
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 1056,
+              "finished": 556,
+              "unfinished": 500,
+              "respond": 610,
+              "wait": 442,
+              "fallback": 4,
+              "early": 134,
+              "late": 76,
+              "coverage": 0.9962121212121212,
+              "earlyRate": 0.268,
+              "lateRate": 0.1366906474820144,
+              "respondError": 0.21967213114754097,
+              "waitError": 0.17194570135746606,
+              "ci95": {
+                "earlyRate": [
+                  0.23105333049086763,
+                  0.30848449250747156
+                ],
+                "lateRate": [
+                  0.11061851089955282,
+                  0.1677487987108799
+                ],
+                "respondError": [
+                  0.18862633705822876,
+                  0.2542266725781334
+                ],
+                "waitError": [
+                  0.1396324860923332,
+                  0.20991228496536984
+                ]
+              }
+            },
+            "modelHash": "83d80285818afda6544fa56d8b25aaf5d64d87b8693e3d5910758d6ef500f13a"
+          }
+        ],
+        "baselines": {
+          "alwaysRespond": {
+            "total": 1056,
+            "finished": 556,
+            "unfinished": 500,
+            "respond": 1056,
+            "wait": 0,
+            "fallback": 0,
+            "early": 500,
+            "late": 0,
+            "coverage": 1,
+            "earlyRate": 1,
+            "lateRate": 0,
+            "respondError": 0.4734848484848485,
+            "waitError": 0,
+            "ci95": {
+              "earlyRate": [
+                0.9923753814690964,
+                0.9999999999999999
+              ],
+              "lateRate": [
+                0,
+                0.006861940949011292
+              ],
+              "respondError": [
+                0.4435204515425803,
+                0.5036414639738517
+              ],
+              "waitError": null
+            }
+          },
+          "alwaysWait": {
+            "total": 1056,
+            "finished": 556,
+            "unfinished": 500,
+            "respond": 0,
+            "wait": 1056,
+            "fallback": 0,
+            "early": 0,
+            "late": 556,
+            "coverage": 1,
+            "earlyRate": 0,
+            "lateRate": 1,
+            "respondError": 0,
+            "waitError": 0.5265151515151515,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.007624618530903363
+              ],
+              "lateRate": [
+                0.9931380590509888,
+                1
+              ],
+              "respondError": null,
+              "waitError": [
+                0.4963585360261484,
+                0.5564795484574198
+              ]
+            }
+          },
+          "punctuation": {
+            "total": 1056,
+            "finished": 556,
+            "unfinished": 500,
+            "respond": 468,
+            "wait": 588,
+            "fallback": 0,
+            "early": 4,
+            "late": 92,
+            "coverage": 1,
+            "earlyRate": 0.008,
+            "lateRate": 0.16546762589928057,
+            "respondError": 0.008547008547008548,
+            "waitError": 0.1564625850340136,
+            "ci95": {
+              "earlyRate": [
+                0.0031152647975077885,
+                0.020387359836901122
+              ],
+              "lateRate": [
+                0.13689535502645228,
+                0.19863097956533232
+              ],
+              "respondError": [
+                0.003328587382279929,
+                0.02176797044560129
+              ],
+              "waitError": [
+                0.12933844888951418,
+                0.18804647302202437
+              ]
+            }
+          }
+        },
+        "wallMs": 2783.9748750000003,
+        "cpuMicros": {
+          "user": 2939857,
+          "system": 75603
+        },
+        "rssBytes": 488914944,
+        "environment": {
+          "platform": "darwin",
+          "arch": "arm64",
+          "cpu": "Apple M4",
+          "node": "v24.2.0"
+        },
+        "activation": "shadow only; production Host and personal profiles untouched"
+      },
+      "check": {
+        "schema": 1,
+        "at": "2026-09-08T05:40:46.156Z",
+        "status": "rejected",
+        "model": "context-8",
+        "modelHash": "1f8c8a241f2716d850f3697de250752368b285fcc314ce865bc7d6ece3bfc315",
+        "thresholds": {
+          "wait": 0.26,
+          "respond": 0.91
+        },
+        "metrics": {
+          "total": 2045,
+          "finished": 1043,
+          "unfinished": 1002,
+          "respond": 369,
+          "wait": 876,
+          "fallback": 800,
+          "early": 1,
+          "late": 109,
+          "coverage": 0.60880195599022,
+          "earlyRate": 0.000998003992015968,
+          "lateRate": 0.10450623202301054,
+          "respondError": 0.0027100271002710027,
+          "waitError": 0.12442922374429223,
+          "ci95": {
+            "earlyRate": [
+              0.00017618940669051437,
+              0.005631484485500859
+            ],
+            "lateRate": [
+              0.08736901699129147,
+              0.12454613808087987
+            ],
+            "respondError": [
+              0.00047853430437977754,
+              0.015189245256699242
+            ],
+            "waitError": [
+              0.10419724614899681,
+              0.14794086598391434
+            ]
+          }
+        },
+        "byLanguage": {
+          "zh": {
+            "total": 1856,
+            "finished": 946,
+            "unfinished": 910,
+            "respond": 369,
+            "wait": 759,
+            "fallback": 728,
+            "early": 1,
+            "late": 74,
+            "coverage": 0.6077586206896551,
+            "earlyRate": 0.001098901098901099,
+            "lateRate": 0.07822410147991543,
+            "respondError": 0.0027100271002710027,
+            "waitError": 0.09749670619235837,
+            "ci95": {
+              "earlyRate": [
+                0.0001940043814921029,
+                0.006198350704991156
+              ],
+              "lateRate": [
+                0.06276789650256062,
+                0.09709202119318991
+              ],
+              "respondError": [
+                0.00047853430437977754,
+                0.015189245256699242
+              ],
+              "waitError": [
+                0.07837601225546323,
+                0.12067133912128389
+              ]
+            }
+          },
+          "en": {
+            "total": 189,
+            "finished": 97,
+            "unfinished": 92,
+            "respond": 0,
+            "wait": 117,
+            "fallback": 72,
+            "early": 0,
+            "late": 35,
+            "coverage": 0.6190476190476191,
+            "earlyRate": 0,
+            "lateRate": 0.36082474226804123,
+            "respondError": 0,
+            "waitError": 0.29914529914529914,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.04008280329209862
+              ],
+              "lateRate": [
+                0.27224345484520945,
+                0.4600099009127316
+              ],
+              "respondError": null,
+              "waitError": [
+                0.22364123768326574,
+                0.3874198538613679
+              ]
+            }
+          }
+        },
+        "noContext": {
+          "total": 2045,
+          "finished": 1043,
+          "unfinished": 1002,
+          "respond": 369,
+          "wait": 876,
+          "fallback": 800,
+          "early": 1,
+          "late": 109,
+          "coverage": 0.60880195599022,
+          "earlyRate": 0.000998003992015968,
+          "lateRate": 0.10450623202301054,
+          "respondError": 0.0027100271002710027,
+          "waitError": 0.12442922374429223,
+          "ci95": {
+            "earlyRate": [
+              0.00017618940669051437,
+              0.005631484485500859
+            ],
+            "lateRate": [
+              0.08736901699129147,
+              0.12454613808087987
+            ],
+            "respondError": [
+              0.00047853430437977754,
+              0.015189245256699242
+            ],
+            "waitError": [
+              0.10419724614899681,
+              0.14794086598391434
+            ]
+          }
+        },
+        "baselines": {
+          "alwaysRespond": {
+            "total": 2045,
+            "finished": 1043,
+            "unfinished": 1002,
+            "respond": 2045,
+            "wait": 0,
+            "fallback": 0,
+            "early": 1002,
+            "late": 0,
+            "coverage": 1,
+            "earlyRate": 1,
+            "lateRate": 0,
+            "respondError": 0.4899755501222494,
+            "waitError": 0,
+            "ci95": {
+              "earlyRate": [
+                0.9961807107600241,
+                0.9999999999999999
+              ],
+              "lateRate": [
+                0,
+                0.003669705139726965
+              ],
+              "respondError": [
+                0.46834799260079996,
+                0.511640699546021
+              ],
+              "waitError": null
+            }
+          },
+          "alwaysWait": {
+            "total": 2045,
+            "finished": 1043,
+            "unfinished": 1002,
+            "respond": 0,
+            "wait": 2045,
+            "fallback": 0,
+            "early": 0,
+            "late": 1043,
+            "coverage": 1,
+            "earlyRate": 0,
+            "lateRate": 1,
+            "respondError": 0,
+            "waitError": 0.5100244498777506,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.003819289239975757
+              ],
+              "lateRate": [
+                0.996330294860273,
+                1
+              ],
+              "respondError": null,
+              "waitError": [
+                0.4883593004539791,
+                0.5316520073992002
+              ]
+            }
+          },
+          "punctuation": {
+            "total": 2045,
+            "finished": 1043,
+            "unfinished": 1002,
+            "respond": 1022,
+            "wait": 1023,
+            "fallback": 0,
+            "early": 0,
+            "late": 21,
+            "coverage": 1,
+            "earlyRate": 0,
+            "lateRate": 0.020134228187919462,
+            "respondError": 0,
+            "waitError": 0.020527859237536656,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.003819289239975757
+              ],
+              "lateRate": [
+                0.013206118738510093,
+                0.030584269415724504
+              ],
+              "respondError": [
+                0,
+                0.003744827661502516
+              ],
+              "waitError": [
+                0.013465037064582708,
+                0.031178265271434843
+              ]
+            }
+          }
+        },
+        "performance": {
+          "p50Ms": 0.010917000000006283,
+          "p95Ms": 0.02287499999999909,
+          "weightBytes": 131072,
+          "jsonBytes": 817880
+        },
+        "gates": {
+          "early": 0.02,
+          "late": 0.05,
+          "coverage": 0.3,
+          "minDirection": 50,
+          "p95Ms": 10,
+          "bytes": 2097152
+        },
+        "activation": "shadow only; no automatic promotion",
+        "caveat": "One public text test, publisher/model-assisted labels; not ASR, noise, owner DDSD, personalized or device acceptance."
+      }
+    },
+    {
+      "manifest": {
+        "schema": 1,
+        "createdAt": "2026-09-08T05:45:37.939Z",
+        "calibration": "domain",
+        "training": {
+          "dataset": "KE synthetic text; same gradient-only fit split as Round 1",
+          "revision": "b5b536e96076a156e79b7e6db9ca8fd100d3f976"
+        },
+        "calibrationNote": "Round 1 holdout permanently demoted to calibration. NO gradient training on it.",
+        "dataset": "ASLP-lab/Easy-Turn-Testset",
+        "revision": "5812651dbab429b9a4fab293de7127bfb9a56650",
+        "sourceSha": {
+          "complete": "0b35356353848bf25200a2fc0f6d5e25f2a3e86a1baa5b0e1a6e4cfe86ee26a3",
+          "incomplete": "01b2465c0bbeb9b434b955d15274f7f74a03bec18ba22f30981ba555b191e476"
+        },
+        "license": "publisher Apache-2.0; transcription metadata only, no audio",
+        "excluded": {
+          "trainTestOverlap": 0,
+          "previouslySeenAndRelated": 0,
+          "duplicates": 0,
+          "conflictingInputs": 0
+        },
+        "splits": {
+          "train": {
+            "count": 4731,
+            "groups": 4066,
+            "sha256": "0ace5928e766957d9cfd44e15650c2ba6ad623c29175bf8ebe9f30c73fce81f1",
+            "idsHash": "31c39c51fe58dee47be0e51e4ed6bfa44043271022e1576cef09d45bf583b0c6"
+          },
+          "dev": {
+            "count": 3101,
+            "groups": 3051,
+            "sha256": "4f41c8428e639b95b8067411dabb285ffbfccc94289ddee047ca05c7b4166a3d",
+            "idsHash": "269c0cc0805f893987b86db7713408f6441a6fd4f5b2da11762728c69bf1b2f0"
+          },
+          "holdout": {
+            "count": 600,
+            "groups": 600,
+            "sha256": "55ce3a71715d6b9d26ba2b12902a90df576f9cbf1631e04b320b317c3bad04ef",
+            "idsHash": "b4cd07c7474591052193f9914378a1e107a4ce5bd6dcc26d4b46040a502d003b"
+          }
+        }
+      },
+      "frozen": {
+        "phase": "frozen",
+        "gates": {
+          "early": 0.02,
+          "late": 0.05,
+          "coverage": 0.3,
+          "minDirection": 50,
+          "p95Ms": 10,
+          "bytes": 2097152
+        },
+        "selected": "suffix-20",
+        "modelHash": "58be6141737b6f81b24362fc482eb9448ed89668685425751bb0be345c4070d5",
+        "thresholds": {
+          "wait": 0.07,
+          "respond": 2
+        },
+        "developmentAccepted": false,
+        "candidates": [
+          {
+            "name": "suffix-20",
+            "trainingMs": 321.572042,
+            "thresholds": {
+              "wait": 0.07,
+              "respond": 2
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 543,
+              "fallback": 2558,
+              "early": 0,
+              "late": 23,
+              "coverage": 0.17510480490164462,
+              "earlyRate": 0,
+              "lateRate": 0.014383989993746092,
+              "respondError": 0,
+              "waitError": 0.0423572744014733,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.009603687699017864,
+                  0.02149208620652589
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.02838810018270994,
+                  0.06275639211633972
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.0126669999999649,
+              "p95Ms": 0.038708000000042375,
+              "weightBytes": 131072,
+              "jsonBytes": 791774
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 0,
+                "wait": 448,
+                "fallback": 2201,
+                "early": 0,
+                "late": 19,
+                "coverage": 0.169120422801057,
+                "earlyRate": 0,
+                "lateRate": 0.013991163475699559,
+                "respondError": 0,
+                "waitError": 0.04241071428571429,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.0029668493814224072
+                  ],
+                  "lateRate": [
+                    0.008975053922968278,
+                    0.021749224142850833
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.02731636699873026,
+                    0.06528599630734869
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 95,
+                "fallback": 357,
+                "early": 0,
+                "late": 4,
+                "coverage": 0.21017699115044247,
+                "earlyRate": 0,
+                "lateRate": 0.016597510373443983,
+                "respondError": 0,
+                "waitError": 0.042105263157894736,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0.006472787980558489,
+                    0.041891542263975116
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.016493505976432808,
+                    0.10331030132737451
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 543,
+              "fallback": 2558,
+              "early": 0,
+              "late": 23,
+              "coverage": 0.17510480490164462,
+              "earlyRate": 0,
+              "lateRate": 0.014383989993746092,
+              "respondError": 0,
+              "waitError": 0.0423572744014733,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.009603687699017864,
+                  0.02149208620652589
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.02838810018270994,
+                  0.06275639211633972
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1249,
+              "wait": 1848,
+              "fallback": 4,
+              "early": 105,
+              "late": 451,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.06990679094540612,
+              "lateRate": 0.28205128205128205,
+              "respondError": 0.08406725380304243,
+              "waitError": 0.24404761904761904,
+              "ci95": {
+                "earlyRate": [
+                  0.05807814804460423,
+                  0.08392988254772368
+                ],
+                "lateRate": [
+                  0.26053710084801973,
+                  0.3046101975500254
+                ],
+                "respondError": [
+                  0.0699240634855409,
+                  0.1007612011161454
+                ],
+                "waitError": [
+                  0.22500823737978468,
+                  0.26414893459431943
+                ]
+              }
+            },
+            "modelHash": "58be6141737b6f81b24362fc482eb9448ed89668685425751bb0be345c4070d5"
+          },
+          {
+            "name": "suffix-8",
+            "trainingMs": 205.4671669999999,
+            "thresholds": {
+              "wait": 0.1,
+              "respond": 2
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 464,
+              "fallback": 2637,
+              "early": 0,
+              "late": 15,
+              "coverage": 0.14962915188648823,
+              "earlyRate": 0,
+              "lateRate": 0.009380863039399626,
+              "respondError": 0,
+              "waitError": 0.032327586206896554,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.0056930777444713825,
+                  0.015420424675231227
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.019686955323090165,
+                  0.05264863860442718
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.012416999999913969,
+              "p95Ms": 0.03683399999999892,
+              "weightBytes": 131072,
+              "jsonBytes": 797917
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 0,
+                "wait": 377,
+                "fallback": 2272,
+                "early": 0,
+                "late": 11,
+                "coverage": 0.1423178557946395,
+                "earlyRate": 0,
+                "lateRate": 0.008100147275405008,
+                "respondError": 0,
+                "waitError": 0.029177718832891247,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.0029668493814224072
+                  ],
+                  "lateRate": [
+                    0.004528917962993335,
+                    0.014446563473320555
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.016368853424434112,
+                    0.05148507849896922
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 87,
+                "fallback": 365,
+                "early": 0,
+                "late": 4,
+                "coverage": 0.19247787610619468,
+                "earlyRate": 0,
+                "lateRate": 0.016597510373443983,
+                "respondError": 0,
+                "waitError": 0.04597701149425287,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0.006472787980558489,
+                    0.041891542263975116
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.018022396823237183,
+                    0.11233197826482823
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 464,
+              "fallback": 2637,
+              "early": 0,
+              "late": 15,
+              "coverage": 0.14962915188648823,
+              "earlyRate": 0,
+              "lateRate": 0.009380863039399626,
+              "respondError": 0,
+              "waitError": 0.032327586206896554,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.0056930777444713825,
+                  0.015420424675231227
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.019686955323090165,
+                  0.05264863860442718
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1215,
+              "wait": 1882,
+              "fallback": 4,
+              "early": 100,
+              "late": 480,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.06657789613848203,
+              "lateRate": 0.300187617260788,
+              "respondError": 0.0823045267489712,
+              "waitError": 0.255047821466525,
+              "ci95": {
+                "earlyRate": [
+                  0.0550438584617213,
+                  0.08032336741382898
+                ],
+                "lateRate": [
+                  0.2782226922023183,
+                  0.323110340331901
+                ],
+                "respondError": [
+                  0.06813576723540195,
+                  0.09910630917551148
+                ],
+                "waitError": [
+                  0.23586712336285556,
+                  0.2752264912864343
+                ]
+              }
+            },
+            "modelHash": "fb3be522f7c5503b523013eee21ca0643514b13f9a46541ed9f1dd711e3fb481"
+          },
+          {
+            "name": "context-20",
+            "trainingMs": 615.2072089999997,
+            "thresholds": {
+              "wait": 0.06,
+              "respond": 0.99
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 97,
+              "wait": 349,
+              "fallback": 2655,
+              "early": 0,
+              "late": 10,
+              "coverage": 0.1438245727184779,
+              "earlyRate": 0,
+              "lateRate": 0.006253908692933083,
+              "respondError": 0,
+              "waitError": 0.02865329512893983,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.003400501938653791,
+                  0.0114740808023981
+                ],
+                "respondError": [
+                  0,
+                  0.03809538920445529
+                ],
+                "waitError": [
+                  0.015636780372348516,
+                  0.051933483451418294
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.013458999999784282,
+              "p95Ms": 0.0915829999999005,
+              "weightBytes": 131072,
+              "jsonBytes": 811543
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 97,
+                "wait": 264,
+                "fallback": 2288,
+                "early": 0,
+                "late": 6,
+                "coverage": 0.13627784069460175,
+                "earlyRate": 0,
+                "lateRate": 0.004418262150220913,
+                "respondError": 0,
+                "waitError": 0.022727272727272728,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.0029668493814224072
+                  ],
+                  "lateRate": [
+                    0.002026427191967169,
+                    0.009606056350905954
+                  ],
+                  "respondError": [
+                    0,
+                    0.03809538920445529
+                  ],
+                  "waitError": [
+                    0.010456628501987184,
+                    0.04868877684206691
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 85,
+                "fallback": 367,
+                "early": 0,
+                "late": 4,
+                "coverage": 0.18805309734513273,
+                "earlyRate": 0,
+                "lateRate": 0.016597510373443983,
+                "respondError": 0,
+                "waitError": 0.047058823529411764,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0.006472787980558489,
+                    0.041891542263975116
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.018449962264952775,
+                    0.11483894743500761
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 122,
+              "wait": 333,
+              "fallback": 2646,
+              "early": 1,
+              "late": 10,
+              "coverage": 0.14672686230248308,
+              "earlyRate": 0.0006657789613848203,
+              "lateRate": 0.006253908692933083,
+              "respondError": 0.00819672131147541,
+              "waitError": 0.03003003003003003,
+              "ci95": {
+                "earlyRate": [
+                  0.00011753298061389851,
+                  0.003761759502738932
+                ],
+                "lateRate": [
+                  0.003400501938653791,
+                  0.0114740808023981
+                ],
+                "respondError": [
+                  0.0014483536709422769,
+                  0.04497190799133792
+                ],
+                "waitError": [
+                  0.01639179249056237,
+                  0.05438806367922189
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1314,
+              "wait": 1783,
+              "fallback": 4,
+              "early": 112,
+              "late": 393,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.07456724367509987,
+              "lateRate": 0.24577861163227016,
+              "respondError": 0.0852359208523592,
+              "waitError": 0.22041503084688727,
+              "ci95": {
+                "earlyRate": [
+                  0.06234003529664819,
+                  0.08896512189916844
+                ],
+                "lateRate": [
+                  0.22530097283431946,
+                  0.26747485729137727
+                ],
+                "respondError": [
+                  0.07132043644152261,
+                  0.10156953758874021
+                ],
+                "waitError": [
+                  0.20178619388917715,
+                  0.2402460489240638
+                ]
+              }
+            },
+            "modelHash": "17c38f94c61bef58b3d813b42bebbe4404bd8f35f64542b3ee42649e843ed74f"
+          },
+          {
+            "name": "context-8",
+            "trainingMs": 393.73683299999993,
+            "thresholds": {
+              "wait": 0.09,
+              "respond": 0.98
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 86,
+              "wait": 274,
+              "fallback": 2741,
+              "early": 0,
+              "late": 5,
+              "coverage": 0.11609158336020639,
+              "earlyRate": 0,
+              "lateRate": 0.0031269543464665416,
+              "respondError": 0,
+              "waitError": 0.01824817518248175,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.0013363452192038739,
+                  0.007299317843197301
+                ],
+                "respondError": [
+                  0,
+                  0.042759701519118086
+                ],
+                "waitError": [
+                  0.007818972728213917,
+                  0.04199934101602021
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.013374999999996362,
+              "p95Ms": 0.08729099999982282,
+              "weightBytes": 131072,
+              "jsonBytes": 817880
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 86,
+                "wait": 199,
+                "fallback": 2364,
+                "early": 0,
+                "late": 2,
+                "coverage": 0.10758776896942242,
+                "earlyRate": 0,
+                "lateRate": 0.0014727540500736377,
+                "respondError": 0,
+                "waitError": 0.010050251256281407,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.0029668493814224072
+                  ],
+                  "lateRate": [
+                    0.00040396677762099707,
+                    0.005354118450499512
+                  ],
+                  "respondError": [
+                    0,
+                    0.042759701519118086
+                  ],
+                  "waitError": [
+                    0.0027604243911927527,
+                    0.0358983122782084
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 75,
+                "fallback": 377,
+                "early": 0,
+                "late": 3,
+                "coverage": 0.16592920353982302,
+                "earlyRate": 0,
+                "lateRate": 0.012448132780082987,
+                "respondError": 0,
+                "waitError": 0.04,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0.004242276777351603,
+                    0.03595350694567585
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.013695816001486477,
+                    0.11113168623083756
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 107,
+              "wait": 255,
+              "fallback": 2739,
+              "early": 1,
+              "late": 5,
+              "coverage": 0.11673653660109642,
+              "earlyRate": 0.0006657789613848203,
+              "lateRate": 0.0031269543464665416,
+              "respondError": 0.009345794392523364,
+              "waitError": 0.0196078431372549,
+              "ci95": {
+                "earlyRate": [
+                  0.00011753298061389851,
+                  0.003761759502738932
+                ],
+                "lateRate": [
+                  0.0013363452192038739,
+                  0.007299317843197301
+                ],
+                "respondError": [
+                  0.0016516291511190044,
+                  0.05105060538898146
+                ],
+                "waitError": [
+                  0.008403543876169758,
+                  0.04507163167520992
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1308,
+              "wait": 1789,
+              "fallback": 4,
+              "early": 112,
+              "late": 399,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.07456724367509987,
+              "lateRate": 0.24953095684803,
+              "respondError": 0.0856269113149847,
+              "waitError": 0.22302962548910005,
+              "ci95": {
+                "earlyRate": [
+                  0.06234003529664819,
+                  0.08896512189916844
+                ],
+                "lateRate": [
+                  0.22893723135876679,
+                  0.2713253023813108
+                ],
+                "respondError": [
+                  0.07164985360979291,
+                  0.10203087125820946
+                ],
+                "waitError": [
+                  0.20434454605111602,
+                  0.24290165796378416
+                ]
+              }
+            },
+            "modelHash": "1f8c8a241f2716d850f3697de250752368b285fcc314ce865bc7d6ece3bfc315"
+          },
+          {
+            "name": "body-20",
+            "trainingMs": 298.02216699999997,
+            "thresholds": {
+              "wait": -1,
+              "respond": 2
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 0,
+              "fallback": 3101,
+              "early": 0,
+              "late": 0,
+              "coverage": 0,
+              "earlyRate": 0,
+              "lateRate": 0,
+              "respondError": 0,
+              "waitError": 0,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0,
+                  0.002396743383750459
+                ],
+                "respondError": null,
+                "waitError": null
+              }
+            },
+            "performance": {
+              "p50Ms": 0.009374999999977263,
+              "p95Ms": 0.031165999999984706,
+              "weightBytes": 131072,
+              "jsonBytes": 762254
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 0,
+                "wait": 0,
+                "fallback": 2649,
+                "early": 0,
+                "late": 0,
+                "coverage": 0,
+                "earlyRate": 0,
+                "lateRate": 0,
+                "respondError": 0,
+                "waitError": 0,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.0029668493814224072
+                  ],
+                  "lateRate": [
+                    0,
+                    0.0028208860707442038
+                  ],
+                  "respondError": null,
+                  "waitError": null
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 0,
+                "fallback": 452,
+                "early": 0,
+                "late": 0,
+                "coverage": 0,
+                "earlyRate": 0,
+                "lateRate": 0,
+                "respondError": 0,
+                "waitError": 0,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0,
+                    0.01569014415850901
+                  ],
+                  "respondError": null,
+                  "waitError": null
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 0,
+              "fallback": 3101,
+              "early": 0,
+              "late": 0,
+              "coverage": 0,
+              "earlyRate": 0,
+              "lateRate": 0,
+              "respondError": 0,
+              "waitError": 0,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0,
+                  0.002396743383750459
+                ],
+                "respondError": null,
+                "waitError": null
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1305,
+              "wait": 1792,
+              "fallback": 4,
+              "early": 209,
+              "late": 499,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.13914780292942744,
+              "lateRate": 0.31207004377736086,
+              "respondError": 0.16015325670498085,
+              "waitError": 0.27845982142857145,
+              "ci95": {
+                "earlyRate": [
+                  0.12256305582698833,
+                  0.1575737128743147
+                ],
+                "lateRate": [
+                  0.2898325519891379,
+                  0.33520837532395414
+                ],
+                "respondError": [
+                  0.14125652076985207,
+                  0.181044970869778
+                ],
+                "waitError": [
+                  0.2581966797168159,
+                  0.2996707847633475
+                ]
+              }
+            },
+            "modelHash": "f458eedd5161d37406cd8e0f2ef7f0b45fcf2c15e110a0b05d5c868d4449e381"
+          },
+          {
+            "name": "body-8",
+            "trainingMs": 190.66729199999997,
+            "thresholds": {
+              "wait": -1,
+              "respond": 2
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 0,
+              "fallback": 3101,
+              "early": 0,
+              "late": 0,
+              "coverage": 0,
+              "earlyRate": 0,
+              "lateRate": 0,
+              "respondError": 0,
+              "waitError": 0,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0,
+                  0.002396743383750459
+                ],
+                "respondError": null,
+                "waitError": null
+              }
+            },
+            "performance": {
+              "p50Ms": 0.00970799999998917,
+              "p95Ms": 0.03237500000000182,
+              "weightBytes": 131072,
+              "jsonBytes": 768679
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 0,
+                "wait": 0,
+                "fallback": 2649,
+                "early": 0,
+                "late": 0,
+                "coverage": 0,
+                "earlyRate": 0,
+                "lateRate": 0,
+                "respondError": 0,
+                "waitError": 0,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.0029668493814224072
+                  ],
+                  "lateRate": [
+                    0,
+                    0.0028208860707442038
+                  ],
+                  "respondError": null,
+                  "waitError": null
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 0,
+                "fallback": 452,
+                "early": 0,
+                "late": 0,
+                "coverage": 0,
+                "earlyRate": 0,
+                "lateRate": 0,
+                "respondError": 0,
+                "waitError": 0,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0,
+                    0.01569014415850901
+                  ],
+                  "respondError": null,
+                  "waitError": null
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 0,
+              "fallback": 3101,
+              "early": 0,
+              "late": 0,
+              "coverage": 0,
+              "earlyRate": 0,
+              "lateRate": 0,
+              "respondError": 0,
+              "waitError": 0,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0,
+                  0.002396743383750459
+                ],
+                "respondError": null,
+                "waitError": null
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1310,
+              "wait": 1787,
+              "fallback": 4,
+              "early": 210,
+              "late": 495,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.13981358189081225,
+              "lateRate": 0.30956848030018763,
+              "respondError": 0.16030534351145037,
+              "waitError": 0.2770005595970901,
+              "ci95": {
+                "earlyRate": [
+                  0.12319228012899214,
+                  0.15827264951566644
+                ],
+                "lateRate": [
+                  0.28738691295470076,
+                  0.3326628786154706
+                ],
+                "respondError": [
+                  0.14143476725504842,
+                  0.18116241645415973
+                ],
+                "waitError": [
+                  0.25674638820517004,
+                  0.29821145954641215
+                ]
+              }
+            },
+            "modelHash": "83d80285818afda6544fa56d8b25aaf5d64d87b8693e3d5910758d6ef500f13a"
+          }
+        ],
+        "baselines": {
+          "alwaysRespond": {
+            "total": 3101,
+            "finished": 1599,
+            "unfinished": 1502,
+            "respond": 3101,
+            "wait": 0,
+            "fallback": 0,
+            "early": 1502,
+            "late": 0,
+            "coverage": 1,
+            "earlyRate": 1,
+            "lateRate": 0,
+            "respondError": 0.48435988390841667,
+            "waitError": 0,
+            "ci95": {
+              "earlyRate": [
+                0.9974488684600027,
+                1
+              ],
+              "lateRate": [
+                0,
+                0.002396743383750459
+              ],
+              "respondError": [
+                0.4668002403394,
+                0.5019582303020653
+              ],
+              "waitError": null
+            }
+          },
+          "alwaysWait": {
+            "total": 3101,
+            "finished": 1599,
+            "unfinished": 1502,
+            "respond": 0,
+            "wait": 3101,
+            "fallback": 0,
+            "early": 0,
+            "late": 1599,
+            "coverage": 1,
+            "earlyRate": 0,
+            "lateRate": 1,
+            "respondError": 0,
+            "waitError": 0.5156401160915833,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.0025511315399973015
+              ],
+              "lateRate": [
+                0.9976032566162495,
+                0.9999999999999999
+              ],
+              "respondError": null,
+              "waitError": [
+                0.4980417696979346,
+                0.5331997596606
+              ]
+            }
+          },
+          "punctuation": {
+            "total": 3101,
+            "finished": 1599,
+            "unfinished": 1502,
+            "respond": 1490,
+            "wait": 1611,
+            "fallback": 0,
+            "early": 4,
+            "late": 113,
+            "coverage": 1,
+            "earlyRate": 0.002663115845539281,
+            "lateRate": 0.07066916823014384,
+            "respondError": 0.0026845637583892616,
+            "waitError": 0.07014276846679081,
+            "ci95": {
+              "earlyRate": [
+                0.0010360893837574737,
+                0.006827685929661946
+              ],
+              "lateRate": [
+                0.05910987416218892,
+                0.08428645395906774
+              ],
+              "respondError": [
+                0.0010444375667259202,
+                0.006882507298111153
+              ],
+              "waitError": [
+                0.058667118454550166,
+                0.08366362160069737
+              ]
+            }
+          }
+        },
+        "wallMs": 3032.684375,
+        "cpuMicros": {
+          "user": 3253951,
+          "system": 71514
+        },
+        "rssBytes": 416530432,
+        "environment": {
+          "platform": "darwin",
+          "arch": "arm64",
+          "cpu": "Apple M4",
+          "node": "v24.2.0"
+        },
+        "activation": "shadow only; production Host and personal profiles untouched"
+      },
+      "check": {
+        "status": "not-tested",
+        "reason": "Development coverage failed; preserve fresh holdout for revised calibration."
+      }
+    },
+    {
+      "manifest": {
+        "schema": 1,
+        "createdAt": "2026-09-08T05:48:50.058Z",
+        "calibration": "language-domain",
+        "training": {
+          "dataset": "KE synthetic text; same gradient-only fit split as Round 1",
+          "revision": "b5b536e96076a156e79b7e6db9ca8fd100d3f976"
+        },
+        "calibrationNote": "Round 1 holdout permanently demoted to calibration. NO gradient training on it.",
+        "dataset": "ASLP-lab/Easy-Turn-Testset",
+        "revision": "5812651dbab429b9a4fab293de7127bfb9a56650",
+        "sourceSha": {
+          "complete": "0b35356353848bf25200a2fc0f6d5e25f2a3e86a1baa5b0e1a6e4cfe86ee26a3",
+          "incomplete": "01b2465c0bbeb9b434b955d15274f7f74a03bec18ba22f30981ba555b191e476"
+        },
+        "license": "publisher Apache-2.0; transcription metadata only, no audio",
+        "excluded": {
+          "trainTestOverlap": 0,
+          "previouslySeenAndRelated": 0,
+          "duplicates": 0,
+          "conflictingInputs": 0
+        },
+        "splits": {
+          "train": {
+            "count": 4731,
+            "groups": 4066,
+            "sha256": "0ace5928e766957d9cfd44e15650c2ba6ad623c29175bf8ebe9f30c73fce81f1",
+            "idsHash": "31c39c51fe58dee47be0e51e4ed6bfa44043271022e1576cef09d45bf583b0c6"
+          },
+          "dev": {
+            "count": 3101,
+            "groups": 3051,
+            "sha256": "4f41c8428e639b95b8067411dabb285ffbfccc94289ddee047ca05c7b4166a3d",
+            "idsHash": "269c0cc0805f893987b86db7713408f6441a6fd4f5b2da11762728c69bf1b2f0"
+          },
+          "holdout": {
+            "count": 600,
+            "groups": 600,
+            "sha256": "55ce3a71715d6b9d26ba2b12902a90df576f9cbf1631e04b320b317c3bad04ef",
+            "idsHash": "b4cd07c7474591052193f9914378a1e107a4ce5bd6dcc26d4b46040a502d003b"
+          }
+        }
+      },
+      "frozen": {
+        "phase": "frozen",
+        "gates": {
+          "early": 0.02,
+          "late": 0.05,
+          "coverage": 0.3,
+          "minDirection": 50,
+          "p95Ms": 10,
+          "bytes": 2097152
+        },
+        "selected": "context-8",
+        "modelHash": "1f8c8a241f2716d850f3697de250752368b285fcc314ce865bc7d6ece3bfc315",
+        "thresholds": {
+          "zh": {
+            "wait": 0.16,
+            "respond": 0.73
+          },
+          "en": {
+            "wait": 0.09,
+            "respond": 2
+          }
+        },
+        "developmentAccepted": true,
+        "candidates": [
+          {
+            "name": "context-8",
+            "trainingMs": 381.054208,
+            "thresholds": {
+              "zh": {
+                "wait": 0.16,
+                "respond": 0.73
+              },
+              "en": {
+                "wait": 0.09,
+                "respond": 2
+              }
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 854,
+              "wait": 662,
+              "fallback": 1585,
+              "early": 17,
+              "late": 26,
+              "coverage": 0.4888745565946469,
+              "earlyRate": 0.011318242343541944,
+              "lateRate": 0.016260162601626018,
+              "respondError": 0.01990632318501171,
+              "waitError": 0.03927492447129909,
+              "ci95": {
+                "earlyRate": [
+                  0.007078426887873937,
+                  0.018051440689167367
+                ],
+                "lateRate": [
+                  0.011120200652125534,
+                  0.023718925060608655
+                ],
+                "respondError": [
+                  0.012465008483503806,
+                  0.03164756428051231
+                ],
+                "waitError": [
+                  0.02694094808405686,
+                  0.05692524471615268
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.014041999999790278,
+              "p95Ms": 0.0929999999998472,
+              "weightBytes": 131072,
+              "jsonBytes": 817880
+            },
+            "accepted": true,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 854,
+                "wait": 587,
+                "fallback": 1208,
+                "early": 17,
+                "late": 23,
+                "coverage": 0.5439788599471499,
+                "earlyRate": 0.013168086754453912,
+                "lateRate": 0.016936671575846832,
+                "respondError": 0.01990632318501171,
+                "waitError": 0.039182282793867124,
+                "ci95": {
+                  "earlyRate": [
+                    0.008237535887294605,
+                    0.020987351542951692
+                  ],
+                  "lateRate": [
+                    0.011311913222190002,
+                    0.02528676315838172
+                  ],
+                  "respondError": [
+                    0.012465008483503806,
+                    0.03164756428051231
+                  ],
+                  "waitError": [
+                    0.02624879373182844,
+                    0.05810816420749067
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 75,
+                "fallback": 377,
+                "early": 0,
+                "late": 3,
+                "coverage": 0.16592920353982302,
+                "earlyRate": 0,
+                "lateRate": 0.012448132780082987,
+                "respondError": 0,
+                "waitError": 0.04,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0.004242276777351603,
+                    0.03595350694567585
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.013695816001486477,
+                    0.11113168623083756
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 889,
+              "wait": 625,
+              "fallback": 1587,
+              "early": 26,
+              "late": 24,
+              "coverage": 0.48822960335375687,
+              "earlyRate": 0.017310252996005325,
+              "lateRate": 0.0150093808630394,
+              "respondError": 0.02924634420697413,
+              "waitError": 0.0384,
+              "ci95": {
+                "earlyRate": [
+                  0.011839967403633217,
+                  0.025243348663607855
+                ],
+                "lateRate": [
+                  0.010106726444022622,
+                  0.02223683139725128
+                ],
+                "respondError": [
+                  0.02003530926003022,
+                  0.04250837150036445
+                ],
+                "waitError": [
+                  0.025938235839112964,
+                  0.05650160274662945
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1308,
+              "wait": 1789,
+              "fallback": 4,
+              "early": 112,
+              "late": 399,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.07456724367509987,
+              "lateRate": 0.24953095684803,
+              "respondError": 0.0856269113149847,
+              "waitError": 0.22302962548910005,
+              "ci95": {
+                "earlyRate": [
+                  0.06234003529664819,
+                  0.08896512189916844
+                ],
+                "lateRate": [
+                  0.22893723135876679,
+                  0.2713253023813108
+                ],
+                "respondError": [
+                  0.07164985360979291,
+                  0.10203087125820946
+                ],
+                "waitError": [
+                  0.20434454605111602,
+                  0.24290165796378416
+                ]
+              }
+            },
+            "modelHash": "1f8c8a241f2716d850f3697de250752368b285fcc314ce865bc7d6ece3bfc315"
+          },
+          {
+            "name": "suffix-8",
+            "trainingMs": 201.89962500000001,
+            "thresholds": {
+              "zh": {
+                "wait": 0.13,
+                "respond": 0.72
+              },
+              "en": {
+                "wait": 0.1,
+                "respond": 2
+              }
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 824,
+              "wait": 656,
+              "fallback": 1621,
+              "early": 16,
+              "late": 29,
+              "coverage": 0.47726539825862624,
+              "earlyRate": 0.010652463382157125,
+              "lateRate": 0.01813633520950594,
+              "respondError": 0.019417475728155338,
+              "waitError": 0.04420731707317073,
+              "ci95": {
+                "earlyRate": [
+                  0.006567484479854204,
+                  0.017234222153831573
+                ],
+                "lateRate": [
+                  0.012656964809784049,
+                  0.025925512710140566
+                ],
+                "respondError": [
+                  0.011986837210773564,
+                  0.031308401878443505
+                ],
+                "waitError": [
+                  0.030953743444140265,
+                  0.06276814374817982
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.012083000000075117,
+              "p95Ms": 0.03562499999998181,
+              "weightBytes": 131072,
+              "jsonBytes": 797917
+            },
+            "accepted": true,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 824,
+                "wait": 569,
+                "fallback": 1256,
+                "early": 16,
+                "late": 25,
+                "coverage": 0.5258588146470367,
+                "earlyRate": 0.012393493415956624,
+                "lateRate": 0.018409425625920472,
+                "respondError": 0.019417475728155338,
+                "waitError": 0.043936731107205626,
+                "ci95": {
+                  "earlyRate": [
+                    0.007642831720429499,
+                    0.020037465236356567
+                  ],
+                  "lateRate": [
+                    0.012500171285276416,
+                    0.027035704252671613
+                  ],
+                  "respondError": [
+                    0.011986837210773564,
+                    0.031308401878443505
+                  ],
+                  "waitError": [
+                    0.02993478305690755,
+                    0.06405559752997722
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 87,
+                "fallback": 365,
+                "early": 0,
+                "late": 4,
+                "coverage": 0.19247787610619468,
+                "earlyRate": 0,
+                "lateRate": 0.016597510373443983,
+                "respondError": 0,
+                "waitError": 0.04597701149425287,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0.006472787980558489,
+                    0.041891542263975116
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.018022396823237183,
+                    0.11233197826482823
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 824,
+              "wait": 656,
+              "fallback": 1621,
+              "early": 16,
+              "late": 29,
+              "coverage": 0.47726539825862624,
+              "earlyRate": 0.010652463382157125,
+              "lateRate": 0.01813633520950594,
+              "respondError": 0.019417475728155338,
+              "waitError": 0.04420731707317073,
+              "ci95": {
+                "earlyRate": [
+                  0.006567484479854204,
+                  0.017234222153831573
+                ],
+                "lateRate": [
+                  0.012656964809784049,
+                  0.025925512710140566
+                ],
+                "respondError": [
+                  0.011986837210773564,
+                  0.031308401878443505
+                ],
+                "waitError": [
+                  0.030953743444140265,
+                  0.06276814374817982
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1215,
+              "wait": 1882,
+              "fallback": 4,
+              "early": 100,
+              "late": 480,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.06657789613848203,
+              "lateRate": 0.300187617260788,
+              "respondError": 0.0823045267489712,
+              "waitError": 0.255047821466525,
+              "ci95": {
+                "earlyRate": [
+                  0.0550438584617213,
+                  0.08032336741382898
+                ],
+                "lateRate": [
+                  0.2782226922023183,
+                  0.323110340331901
+                ],
+                "respondError": [
+                  0.06813576723540195,
+                  0.09910630917551148
+                ],
+                "waitError": [
+                  0.23586712336285556,
+                  0.2752264912864343
+                ]
+              }
+            },
+            "modelHash": "fb3be522f7c5503b523013eee21ca0643514b13f9a46541ed9f1dd711e3fb481"
+          },
+          {
+            "name": "context-20",
+            "trainingMs": 583.660625,
+            "thresholds": {
+              "zh": {
+                "wait": 0.1,
+                "respond": 0.77
+              },
+              "en": {
+                "wait": 0.06,
+                "respond": 2
+              }
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 852,
+              "wait": 623,
+              "fallback": 1626,
+              "early": 17,
+              "late": 25,
+              "coverage": 0.4756530151564012,
+              "earlyRate": 0.011318242343541944,
+              "lateRate": 0.015634771732332707,
+              "respondError": 0.01995305164319249,
+              "waitError": 0.04012841091492777,
+              "ci95": {
+                "earlyRate": [
+                  0.007078426887873937,
+                  0.018051440689167367
+                ],
+                "lateRate": [
+                  0.01061227796756306,
+                  0.02297906380944098
+                ],
+                "respondError": [
+                  0.012494354416157536,
+                  0.031721304182349475
+                ],
+                "waitError": [
+                  0.027326192787288185,
+                  0.058567276950521156
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.013374999999996362,
+              "p95Ms": 0.08724999999958527,
+              "weightBytes": 131072,
+              "jsonBytes": 811543
+            },
+            "accepted": true,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 852,
+                "wait": 538,
+                "fallback": 1259,
+                "early": 17,
+                "late": 21,
+                "coverage": 0.5247263118157796,
+                "earlyRate": 0.013168086754453912,
+                "lateRate": 0.015463917525773196,
+                "respondError": 0.01995305164319249,
+                "waitError": 0.03903345724907063,
+                "ci95": {
+                  "earlyRate": [
+                    0.008237535887294605,
+                    0.020987351542951692
+                  ],
+                  "lateRate": [
+                    0.010136294407772577,
+                    0.02352518281542284
+                  ],
+                  "respondError": [
+                    0.012494354416157536,
+                    0.031721304182349475
+                  ],
+                  "waitError": [
+                    0.025669703529181,
+                    0.05893361965604509
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 85,
+                "fallback": 367,
+                "early": 0,
+                "late": 4,
+                "coverage": 0.18805309734513273,
+                "earlyRate": 0,
+                "lateRate": 0.016597510373443983,
+                "respondError": 0,
+                "waitError": 0.047058823529411764,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0.006472787980558489,
+                    0.041891542263975116
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.018449962264952775,
+                    0.11483894743500761
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 884,
+              "wait": 599,
+              "fallback": 1618,
+              "early": 26,
+              "late": 24,
+              "coverage": 0.4782328281199613,
+              "earlyRate": 0.017310252996005325,
+              "lateRate": 0.0150093808630394,
+              "respondError": 0.029411764705882353,
+              "waitError": 0.04006677796327212,
+              "ci95": {
+                "earlyRate": [
+                  0.011839967403633217,
+                  0.025243348663607855
+                ],
+                "lateRate": [
+                  0.010106726444022622,
+                  0.02223683139725128
+                ],
+                "respondError": [
+                  0.020149068326765912,
+                  0.04274683562727273
+                ],
+                "waitError": [
+                  0.02707019687366266,
+                  0.058925195614181566
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1314,
+              "wait": 1783,
+              "fallback": 4,
+              "early": 112,
+              "late": 393,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.07456724367509987,
+              "lateRate": 0.24577861163227016,
+              "respondError": 0.0852359208523592,
+              "waitError": 0.22041503084688727,
+              "ci95": {
+                "earlyRate": [
+                  0.06234003529664819,
+                  0.08896512189916844
+                ],
+                "lateRate": [
+                  0.22530097283431946,
+                  0.26747485729137727
+                ],
+                "respondError": [
+                  0.07132043644152261,
+                  0.10156953758874021
+                ],
+                "waitError": [
+                  0.20178619388917715,
+                  0.2402460489240638
+                ]
+              }
+            },
+            "modelHash": "17c38f94c61bef58b3d813b42bebbe4404bd8f35f64542b3ee42649e843ed74f"
+          },
+          {
+            "name": "suffix-20",
+            "trainingMs": 325.5205000000001,
+            "thresholds": {
+              "zh": {
+                "wait": 0.08,
+                "respond": 0.76
+              },
+              "en": {
+                "wait": 0.07,
+                "respond": 2
+              }
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 826,
+              "wait": 613,
+              "fallback": 1662,
+              "early": 15,
+              "late": 28,
+              "coverage": 0.4640438568203805,
+              "earlyRate": 0.009986684420772303,
+              "lateRate": 0.017510944340212633,
+              "respondError": 0.018159806295399514,
+              "waitError": 0.04567699836867863,
+              "ci95": {
+                "earlyRate": [
+                  0.0060612890548138836,
+                  0.016412256635516362
+                ],
+                "lateRate": [
+                  0.012142656332322536,
+                  0.025192037251871937
+                ],
+                "respondError": [
+                  0.011035377841114047,
+                  0.029745416951530712
+                ],
+                "waitError": [
+                  0.031788746111937514,
+                  0.0652241661170691
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.013208000000076936,
+              "p95Ms": 0.037624999999934516,
+              "weightBytes": 131072,
+              "jsonBytes": 791774
+            },
+            "accepted": true,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 826,
+                "wait": 518,
+                "fallback": 1305,
+                "early": 15,
+                "late": 24,
+                "coverage": 0.507361268403171,
+                "earlyRate": 0.011618900077459334,
+                "lateRate": 0.017673048600883652,
+                "respondError": 0.018159806295399514,
+                "waitError": 0.04633204633204633,
+                "ci95": {
+                  "earlyRate": [
+                    0.007053664139409395,
+                    0.01908204234391644
+                  ],
+                  "lateRate": [
+                    0.011904557114125929,
+                    0.02616271884513395
+                  ],
+                  "respondError": [
+                    0.011035377841114047,
+                    0.029745416951530712
+                  ],
+                  "waitError": [
+                    0.03132975287512625,
+                    0.06801380271722209
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 95,
+                "fallback": 357,
+                "early": 0,
+                "late": 4,
+                "coverage": 0.21017699115044247,
+                "earlyRate": 0,
+                "lateRate": 0.016597510373443983,
+                "respondError": 0,
+                "waitError": 0.042105263157894736,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0.006472787980558489,
+                    0.041891542263975116
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.016493505976432808,
+                    0.10331030132737451
+                  ]
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 826,
+              "wait": 613,
+              "fallback": 1662,
+              "early": 15,
+              "late": 28,
+              "coverage": 0.4640438568203805,
+              "earlyRate": 0.009986684420772303,
+              "lateRate": 0.017510944340212633,
+              "respondError": 0.018159806295399514,
+              "waitError": 0.04567699836867863,
+              "ci95": {
+                "earlyRate": [
+                  0.0060612890548138836,
+                  0.016412256635516362
+                ],
+                "lateRate": [
+                  0.012142656332322536,
+                  0.025192037251871937
+                ],
+                "respondError": [
+                  0.011035377841114047,
+                  0.029745416951530712
+                ],
+                "waitError": [
+                  0.031788746111937514,
+                  0.0652241661170691
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1249,
+              "wait": 1848,
+              "fallback": 4,
+              "early": 105,
+              "late": 451,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.06990679094540612,
+              "lateRate": 0.28205128205128205,
+              "respondError": 0.08406725380304243,
+              "waitError": 0.24404761904761904,
+              "ci95": {
+                "earlyRate": [
+                  0.05807814804460423,
+                  0.08392988254772368
+                ],
+                "lateRate": [
+                  0.26053710084801973,
+                  0.3046101975500254
+                ],
+                "respondError": [
+                  0.0699240634855409,
+                  0.1007612011161454
+                ],
+                "waitError": [
+                  0.22500823737978468,
+                  0.26414893459431943
+                ]
+              }
+            },
+            "modelHash": "58be6141737b6f81b24362fc482eb9448ed89668685425751bb0be345c4070d5"
+          },
+          {
+            "name": "body-20",
+            "trainingMs": 295.70608300000004,
+            "thresholds": {
+              "zh": {
+                "wait": 0.11,
+                "respond": 2
+              },
+              "en": {
+                "wait": -1,
+                "respond": 2
+              }
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 466,
+              "fallback": 2635,
+              "early": 0,
+              "late": 20,
+              "coverage": 0.15027410512737827,
+              "earlyRate": 0,
+              "lateRate": 0.012507817385866166,
+              "respondError": 0,
+              "waitError": 0.04291845493562232,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.008111302010358342,
+                  0.01924112008799498
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.027952151244975545,
+                  0.06535929669833129
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.009624999999914507,
+              "p95Ms": 0.03208300000005693,
+              "weightBytes": 131072,
+              "jsonBytes": 762254
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 0,
+                "wait": 466,
+                "fallback": 2183,
+                "early": 0,
+                "late": 20,
+                "coverage": 0.17591543978859947,
+                "earlyRate": 0,
+                "lateRate": 0.014727540500736377,
+                "respondError": 0,
+                "waitError": 0.04291845493562232,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.0029668493814224072
+                  ],
+                  "lateRate": [
+                    0.009553752446336446,
+                    0.022639125198170816
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.027952151244975545,
+                    0.06535929669833129
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 0,
+                "fallback": 452,
+                "early": 0,
+                "late": 0,
+                "coverage": 0,
+                "earlyRate": 0,
+                "lateRate": 0,
+                "respondError": 0,
+                "waitError": 0,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0,
+                    0.01569014415850901
+                  ],
+                  "respondError": null,
+                  "waitError": null
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 466,
+              "fallback": 2635,
+              "early": 0,
+              "late": 20,
+              "coverage": 0.15027410512737827,
+              "earlyRate": 0,
+              "lateRate": 0.012507817385866166,
+              "respondError": 0,
+              "waitError": 0.04291845493562232,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.008111302010358342,
+                  0.01924112008799498
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.027952151244975545,
+                  0.06535929669833129
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1305,
+              "wait": 1792,
+              "fallback": 4,
+              "early": 209,
+              "late": 499,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.13914780292942744,
+              "lateRate": 0.31207004377736086,
+              "respondError": 0.16015325670498085,
+              "waitError": 0.27845982142857145,
+              "ci95": {
+                "earlyRate": [
+                  0.12256305582698833,
+                  0.1575737128743147
+                ],
+                "lateRate": [
+                  0.2898325519891379,
+                  0.33520837532395414
+                ],
+                "respondError": [
+                  0.14125652076985207,
+                  0.181044970869778
+                ],
+                "waitError": [
+                  0.2581966797168159,
+                  0.2996707847633475
+                ]
+              }
+            },
+            "modelHash": "f458eedd5161d37406cd8e0f2ef7f0b45fcf2c15e110a0b05d5c868d4449e381"
+          },
+          {
+            "name": "body-8",
+            "trainingMs": 211.01245799999998,
+            "thresholds": {
+              "zh": {
+                "wait": 0.16,
+                "respond": 2
+              },
+              "en": {
+                "wait": -1,
+                "respond": 2
+              }
+            },
+            "metrics": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 451,
+              "fallback": 2650,
+              "early": 0,
+              "late": 20,
+              "coverage": 0.145436955820703,
+              "earlyRate": 0,
+              "lateRate": 0.012507817385866166,
+              "respondError": 0,
+              "waitError": 0.04434589800443459,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.008111302010358342,
+                  0.01924112008799498
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.028887695913588498,
+                  0.06750102490702246
+                ]
+              }
+            },
+            "performance": {
+              "p50Ms": 0.009708999999929802,
+              "p95Ms": 0.03274999999996453,
+              "weightBytes": 131072,
+              "jsonBytes": 768679
+            },
+            "accepted": false,
+            "byLanguage": {
+              "zh": {
+                "total": 2649,
+                "finished": 1358,
+                "unfinished": 1291,
+                "respond": 0,
+                "wait": 451,
+                "fallback": 2198,
+                "early": 0,
+                "late": 20,
+                "coverage": 0.1702529256323141,
+                "earlyRate": 0,
+                "lateRate": 0.014727540500736377,
+                "respondError": 0,
+                "waitError": 0.04434589800443459,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.0029668493814224072
+                  ],
+                  "lateRate": [
+                    0.009553752446336446,
+                    0.022639125198170816
+                  ],
+                  "respondError": null,
+                  "waitError": [
+                    0.028887695913588498,
+                    0.06750102490702246
+                  ]
+                }
+              },
+              "en": {
+                "total": 452,
+                "finished": 241,
+                "unfinished": 211,
+                "respond": 0,
+                "wait": 0,
+                "fallback": 452,
+                "early": 0,
+                "late": 0,
+                "coverage": 0,
+                "earlyRate": 0,
+                "lateRate": 0,
+                "respondError": 0,
+                "waitError": 0,
+                "ci95": {
+                  "earlyRate": [
+                    0,
+                    0.017881080759033628
+                  ],
+                  "lateRate": [
+                    0,
+                    0.01569014415850901
+                  ],
+                  "respondError": null,
+                  "waitError": null
+                }
+              }
+            },
+            "noContext": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 0,
+              "wait": 451,
+              "fallback": 2650,
+              "early": 0,
+              "late": 20,
+              "coverage": 0.145436955820703,
+              "earlyRate": 0,
+              "lateRate": 0.012507817385866166,
+              "respondError": 0,
+              "waitError": 0.04434589800443459,
+              "ci95": {
+                "earlyRate": [
+                  0,
+                  0.0025511315399973015
+                ],
+                "lateRate": [
+                  0.008111302010358342,
+                  0.01924112008799498
+                ],
+                "respondError": null,
+                "waitError": [
+                  0.028887695913588498,
+                  0.06750102490702246
+                ]
+              }
+            },
+            "forcedBinary": {
+              "total": 3101,
+              "finished": 1599,
+              "unfinished": 1502,
+              "respond": 1310,
+              "wait": 1787,
+              "fallback": 4,
+              "early": 210,
+              "late": 495,
+              "coverage": 0.9987100935182199,
+              "earlyRate": 0.13981358189081225,
+              "lateRate": 0.30956848030018763,
+              "respondError": 0.16030534351145037,
+              "waitError": 0.2770005595970901,
+              "ci95": {
+                "earlyRate": [
+                  0.12319228012899214,
+                  0.15827264951566644
+                ],
+                "lateRate": [
+                  0.28738691295470076,
+                  0.3326628786154706
+                ],
+                "respondError": [
+                  0.14143476725504842,
+                  0.18116241645415973
+                ],
+                "waitError": [
+                  0.25674638820517004,
+                  0.29821145954641215
+                ]
+              }
+            },
+            "modelHash": "83d80285818afda6544fa56d8b25aaf5d64d87b8693e3d5910758d6ef500f13a"
+          }
+        ],
+        "baselines": {
+          "alwaysRespond": {
+            "total": 3101,
+            "finished": 1599,
+            "unfinished": 1502,
+            "respond": 3101,
+            "wait": 0,
+            "fallback": 0,
+            "early": 1502,
+            "late": 0,
+            "coverage": 1,
+            "earlyRate": 1,
+            "lateRate": 0,
+            "respondError": 0.48435988390841667,
+            "waitError": 0,
+            "ci95": {
+              "earlyRate": [
+                0.9974488684600027,
+                1
+              ],
+              "lateRate": [
+                0,
+                0.002396743383750459
+              ],
+              "respondError": [
+                0.4668002403394,
+                0.5019582303020653
+              ],
+              "waitError": null
+            }
+          },
+          "alwaysWait": {
+            "total": 3101,
+            "finished": 1599,
+            "unfinished": 1502,
+            "respond": 0,
+            "wait": 3101,
+            "fallback": 0,
+            "early": 0,
+            "late": 1599,
+            "coverage": 1,
+            "earlyRate": 0,
+            "lateRate": 1,
+            "respondError": 0,
+            "waitError": 0.5156401160915833,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.0025511315399973015
+              ],
+              "lateRate": [
+                0.9976032566162495,
+                0.9999999999999999
+              ],
+              "respondError": null,
+              "waitError": [
+                0.4980417696979346,
+                0.5331997596606
+              ]
+            }
+          },
+          "punctuation": {
+            "total": 3101,
+            "finished": 1599,
+            "unfinished": 1502,
+            "respond": 1490,
+            "wait": 1611,
+            "fallback": 0,
+            "early": 4,
+            "late": 113,
+            "coverage": 1,
+            "earlyRate": 0.002663115845539281,
+            "lateRate": 0.07066916823014384,
+            "respondError": 0.0026845637583892616,
+            "waitError": 0.07014276846679081,
+            "ci95": {
+              "earlyRate": [
+                0.0010360893837574737,
+                0.006827685929661946
+              ],
+              "lateRate": [
+                0.05910987416218892,
+                0.08428645395906774
+              ],
+              "respondError": [
+                0.0010444375667259202,
+                0.006882507298111153
+              ],
+              "waitError": [
+                0.058667118454550166,
+                0.08366362160069737
+              ]
+            }
+          }
+        },
+        "wallMs": 3051.010041,
+        "cpuMicros": {
+          "user": 3325732,
+          "system": 75376
+        },
+        "rssBytes": 460800000,
+        "environment": {
+          "platform": "darwin",
+          "arch": "arm64",
+          "cpu": "Apple M4",
+          "node": "v24.2.0"
+        },
+        "activation": "shadow only; production Host and personal profiles untouched"
+      },
+      "check": {
+        "schema": 1,
+        "at": "2026-09-08T05:50:09.883Z",
+        "status": "rejected",
+        "model": "context-8",
+        "modelHash": "1f8c8a241f2716d850f3697de250752368b285fcc314ce865bc7d6ece3bfc315",
+        "thresholds": {
+          "zh": {
+            "wait": 0.16,
+            "respond": 0.73
+          },
+          "en": {
+            "wait": 0.09,
+            "respond": 2
+          }
+        },
+        "metrics": {
+          "total": 600,
+          "finished": 300,
+          "unfinished": 300,
+          "respond": 52,
+          "wait": 136,
+          "fallback": 412,
+          "early": 0,
+          "late": 19,
+          "coverage": 0.31333333333333335,
+          "earlyRate": 0,
+          "lateRate": 0.06333333333333334,
+          "respondError": 0,
+          "waitError": 0.13970588235294118,
+          "ci95": {
+            "earlyRate": [
+              0,
+              0.012643429997735661
+            ],
+            "lateRate": [
+              0.04091655604878176,
+              0.09679203948257407
+            ],
+            "respondError": [
+              0,
+              0.06879459041288215
+            ],
+            "waitError": [
+              0.0912969283906715,
+              0.20791017450288807
+            ]
+          }
+        },
+        "byLanguage": {
+          "zh": {
+            "total": 600,
+            "finished": 300,
+            "unfinished": 300,
+            "respond": 52,
+            "wait": 136,
+            "fallback": 412,
+            "early": 0,
+            "late": 19,
+            "coverage": 0.31333333333333335,
+            "earlyRate": 0,
+            "lateRate": 0.06333333333333334,
+            "respondError": 0,
+            "waitError": 0.13970588235294118,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.012643429997735661
+              ],
+              "lateRate": [
+                0.04091655604878176,
+                0.09679203948257407
+              ],
+              "respondError": [
+                0,
+                0.06879459041288215
+              ],
+              "waitError": [
+                0.0912969283906715,
+                0.20791017450288807
+              ]
+            }
+          },
+          "en": {
+            "total": 0,
+            "finished": 0,
+            "unfinished": 0,
+            "respond": 0,
+            "wait": 0,
+            "fallback": 0,
+            "early": 0,
+            "late": 0,
+            "coverage": 0,
+            "earlyRate": 0,
+            "lateRate": 0,
+            "respondError": 0,
+            "waitError": 0,
+            "ci95": {
+              "earlyRate": null,
+              "lateRate": null,
+              "respondError": null,
+              "waitError": null
+            }
+          }
+        },
+        "noContext": {
+          "total": 600,
+          "finished": 300,
+          "unfinished": 300,
+          "respond": 52,
+          "wait": 136,
+          "fallback": 412,
+          "early": 0,
+          "late": 19,
+          "coverage": 0.31333333333333335,
+          "earlyRate": 0,
+          "lateRate": 0.06333333333333334,
+          "respondError": 0,
+          "waitError": 0.13970588235294118,
+          "ci95": {
+            "earlyRate": [
+              0,
+              0.012643429997735661
+            ],
+            "lateRate": [
+              0.04091655604878176,
+              0.09679203948257407
+            ],
+            "respondError": [
+              0,
+              0.06879459041288215
+            ],
+            "waitError": [
+              0.0912969283906715,
+              0.20791017450288807
+            ]
+          }
+        },
+        "baselines": {
+          "alwaysRespond": {
+            "total": 600,
+            "finished": 300,
+            "unfinished": 300,
+            "respond": 600,
+            "wait": 0,
+            "fallback": 0,
+            "early": 300,
+            "late": 0,
+            "coverage": 1,
+            "earlyRate": 1,
+            "lateRate": 0,
+            "respondError": 0.5,
+            "waitError": 0,
+            "ci95": {
+              "earlyRate": [
+                0.9873565700022643,
+                0.9999999999999999
+              ],
+              "lateRate": [
+                0,
+                0.012643429997735661
+              ],
+              "respondError": [
+                0.46011913576597613,
+                0.5398808642340238
+              ],
+              "waitError": null
+            }
+          },
+          "alwaysWait": {
+            "total": 600,
+            "finished": 300,
+            "unfinished": 300,
+            "respond": 0,
+            "wait": 600,
+            "fallback": 0,
+            "early": 0,
+            "late": 300,
+            "coverage": 1,
+            "earlyRate": 0,
+            "lateRate": 1,
+            "respondError": 0,
+            "waitError": 0.5,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.012643429997735661
+              ],
+              "lateRate": [
+                0.9873565700022643,
+                0.9999999999999999
+              ],
+              "respondError": null,
+              "waitError": [
+                0.46011913576597613,
+                0.5398808642340238
+              ]
+            }
+          },
+          "punctuation": {
+            "total": 600,
+            "finished": 300,
+            "unfinished": 300,
+            "respond": 126,
+            "wait": 474,
+            "fallback": 0,
+            "early": 2,
+            "late": 176,
+            "coverage": 1,
+            "earlyRate": 0.006666666666666667,
+            "lateRate": 0.5866666666666667,
+            "respondError": 0.015873015873015872,
+            "waitError": 0.37130801687763715,
+            "ci95": {
+              "earlyRate": [
+                0.0018301100329710784,
+                0.023978074231461442
+              ],
+              "lateRate": [
+                0.5301895702243481,
+                0.6409522352427112
+              ],
+              "respondError": [
+                0.00436371038878235,
+                0.05602987687446764
+              ],
+              "waitError": [
+                0.32900910717180026,
+                0.41567616091703913
+              ]
+            }
+          }
+        },
+        "performance": {
+          "p50Ms": 0.00925000000000864,
+          "p95Ms": 0.01645899999999756,
+          "weightBytes": 131072,
+          "jsonBytes": 817880
+        },
+        "bySource": {
+          "real": {
+            "total": 300,
+            "finished": 150,
+            "unfinished": 150,
+            "respond": 26,
+            "wait": 70,
+            "fallback": 204,
+            "early": 0,
+            "late": 14,
+            "coverage": 0.32,
+            "earlyRate": 0,
+            "lateRate": 0.09333333333333334,
+            "respondError": 0,
+            "waitError": 0.2,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.02497113914571871
+              ],
+              "lateRate": [
+                0.056411348659597745,
+                0.15056517784558682
+              ],
+              "respondError": [
+                0,
+                0.12873304380462175
+              ],
+              "waitError": [
+                0.12304627802949916,
+                0.30816864689087087
+              ]
+            }
+          },
+          "synthetic": {
+            "total": 300,
+            "finished": 150,
+            "unfinished": 150,
+            "respond": 26,
+            "wait": 66,
+            "fallback": 208,
+            "early": 0,
+            "late": 5,
+            "coverage": 0.30666666666666664,
+            "earlyRate": 0,
+            "lateRate": 0.03333333333333333,
+            "respondError": 0,
+            "waitError": 0.07575757575757576,
+            "ci95": {
+              "earlyRate": [
+                0,
+                0.02497113914571871
+              ],
+              "lateRate": [
+                0.014320220695575196,
+                0.07565284250709559
+              ],
+              "respondError": [
+                0,
+                0.12873304380462175
+              ],
+              "waitError": [
+                0.03279155406460817,
+                0.16539405451251493
+              ]
+            }
+          }
+        },
+        "gates": {
+          "early": 0.02,
+          "late": 0.05,
+          "coverage": 0.3,
+          "minDirection": 50,
+          "p95Ms": 10,
+          "bytes": 2097152
+        },
+        "activation": "shadow only; no automatic promotion",
+        "caveat": "Public Chinese transcription metadata; publisher human labels. No audio, English, owner/DDSD or private-device acceptance."
+      }
+    }
+  ],
+  "production": "unchanged; all trained public models remain shadow/rejected"
+}

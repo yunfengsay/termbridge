@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_agent_chat" android:icon="@drawable/ic_global" android:title="@string/agent_chat_title" android:visible="false" app:showAsAction="never" />
+    <item android:id="@+id/action_desktop" android:icon="@drawable/ic_desktop" android:title="@string/remote_desktop" app:showAsAction="never" />
+    <item android:id="@+id/action_keyboard" android:icon="@drawable/ic_desktop_keyboard" android:title="@string/keyboard" app:showAsAction="never" />
+    <item android:id="@+id/action_copy" android:icon="@drawable/ic_copy" android:title="@string/copy" app:showAsAction="never" />
+    <item android:id="@+id/action_paste" android:icon="@drawable/ic_paste" android:title="@string/paste" app:showAsAction="never" />
+    <item
+        android:id="@+id/action_review"
+        android:icon="@drawable/ic_git_diff"
+        android:title="@string/review_changes"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_global"
+        android:icon="@drawable/ic_global"
+        android:title="@string/global"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item android:id="@+id/action_reconnect" android:icon="@drawable/ic_refresh" android:title="@string/reconnect" app:showAsAction="never" />
+    <item android:id="@+id/action_close_session" android:icon="@drawable/ic_delete" android:title="@string/delete_session" android:visible="false" app:showAsAction="never" />
+</menu>
