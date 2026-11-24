@@ -715,3 +715,13 @@ Mac Peer 仅在具备 `termbridge.lan` capability 时可接收同名工具，且
 The existing Control frame carries `automation` messages with a random request `id`, `kind` (`request`, `data`, `ack`, `eof`, `result`, `cancel`), and optional `op`, `args`, `stream`, `seq`, `data`, `result`, `error`. Operations are `exec`, `push`, `pull`, `cat`, `audit`. Relays forward authenticated Control frames unchanged; deployment is unnecessary. Data is base64 in at most 64 KiB raw chunks, acknowledged only after the consumer writes it. Independent stdout/stderr streams each have one outstanding chunk. This bounds transport buffering without a file-size ceiling. `eof` terminates input; file EOF/final results carry SHA-256 and byte count. File destinations are committed by rename only after verification.
 
 The Host owns request channels and foreground process groups. Disconnect/cancel revokes that channel and kills its process group; pooled connections translate a local socket disconnect into cancellation of only that socket's requests. Reconnect never replays a request. Capability handshake and pooled/direct connections use the same `client.ts` dial/pinning/HMAC path. Host option `remoteAutomation: false` rejects exec/fs before resource creation. Audit records only metadata and never serialize request `env`, streamed bytes, or output.
+
+### Optional client-to-host TCP proxy tunnel (`proxy_tunnel`)
+
+`config_info` adds optional `proxyTunnel: 'full' | 'loopback' | 'off'` (default `'full'` on updated Hosts). Authenticated clients may multiplex raw TCP streams through existing Control frames without relay changes using `proxy_tunnel`:
+
+- Client → Host `open`: `{ t: 'proxy_tunnel', id, kind: 'open', host, port }` — Host normalizes `0.0.0.0`/`::` to `127.0.0.1`, enforces `config.proxyTunnel` (`off` rejects all; `loopback` allows only `localhost`/`127.x`/`::1`; `full` allows loopback, Host LAN, and upstream Internet), and dials `host:port`.
+- Host → Client `opened`: `{ t: 'proxy_tunnel', id, kind: 'opened' }` once TCP connects.
+- Bidirectional `data`: `{ t: 'proxy_tunnel', id, kind: 'data', data }` carries base64 TCP chunks (up to 48 KiB raw per frame).
+- Client → Host `ack`: `{ t: 'proxy_tunnel', id, kind: 'ack', bytes }` replenishes the Host's 512 KiB downstream flow-control window (capped at 2 MiB) so streaming endpoints (MJPEG/WebSocket/SSE) pace smoothly to the link.
+- Bidirectional `close`: `{ t: 'proxy_tunnel', id, kind: 'close', reason? }` destroys the upstream socket and logs metadata only (`clientId`, `host`, `port`, `bytesUp`, `bytesDown`, `durationMs`, optional `error`) to `~/.termbridge/audit.log` without ever recording payloads. Disconnecting a client or relay immediately destroys all of that client's active tunnels.

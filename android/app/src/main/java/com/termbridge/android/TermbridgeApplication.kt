@@ -2,9 +2,11 @@ package com.termbridge.android
 
 import android.app.Activity
 import android.app.Application
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.webkit.WebView
 import com.termbridge.android.brain.VoiceAppVisibility
 import com.termbridge.android.brain.VoiceCallUiState
 import com.termbridge.android.brain.VoiceCallOwnership
@@ -33,6 +35,13 @@ class TermbridgeApplication : Application(), Application.ActivityLifecycleCallba
 
     override fun onCreate() {
         super.onCreate()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val processName = Application.getProcessName().orEmpty()
+            if (processName.endsWith(":browser")) {
+                WebView.setDataDirectorySuffix("browser")
+                return
+            }
+        }
         registerActivityLifecycleCallbacks(this)
         VoiceCallUiState.addListener {
             if (!it.active) {

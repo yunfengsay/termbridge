@@ -172,6 +172,7 @@ final class TerminalSessionController: NSObject, @preconcurrency LocalProcessTer
             let view = MacAgentChatView(session: session)
             chatSession = session; chatView = view
             view.onNativeCommands = { [weak self] query in self?.openNativeCommands(query) }
+            view.onOpenWebURL = { [weak self] url in self?.openWebURL(url) }
             showingChat = preference.startsInChat(sessionID: agent.sessionId, source: agent.source)
             view.translatesAutoresizingMaskIntoConstraints = false
             self.view.addSubview(view)
@@ -650,11 +651,19 @@ final class TerminalSessionController: NSObject, @preconcurrency LocalProcessTer
     private func openTerminalLink(_ link: String) {
         guard let target = TerminalFileLink.parse(link) else { return }
         switch target {
-        case .web(let url): NSWorkspace.shared.open(url)
+        case .web(let url): openWebURL(url)
         case .file(let path, let line):
             guard let settings = inspectorSettings() else { return }
             TerminalFilePreview.shared.present(sessionID: agent.sessionId, path: path, settings: settings, line: line)
         }
+    }
+
+    private func openWebURL(_ url: URL) {
+        if let connection, MacRemoteBrowserPolicy.shouldIntercept(url) {
+            MacRemoteBrowserWindow.present(profile: connection, url: url)
+            return
+        }
+        NSWorkspace.shared.open(url)
     }
 
     /// The Git repositories this conversation touched, with their diffs.

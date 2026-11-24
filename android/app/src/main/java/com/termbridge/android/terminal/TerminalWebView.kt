@@ -33,6 +33,7 @@ class TerminalWebView @JvmOverloads constructor(
         fun onSelectionCopied()
         fun onTerminalTouched()
         fun onTranscriptResync(revision: Int)
+        fun onOpenLink(url: String): Boolean = false
         fun onOpenFile(path: String) = Unit
     }
 
@@ -204,6 +205,7 @@ class TerminalWebView @JvmOverloads constructor(
 
     private fun openExternalLink(value: String) {
         val url = ExternalLinkPolicy.allow(value) ?: return
+        if (listener?.onOpenLink(url) == true) return
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (_: ActivityNotFoundException) {

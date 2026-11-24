@@ -1,4 +1,5 @@
 import { Automation } from './automation/index.js';
+import { ProxyTunnelManager } from './proxyTunnel.js';
 import { readSessionFile, readSessionRevision, listSessionDirectory } from './sessionFiles.js';
 import { ConversationFiles } from './conversationFiles.js';
 import { CompletionSupervisor, completionJudge } from './completionSupervisor.js';
@@ -244,13 +245,21 @@ console.log(`[host] Voice execution: ${voiceExecutionConversations?.standard.mod
 
 declare const __TB_VERSION__: string;
 const automation = new Automation({ config: () => config, send: (client, msg) => sendToClient(client, encodeControl(msg)) });
-process.once('exit', () => automation.dispose());
+const proxyTunnel = new ProxyTunnelManager({
+  policy: () => config.proxyTunnel ?? 'full',
+  send: (client, msg) => sendToClient(client, encodeControl(msg)),
+});
+process.once('exit', () => {
+  automation.dispose();
+  proxyTunnel.dispose();
+});
 
 function configInfo() {
   return encodeControl({
     t: 'config_info' as const,
     version: typeof __TB_VERSION__ === 'string' ? __TB_VERSION__ : '0.1.38-dev',
     automation: true,
+    proxyTunnel: config.proxyTunnel ?? 'full',
     hostId: HOST_ID,
     hostName: HOST_NAME,
     shell: config.shell,
@@ -1534,6 +1543,7 @@ async function sessionPreviewRoots(sessionId: string): Promise<string[]> {
 
 async function handleClientControl(clientId: number, msg: ControlMessage): Promise<void> {
   if (msg.t === 'automation') { automation.handle(clientId, msg); return; }
+  if (msg.t === 'proxy_tunnel') { proxyTunnel.handle(clientId, msg); return; }
   if (msg.t === 'peer_call') {
     const owner = clients.get(clientId);
     if (owner) await peerRequests.handle(owner, msg, bridge,
@@ -2988,6 +2998,7 @@ function connect(): void {
       }
       if (msg.t === 'client_disconnect') {
         automation.drop(clientId);
+        proxyTunnel.drop(clientId);
         remoteDesktop.drop(clientId);
         bridge.onClientDisconnect(clientId);
         mgr.removeViewersForClient(clientId);
@@ -3036,6 +3047,7 @@ function connect(): void {
     realtimeVoiceAudioOutput.clear();
     for (const clientId of clients.keys()) {
       automation.drop(clientId);
+      proxyTunnel.drop(clientId);
       remoteDesktop.drop(clientId);
       bridge.onClientDisconnect(clientId);
       mgr.removeViewersForClient(clientId);

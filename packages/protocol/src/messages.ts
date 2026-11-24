@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { AutomationSchema } from './automation.js';
+import { ProxyTunnelPolicySchema, ProxyTunnelSchema } from './proxyTunnel.js';
 import { VoiceLearningRequestSchema, VoiceLearningResultSchema } from './voiceLearning.js';
 import { RelayTopologySchema } from './topology.js';
 
@@ -415,6 +416,7 @@ const AgentChatMessageSchema = z.object({
  */
 export const ControlMessageSchema = z.discriminatedUnion('t', [
   AutomationSchema,
+  ProxyTunnelSchema,
   RelayTopologySchema,
   z.object({ t: z.literal('desktop_attention'), id: z.string().uuid() }),
   z.object({ t: z.literal('desktop_subscribe'), deviceId: z.string().min(1).max(128), foreground: z.boolean() }),
@@ -1021,6 +1023,7 @@ export const ControlMessageSchema = z.discriminatedUnion('t', [
     t: z.literal('config_info'),
     version: z.string().optional(),
     automation: z.boolean().optional(),
+    proxyTunnel: ProxyTunnelPolicySchema.optional(),
     hostId: z.string(),
     hostName: z.string(),
     shell: z.string(),

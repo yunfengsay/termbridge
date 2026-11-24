@@ -28,6 +28,8 @@ struct TermBridgeControlCenterApp: App {
             CommandGroup(after: .toolbar) {
                 Button("打开当前 Host 的远程桌面", action: model.openDesktop)
                     .keyboardShortcut("r", modifiers: [.command, .shift])
+                Button("打开当前 Host 的代理浏览器", action: model.openProxyBrowser)
+                    .keyboardShortcut("b", modifiers: [.command, .shift])
                 Button("在终端中打开此会话") {
                     NSApp.sendAction(#selector(TerminalWindowController.showTerminalForSession(_:)), to: nil, from: nil)
                 }

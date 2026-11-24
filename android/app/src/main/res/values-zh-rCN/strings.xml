@@ -620,4 +620,18 @@
     <string name="desktop_password_forgotten">已移除此电脑的登录密码</string>
     <string name="desktop_password_save_failed">已连接，但密码未能保存，请下次重新输入。</string>
     <string name="desktop_frame_rate">刷新率</string>
+    <string name="remote_browser">代理浏览器</string>
+    <string name="remote_browser_close">关闭</string>
+    <string name="remote_browser_back">后退</string>
+    <string name="remote_browser_forward">前进</string>
+    <string name="remote_browser_reload">刷新</string>
+    <string name="remote_browser_url_hint">输入网址（全流量经宿主机代理）</string>
+    <string name="remote_browser_connecting">正在连接 %1$s 代理通道…</string>
+    <string name="remote_browser_proxying">代理 · %1$s</string>
+    <string name="remote_browser_disconnected">代理通道已断开，点击重连</string>
+    <string name="remote_browser_error">代理连接失败：%1$s</string>
+    <string name="remote_browser_load_error">加载失败：%1$s</string>
+    <string name="remote_browser_invalid_url">请输入有效的 http:// 或 https:// 网址</string>
+    <string name="remote_browser_unsupported">当前系统 WebView 不支持应用内代理接管。</string>
+    <string name="remote_browser_proxy_failed">无法启动本机代理端口。</string>
 </resources>

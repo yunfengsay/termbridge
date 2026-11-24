@@ -63,6 +63,18 @@ enum RemoteDesktopProtocol {
   static let maxPacketBase64 = 87408
 }
 
+/// Multiplexed TCP proxy tunnel over Control frames for the built-in remote browser.
+enum ProxyTunnelProtocol {
+  static let type = "proxy_tunnel"
+  static let kindOpen = "open"
+  static let kindOpened = "opened"
+  static let kindData = "data"
+  static let kindAck = "ack"
+  static let kindClose = "close"
+  static let maxChunkBytes = 48 * 1024
+  static let ackBatchBytes = 64 * 1024
+}
+
 /// Authenticated user confirmation; model tools cannot approve terminal handoffs.
 struct BrainCompletionAction: Encodable {
     let t = "brain_completion_action"

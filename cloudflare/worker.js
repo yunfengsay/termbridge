@@ -6112,6 +6112,21 @@ var AutomationSchema = z.object({
   error: z.string().max(4e3).optional()
 });
 
+// packages/protocol/src/proxyTunnel.ts
+var ProxyTunnelPolicySchema = z.enum(["full", "loopback", "off"]);
+var ProxyTunnelSchema = z.object({
+  t: z.literal("proxy_tunnel"),
+  id: z.string().min(1).max(64),
+  kind: z.enum(["open", "opened", "data", "ack", "close"]),
+  host: z.string().min(1).max(255).optional(),
+  port: z.number().int().min(1).max(65535).optional(),
+  /** Base64-encoded raw TCP payload chunk (up to 48 KiB raw -> 64 KiB base64). */
+  data: z.string().max(96e3).optional(),
+  /** Flow-control credit replenishment in raw bytes consumed by the peer. */
+  bytes: z.number().int().min(1).max(4 * 1024 * 1024).optional(),
+  reason: z.string().max(512).optional()
+});
+
 // packages/protocol/src/voiceLearning.ts
 var unit = z.number().finite().min(0).max(1);
 var VoiceFeedbackSchema = z.object({
@@ -6608,6 +6623,7 @@ var AgentChatMessageSchema = z.object({
 });
 var ControlMessageSchema = z.discriminatedUnion("t", [
   AutomationSchema,
+  ProxyTunnelSchema,
   RelayTopologySchema,
   z.object({ t: z.literal("desktop_attention"), id: z.string().uuid() }),
   z.object({ t: z.literal("desktop_subscribe"), deviceId: z.string().min(1).max(128), foreground: z.boolean() }),
@@ -7237,6 +7253,7 @@ var ControlMessageSchema = z.discriminatedUnion("t", [
     t: z.literal("config_info"),
     version: z.string().optional(),
     automation: z.boolean().optional(),
+    proxyTunnel: ProxyTunnelPolicySchema.optional(),
     hostId: z.string(),
     hostName: z.string(),
     shell: z.string(),

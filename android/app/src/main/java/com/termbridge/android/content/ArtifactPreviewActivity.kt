@@ -103,6 +103,20 @@ class ArtifactPreviewActivity : AppCompatActivity() {
         ) {
             val target = ArtifactTarget.parse(location) ?: return
             if (target.remote && !target.image && !target.markdown) {
+                if (com.termbridge.android.browser.RemoteBrowserPolicy.shouldIntercept(target.location)) {
+                    val active = SettingsStore.load(context)
+                    val profiles = SettingsStore.profiles(context)
+                    val pin = if (!endpointKey.isNullOrBlank()) {
+                        SessionPin(hostId.orEmpty(), endpointKey)
+                    } else {
+                        SessionHostPin.pin(hostId, active, profiles)
+                    }
+                    val resolved = SessionHostPin.resolve(pin, active, profiles)
+                    if (resolved != null) {
+                        com.termbridge.android.browser.RemoteBrowserActivity.open(context, resolved, target.location)
+                        return
+                    }
+                }
                 runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target.location))) }; return
             }
             val settings = SettingsStore.load(context)

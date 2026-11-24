@@ -5,3 +5,4 @@ export * from './desktopCrypto.js';
 export * from './topology.js';
 
 export * from './automation.js';
+export * from './proxyTunnel.js';

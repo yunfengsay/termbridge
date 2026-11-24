@@ -16,6 +16,18 @@ object RemoteDesktopProtocol {
     const val MAX_PACKET_BASE64 = 87408
 }
 
+/** Multiplexed TCP proxy tunnel over Control frames for the built-in remote browser. */
+object ProxyTunnelProtocol {
+    const val TYPE = "proxy_tunnel"
+    const val KIND_OPEN = "open"
+    const val KIND_OPENED = "opened"
+    const val KIND_DATA = "data"
+    const val KIND_ACK = "ack"
+    const val KIND_CLOSE = "close"
+    const val MAX_CHUNK_BYTES = 48 * 1024
+    const val ACK_BATCH_BYTES = 64 * 1024
+}
+
 object CompletionReviewProtocol {
     const val ACTION = "brain_completion_action"
     const val RESULT = "brain_completion_result"

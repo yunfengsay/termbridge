@@ -116,6 +116,7 @@ final class MacChatTextView: NSTextView {
 final class MacAgentChatView: NSView, NSTextViewDelegate, WKNavigationDelegate {
     let web: WKWebView
     let composer = MacChatTextView()
+    var onOpenWebURL: ((URL) -> Void)?
     private let session: MacAgentChatSession
     /// Shown only when something is actually wrong. There is no standing line.
     private let notice = NSTextField(labelWithString: "")
@@ -522,7 +523,7 @@ final class MacAgentChatView: NSView, NSTextViewDelegate, WKNavigationDelegate {
             }
         case "open":
             if let value = value["url"] as? String, let url = URL(string: value), ["https", "http"].contains(url.scheme?.lowercased() ?? "") {
-                NSWorkspace.shared.open(url)
+                if let onOpenWebURL { onOpenWebURL(url) } else { NSWorkspace.shared.open(url) }
             }
         default: break
         }

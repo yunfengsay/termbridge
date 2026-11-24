@@ -618,4 +618,18 @@
     <string name="desktop_password_forgotten">Saved login removed</string>
     <string name="desktop_password_save_failed">Connected, but the password could not be saved.</string>
     <string name="desktop_frame_rate">Frame rate</string>
+    <string name="remote_browser">Proxy browser</string>
+    <string name="remote_browser_close">Close</string>
+    <string name="remote_browser_back">Back</string>
+    <string name="remote_browser_forward">Forward</string>
+    <string name="remote_browser_reload">Reload</string>
+    <string name="remote_browser_url_hint">Enter URL (proxied via Host)</string>
+    <string name="remote_browser_connecting">Connecting proxy via %1$s…</string>
+    <string name="remote_browser_proxying">Proxy · %1$s</string>
+    <string name="remote_browser_disconnected">Proxy disconnected — tap to reconnect</string>
+    <string name="remote_browser_error">Proxy failed: %1$s</string>
+    <string name="remote_browser_load_error">Page error: %1$s</string>
+    <string name="remote_browser_invalid_url">Enter a valid http:// or https:// URL</string>
+    <string name="remote_browser_unsupported">This Android WebView does not support in-app proxy override.</string>
+    <string name="remote_browser_proxy_failed">Could not start local proxy listener.</string>
 </resources>

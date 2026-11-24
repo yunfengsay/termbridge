@@ -161,6 +161,12 @@
 
         <activity android:name=".desktop.RemoteDesktopActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".browser.RemoteBrowserActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+            android:exported="false"
+            android:process=":browser"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

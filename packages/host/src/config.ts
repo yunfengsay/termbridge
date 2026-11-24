@@ -17,6 +17,8 @@ import {
  */
 export interface Config {
   remoteAutomation?: boolean;
+  /** Policy for client proxy_tunnel TCP forwarding: 'full' (default), 'loopback', or 'off'. */
+  proxyTunnel?: 'full' | 'loopback' | 'off';
   shell: string;
   agents: Record<string, string>;
   agentProfiles?: Record<string, AgentProfileConfig>;
@@ -79,9 +81,13 @@ export function loadConfig(): Config {
   }
   try {
     const parsed = JSON.parse(readFileSync(path, 'utf8')) as Partial<Config>;
+    const proxyTunnel = parsed.proxyTunnel === 'off' || parsed.proxyTunnel === 'loopback' || parsed.proxyTunnel === 'full'
+      ? parsed.proxyTunnel
+      : 'full';
     return {
       shell: parsed.shell || DEFAULTS.shell,
       remoteAutomation: parsed.remoteAutomation !== false,
+      proxyTunnel,
       agents: { ...DEFAULTS.agents, ...(parsed.agents ?? {}) },
       agentProfiles: { ...DEFAULTS.agentProfiles, ...(parsed.agentProfiles ?? {}) },
     };

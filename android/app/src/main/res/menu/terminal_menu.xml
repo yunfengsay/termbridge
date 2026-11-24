@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_agent_chat" android:icon="@drawable/ic_global" android:title="@string/agent_chat_title" android:visible="false" app:showAsAction="never" />
     <item android:id="@+id/action_desktop" android:icon="@drawable/ic_desktop" android:title="@string/remote_desktop" app:showAsAction="never" />
+    <item android:id="@+id/action_proxy_browser" android:icon="@drawable/ic_global" android:title="@string/remote_browser" app:showAsAction="never" />
     <item android:id="@+id/action_keyboard" android:icon="@drawable/ic_desktop_keyboard" android:title="@string/keyboard" app:showAsAction="never" />
     <item android:id="@+id/action_copy" android:icon="@drawable/ic_copy" android:title="@string/copy" app:showAsAction="never" />
     <item android:id="@+id/action_paste" android:icon="@drawable/ic_paste" android:title="@string/paste" app:showAsAction="never" />

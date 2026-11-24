@@ -37,6 +37,10 @@ struct ControlCenterView: View {
                 Image(systemName: "desktopcomputer")
             }.buttonStyle(.borderless).help("打开当前 Host 的远程桌面")
                 .accessibilityLabel("远程桌面")
+            Button(action: model.openProxyBrowser) {
+                Image(systemName: "globe")
+            }.buttonStyle(.borderless).help("打开当前 Host 的代理浏览器（⌘⇧B）")
+                .accessibilityLabel("代理浏览器")
             Button(action: newSession) {
                 Label("新建对话", systemImage: "plus.bubble")
             }

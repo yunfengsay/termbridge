@@ -199,6 +199,19 @@ final class ControlCenterModel: ObservableObject, @preconcurrency TermbridgeClie
         } catch { showNotificationError("无法读取本机 Host 的连接信息，请先选择已配置的 Host，或在设置中开启本机服务。") }
     }
 
+    func openProxyBrowser() {
+        do {
+            var destination: ConnectionSettings
+            if let activeProfile { destination = activeProfile }
+            else {
+                destination = try MacConnectionStore.loadCLIProfile(from: resolvedCLISettingsURL,
+                    environment: ProcessInfo.processInfo.environment)
+                destination.hostID = try TerminalLaunch.localHostId()
+            }
+            MacRemoteBrowserWindow.present(profile: destination)
+        } catch { showNotificationError("无法读取当前 Host 的连接信息，请先选择已配置的 Host，或在设置中开启本机服务。") }
+    }
+
     func prepareNewSession() {
         guard sessionCreator?.phase != .creating else { return }
         sessionCreator?.cancel(); sessionCreator = nil; sessionCreationError = nil

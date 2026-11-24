@@ -147,6 +147,12 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
                     else startActivity(RemoteDesktopActivity.intent(this, target.hostId, target.endpointKey))
                     true
                 }
+                R.id.action_proxy_browser -> {
+                    val target = SessionHostPin.resolve(pin, SettingsStore.load(this), SettingsStore.profiles(this))
+                    if (target == null) showStatus(getString(R.string.session_host_missing), true)
+                    else com.termbridge.android.browser.RemoteBrowserActivity.open(this, target)
+                    true
+                }
                 R.id.action_keyboard -> {
                     showKeyboard()
                     true
@@ -303,6 +309,13 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
         } else {
             client?.sendControl("t" to "terminal_mobile_resync", "sid" to attachedSid)
         }
+    }
+
+    override fun onOpenLink(url: String): Boolean {
+        if (!com.termbridge.android.browser.RemoteBrowserPolicy.shouldIntercept(url)) return false
+        val target = SessionHostPin.resolve(pin, SettingsStore.load(this), SettingsStore.profiles(this)) ?: return false
+        com.termbridge.android.browser.RemoteBrowserActivity.open(this, target, url)
+        return true
     }
 
     override fun onOpenFile(path: String) {
