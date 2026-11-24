@@ -1,4 +1,5 @@
 import { Automation } from './automation/index.js';
+import { PriorityRelaySender, type FramePriority } from './priorityQueue.js';
 import { ProxyTunnelManager } from './proxyTunnel.js';
 import { readSessionFile, readSessionRevision, listSessionDirectory } from './sessionFiles.js';
 import { ConversationFiles } from './conversationFiles.js';
@@ -244,10 +245,10 @@ console.log(`[host] Global Brain: ${brainConversation ? `${brainConversation.run
 console.log(`[host] Voice execution: ${voiceExecutionConversations?.standard.model ?? 'off'} (Pi; thinking off; realtime audio model unchanged)`);
 
 declare const __TB_VERSION__: string;
-const automation = new Automation({ config: () => config, send: (client, msg) => sendToClient(client, encodeControl(msg)) });
+const automation = new Automation({ config: () => config, send: (client, msg) => sendToClient(client, encodeControl(msg), msg.kind === 'data' ? 'bulk' : 'high') });
 const proxyTunnel = new ProxyTunnelManager({
   policy: () => config.proxyTunnel ?? 'full',
-  send: (client, msg) => sendToClient(client, encodeControl(msg)),
+  send: (client, msg) => sendToClient(client, encodeControl(msg), msg.kind === 'data' ? 'bulk' : 'high'),
 });
 process.once('exit', () => {
   automation.dispose();
@@ -459,10 +460,10 @@ let voiceUsageSummary = readVoiceUsageSummary();
 const brainResultDirectory = join(hostStateDirectory, 'brain-results');
 const brainResultPaths = new Map<string, string>();
 
-function sendToClient(clientId: number, frame: Buffer): void {
-  if (relay.readyState === WebSocket.OPEN) {
-    relay.send(encodeEnvelope(clientId, frame));
-  }
+const relaySender = new PriorityRelaySender(() => relay);
+
+function sendToClient(clientId: number, frame: Buffer, priority: FramePriority = 'high'): void {
+  relaySender.enqueue(encodeEnvelope(clientId, frame), priority);
 }
 
 function sendMobileTranscriptSnapshot(clientId: number, sid: number, snapshot: MobileTranscriptSnapshot): void {
@@ -3036,6 +3037,7 @@ function connect(): void {
   });
 
   relay.on('close', (code) => {
+    relaySender.clear();
     latestRelayTopology = undefined;
     if (process.env.TB_LAN_PARENT === '1') process.send?.({ event: 'relay_disconnected' });
     clearInterval(heartbeat);

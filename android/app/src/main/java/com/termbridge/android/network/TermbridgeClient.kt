@@ -36,7 +36,7 @@ sealed interface ConnectionState {
 
 class TermbridgeClient(
     private val settings: ConnectionSettings,
-    private val listener: Listener,
+    initialListener: Listener,
     private val backgroundMonitor: Boolean = false,
     context: Context? = null,
 ) {
@@ -47,8 +47,9 @@ class TermbridgeClient(
         fun onPtyOutput(sid: Int, data: ByteArray)
     }
 
+    @Volatile private var listener: Listener = initialListener
     private val httpClient: OkHttpClient
-    private val appContext = context?.applicationContext ?: (listener as? Context)?.applicationContext
+    private val appContext = context?.applicationContext ?: (initialListener as? Context)?.applicationContext
     @Volatile private var webSocket: WebSocket? = null
     @Volatile private var ready = false
     @Volatile var backgroundTrafficAcknowledged = false
@@ -153,6 +154,14 @@ class TermbridgeClient(
             }
         val socketListener = SocketListener()
         webSocket = httpClient.newWebSocket(request, socketListener)
+    }
+
+    /** Transfers an already-authenticated live socket to a new owner without re-handshaking. */
+    @Synchronized
+    fun transferListener(newListener: Listener): Boolean {
+        if (!ready || closedByClient || webSocket == null) return false
+        listener = newListener
+        return true
     }
 
     fun disconnect() {

@@ -288,7 +288,13 @@ class AgentChatActivity : AppCompatActivity() {
         if (!settings.connectionEnabled) { showStatus(getString(R.string.connection_paused)); return }
         settings.validationError()?.let { showStatus(it); return }
         unavailable = null; initialSnapshot = null; queuedEvents.clear()
-        surface.receive(JSONObject().put("op", "clear"))
+        val cachedSnapshot = com.termbridge.android.cache.SessionSnapshotCache.getChat(settings.profileKey, conversationId)
+        if (cachedSnapshot != null) {
+            val preview = JSONObject(cachedSnapshot.toString()).put("generation", 0)
+            deliverToSurface(preview)
+        } else {
+            surface.receive(JSONObject().put("op", "clear"))
+        }
         val connection = epoch.connection
         val listener = object : TermbridgeClient.Listener {
             private fun current(block: () -> Unit) = runOnUiThread {
@@ -310,7 +316,14 @@ class AgentChatActivity : AppCompatActivity() {
             override fun onControl(message: ControlMessage) = current { handle(message, connection) }
             override fun onPtyOutput(sid: Int, data: ByteArray) = Unit
         }
-        client = TermbridgeClient(settings, listener, context = applicationContext).also(TermbridgeClient::connect)
+        val warm = com.termbridge.android.network.WarmConnectionPool.claimReady(settings, listener)
+        if (warm != null) {
+            client = warm
+            connected = true
+            subscribe(warm)
+        } else {
+            client = TermbridgeClient(settings, listener, context = applicationContext).also(TermbridgeClient::connect)
+        }
     }
 
     /**
@@ -388,6 +401,7 @@ class AgentChatActivity : AppCompatActivity() {
                         degrade(unavailable ?: getString(R.string.agent_chat_unsupported))
                         return
                     }
+                    com.termbridge.android.cache.SessionSnapshotCache.putChat(settings.profileKey, conversationId, payload)
                 }
                 deliverToSurface(payload)
                 // Anything the picker produced before the Host confirmed the

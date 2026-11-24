@@ -48,6 +48,8 @@ import java.util.concurrent.Executors
 
 class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, TerminalWebView.Listener {
     private lateinit var binding: ActivityTerminalBinding
+    private lateinit var terminalView: TerminalWebView
+    private var paintedCachedSnapshot = false
     private val handler = Handler(Looper.getMainLooper())
     private var client: TermbridgeClient? = null
     private var started = false
@@ -158,7 +160,7 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
                     true
                 }
                 R.id.action_copy -> {
-                    binding.terminalView.copySelection()
+                    terminalView.copySelection()
                     true
                 }
                 R.id.action_paste -> {
@@ -194,7 +196,21 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
             }
         }
         binding.deleteSession.setOnClickListener { confirmDeleteSession() }
-        binding.terminalView.listener = this
+        val warmed = com.termbridge.android.ui.WebViewPrewarmer.claimTerminal(this)
+        terminalView = warmed?.first ?: TerminalWebView(this)
+        binding.terminalContainer.addView(
+            terminalView,
+            android.widget.FrameLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        terminalView.listener = this
+        if (warmed?.second == true) {
+            terminalReady = true
+            terminalView.fitTerminal()
+        }
+        paintCachedTerminalSnapshot()
         binding.voiceMiniOrb.setCompactMode(true)
         binding.voiceMiniOrb.setOnClickListener {
             startActivity(
@@ -253,7 +269,7 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
         if (::attachments.isInitialized) attachments.dispose()
         // A notification that resolved to the chat view finishes before the
         // layout is inflated, so there is no terminal to release.
-        if (::binding.isInitialized) binding.terminalView.release()
+        if (::terminalView.isInitialized) terminalView.release()
         super.onDestroy()
     }
 
@@ -414,14 +430,21 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
                 val attachedSid = message.int("sid") ?: return
                 val revision = message.int("revision") ?: return
                 val payload = message.bytes("payload") ?: return
-                if (attachedSid == sid) binding.terminalView.applyMobileSnapshot(revision, payload)
+                if (attachedSid == sid) {
+                    terminalView.applyMobileSnapshot(revision, payload)
+                    val targetSession = sessionId
+                    val profile = SessionHostPin.resolve(pin, SettingsStore.load(this), SettingsStore.profiles(this))
+                    if (targetSession != null && profile != null) {
+                        com.termbridge.android.cache.SessionSnapshotCache.putTerminal(profile.profileKey, targetSession, revision, payload)
+                    }
+                }
             }
             "terminal_mobile_patch" -> {
                 val attachedSid = message.int("sid") ?: return
                 val baseRevision = message.int("baseRevision") ?: return
                 val revision = message.int("revision") ?: return
                 val payload = message.bytes("payload") ?: return
-                if (attachedSid == sid) binding.terminalView.applyMobilePatch(baseRevision, revision, payload)
+                if (attachedSid == sid) terminalView.applyMobilePatch(baseRevision, revision, payload)
             }
             "error" -> {
                 val detail = message.string("message") ?: "Host rejected the request"
@@ -436,7 +459,15 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
     }
 
     override fun onPtyOutput(sid: Int, data: ByteArray) {
-        if (sid == this.sid) binding.terminalView.write(data)
+        if (sid == this.sid) terminalView.write(data)
+    }
+
+    private fun paintCachedTerminalSnapshot() {
+        val targetSession = sessionId ?: return
+        val profile = SessionHostPin.resolve(pin, SettingsStore.load(this), SettingsStore.profiles(this)) ?: return
+        val cached = com.termbridge.android.cache.SessionSnapshotCache.getTerminal(profile.profileKey, targetSession) ?: return
+        paintedCachedSnapshot = true
+        terminalView.applyMobileSnapshot(cached.revision, cached.payload)
     }
 
     private fun connectNow() {
@@ -479,14 +510,22 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
         val generation = ++connectGeneration
         val startConnection = {
             if (started && generation == connectGeneration) {
-                client = TermbridgeClient(settings, this).also(TermbridgeClient::connect)
+                val warm = com.termbridge.android.network.WarmConnectionPool.claimReady(settings, this)
+                if (warm != null) {
+                    client = warm
+                    onConnectionState(ConnectionState.Connected)
+                    onReady(warm)
+                } else {
+                    client = TermbridgeClient(settings, this).also(TermbridgeClient::connect)
+                }
             }
         }
-        if (sessionId != null) {
+        if (sessionId != null && !paintedCachedSnapshot) {
             // Clear before reconnecting, so the host's ordered scrollback replay cannot
             // race a later terminal reset and disappear from the screen.
-            binding.terminalView.resetTerminal(startConnection)
+            terminalView.resetTerminal(startConnection)
         } else {
+            paintedCachedSnapshot = false
             startConnection()
         }
     }
@@ -649,7 +688,7 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
         binding.keyRight.setOnClickListener { sendSequence("\u001b[C".toByteArray()) }
         binding.keyEnd.setOnClickListener { sendSequence("\u001b[F".toByteArray()) }
         binding.keyEnter.setOnClickListener { sendSequence(byteArrayOf(0x0d)) }
-        binding.keyCopy.setOnClickListener { binding.terminalView.copySelection() }
+        binding.keyCopy.setOnClickListener { terminalView.copySelection() }
         binding.keyPaste.setOnClickListener { pasteClipboard() }
         listOf(binding.keyCtrl, binding.keyAlt).forEach { key ->
             key.setOnClickListener { binding.composer.composerInput.requestFocus() }
@@ -744,7 +783,7 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
         if (!attachments.isIdle) return
         val message = attachments.payload(binding.composer.composerInput.text?.toString().orEmpty())
         if (message.isBlank()) return
-        val bracketed = binding.terminalView.bracketedPasteMode && !binding.keyCtrl.isChecked && !binding.keyAlt.isChecked
+        val bracketed = terminalView.bracketedPasteMode && !binding.keyCtrl.isChecked && !binding.keyAlt.isChecked
         val sent = sendInput(ComposerPayload.submitBytes(applyModifiers(message), bracketed))
         if (!sent) {
             Toast.makeText(this, R.string.terminal_not_ready, Toast.LENGTH_SHORT).show()

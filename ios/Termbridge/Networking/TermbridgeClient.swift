@@ -38,6 +38,7 @@ final class TermbridgeClient: NSObject {
   private let settings: ConnectionSettings
   private weak var listener: TermbridgeClientListener?
   private var urlSession: URLSession?
+  private let socketLock = NSLock()
   private var socket: RelayWebSocket?
   private var pingTimer: DispatchSourceTimer?
   private let transportQueue = DispatchQueue(label: "com.termbridge.ios.websocket")
@@ -98,7 +99,7 @@ final class TermbridgeClient: NSObject {
         guard let self, let task else { return }
         self.didClose(task, code: code, reason: nil)
       }
-      socket = task
+      socketLock.withLock { socket = task }
       task.resume(); receiveNext(from: task); startPingTimer(for: task)
       return
     }
@@ -117,7 +118,7 @@ final class TermbridgeClient: NSObject {
     let task = session.webSocketTask(with: request)
     task.maximumMessageSize = 2 * 1024 * 1024
     urlSession = session
-    socket = task
+    socketLock.withLock { socket = task }
     task.resume()
     receiveNext(from: task)
     startPingTimer(for: task)
@@ -135,12 +136,15 @@ final class TermbridgeClient: NSObject {
   }
 
   func disconnect() {
-    if socket != nil { diagnose("disconnect_requested") }
+    let task = socketLock.withLock { () -> RelayWebSocket? in
+      let current = socket
+      socket = nil
+      return current
+    }
+    if task != nil { diagnose("disconnect_requested") }
     closedByClient = true
     pingTimer?.cancel()
     pingTimer = nil
-    let task = socket
-    socket = nil
     task?.cancel(with: .normalClosure, reason: nil)
     urlSession?.invalidateAndCancel()
     urlSession = nil
@@ -263,9 +267,9 @@ final class TermbridgeClient: NSObject {
 
   @discardableResult
   private func send(_ data: Data) -> Bool {
-    guard let task = socket, task.state == .running else { return false }
+    guard let task = socketLock.withLock({ socket }), task.state == .running else { return false }
     task.send(.data(data)) { [weak self, weak task] error in
-      guard let self, let task, self.socket === task, let error else { return }
+      guard let self, let task, self.socketLock.withLock({ self.socket === task }), let error else { return }
       self.fail(error)
     }
     return true
@@ -305,8 +309,12 @@ final class TermbridgeClient: NSObject {
     diagnose("failed", ["cause": Self.failureCategory(message)])
     pingTimer?.cancel()
     pingTimer = nil
-    socket?.cancel(with: .protocolError, reason: Data(message.utf8.prefix(100)))
-    socket = nil
+    let failedTask = socketLock.withLock { () -> RelayWebSocket? in
+      let current = socket
+      socket = nil
+      return current
+    }
+    failedTask?.cancel(with: .protocolError, reason: Data(message.utf8.prefix(100)))
     urlSession?.invalidateAndCancel()
     urlSession = nil
     emitState(.failed(message))

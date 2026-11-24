@@ -59,9 +59,20 @@ export function startChatSurface(host: WebViewHost, root: HTMLElement, scope: Ch
     if (!document.hidden) reflow();
   });
 
+  const raf = (scope as unknown as { requestAnimationFrame?: (cb: () => void) => number }).requestAnimationFrame;
+  let pendingAppend: Extract<ShellMessage, { op: 'append' }> | undefined;
+  let appendFrame: number | undefined;
+  const flushAppend = (): void => {
+    appendFrame = undefined;
+    const queued = pendingAppend;
+    pendingAppend = undefined;
+    if (queued) view.append(queued);
+  };
+
   const receive = (data: unknown): void => {
     const message: ShellMessage | undefined = readShellMessage(data);
     if (!message) return;
+    if (message.op !== 'append' && pendingAppend) flushAppend();
     switch (message.op) {
       case 'snapshot':
         generation = message.generation;
@@ -81,7 +92,18 @@ export function startChatSurface(host: WebViewHost, root: HTMLElement, scope: Ch
         view.revealHistory();
         break;
       case 'append':
-        view.append(message);
+        if (raf && pendingAppend && pendingAppend.generation === message.generation) {
+          pendingAppend = {
+            ...message,
+            messages: [...pendingAppend.messages, ...message.messages],
+          };
+        } else if (raf) {
+          if (pendingAppend) flushAppend();
+          pendingAppend = message;
+          if (appendFrame === undefined) appendFrame = raf(flushAppend);
+        } else {
+          view.append(message);
+        }
         break;
       case 'earlier':
         view.prepend(message);

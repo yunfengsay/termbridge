@@ -21,6 +21,8 @@ final class MacRemoteBrowserSession: NSObject, ObservableObject, WKNavigationDel
     @Published private(set) var supported = true
 
     private var client: TermbridgeClient?
+    private let transportLock = NSLock()
+    private nonisolated(unsafe) var liveTransportClient: TermbridgeClient?
     private var proxyServer: MacLocalProxyServer?
     private var pendingURL: URL?
     private(set) var closed = false
@@ -95,6 +97,7 @@ final class MacRemoteBrowserSession: NSObject, ObservableObject, WKNavigationDel
         connected = false
         isError = false
         status = "正在连接 \(profile.displayName) 代理通道…"
+        transportLock.withLock { liveTransportClient = nil }
         proxyServer?.resetAllTunnels(reason: "Reconnecting")
         let old = client; client = nil; old?.disconnect()
         let next = TermbridgeClient(settings: profile, listener: self)
@@ -132,6 +135,7 @@ final class MacRemoteBrowserSession: NSObject, ObservableObject, WKNavigationDel
         guard !closed else { return }
         closed = true
         connected = false
+        transportLock.withLock { liveTransportClient = nil }
         observations.removeAll()
         proxyServer?.close(); proxyServer = nil
         let old = client; client = nil; old?.disconnect()
@@ -158,10 +162,12 @@ final class MacRemoteBrowserSession: NSObject, ObservableObject, WKNavigationDel
             break
         case .disconnected:
             connected = false; isError = true
+            transportLock.withLock { liveTransportClient = nil }
             proxyServer?.resetAllTunnels(reason: "Relay disconnected")
             status = "代理通道已断开"
         case .failed(let message):
             connected = false; isError = true
+            transportLock.withLock { liveTransportClient = nil }
             proxyServer?.resetAllTunnels(reason: message)
             let reason = client.transportError.map(ConnectionFailure.description) ?? ConnectionFailure.description(message)
             status = "代理连接失败：\(reason)"
@@ -171,6 +177,7 @@ final class MacRemoteBrowserSession: NSObject, ObservableObject, WKNavigationDel
     func clientIsReady(_ client: TermbridgeClient) {
         guard self.client === client, !closed else { return }
         connected = true; isError = false
+        transportLock.withLock { liveTransportClient = client }
         status = "代理 · \(profile.displayName)"
         maybeLoadPending()
     }
@@ -192,56 +199,48 @@ final class MacRemoteBrowserSession: NSObject, ObservableObject, WKNavigationDel
 
     func client(_ client: TermbridgeClient, receivedPTYOutput data: Data, sid: Int) {}
 
-    // MARK: - MacProxyTunnelTransport
+    // MARK: - MacProxyTunnelTransport (lock-guarded off-main-thread fast path)
 
     nonisolated func sendTunnelOpen(id: String, host: String, port: Int) -> Bool {
-        DispatchQueue.main.sync {
-            guard self.connected, !self.closed else { return false }
-            return self.client?.sendControl([
-                "t": .string(ProxyTunnelProtocol.type),
-                "id": .string(id),
-                "kind": .string(ProxyTunnelProtocol.kindOpen),
-                "host": .string(host),
-                "port": .int(Int64(port)),
-            ]) == true
-        }
+        guard let active = transportLock.withLock({ liveTransportClient }) else { return false }
+        return active.sendControl([
+            "t": .string(ProxyTunnelProtocol.type),
+            "id": .string(id),
+            "kind": .string(ProxyTunnelProtocol.kindOpen),
+            "host": .string(host),
+            "port": .int(Int64(port)),
+        ])
     }
 
     nonisolated func sendTunnelData(id: String, base64Data: String) -> Bool {
-        DispatchQueue.main.sync {
-            guard self.connected, !self.closed else { return false }
-            return self.client?.sendControl([
-                "t": .string(ProxyTunnelProtocol.type),
-                "id": .string(id),
-                "kind": .string(ProxyTunnelProtocol.kindData),
-                "data": .string(base64Data),
-            ]) == true
-        }
+        guard let active = transportLock.withLock({ liveTransportClient }) else { return false }
+        return active.sendControl([
+            "t": .string(ProxyTunnelProtocol.type),
+            "id": .string(id),
+            "kind": .string(ProxyTunnelProtocol.kindData),
+            "data": .string(base64Data),
+        ])
     }
 
     nonisolated func sendTunnelAck(id: String, bytes: Int) -> Bool {
-        DispatchQueue.main.sync {
-            guard self.connected, !self.closed else { return false }
-            return self.client?.sendControl([
-                "t": .string(ProxyTunnelProtocol.type),
-                "id": .string(id),
-                "kind": .string(ProxyTunnelProtocol.kindAck),
-                "bytes": .int(Int64(bytes)),
-            ]) == true
-        }
+        guard let active = transportLock.withLock({ liveTransportClient }) else { return false }
+        return active.sendControl([
+            "t": .string(ProxyTunnelProtocol.type),
+            "id": .string(id),
+            "kind": .string(ProxyTunnelProtocol.kindAck),
+            "bytes": .int(Int64(bytes)),
+        ])
     }
 
     nonisolated func sendTunnelClose(id: String, reason: String?) -> Bool {
-        DispatchQueue.main.sync {
-            guard !self.closed else { return false }
-            var fields: [String: MessagePackValue] = [
-                "t": .string(ProxyTunnelProtocol.type),
-                "id": .string(id),
-                "kind": .string(ProxyTunnelProtocol.kindClose),
-            ]
-            if let reason, !reason.isEmpty { fields["reason"] = .string(String(reason.prefix(512))) }
-            return self.client?.sendControl(fields) == true
-        }
+        guard let active = transportLock.withLock({ liveTransportClient }) else { return false }
+        var fields: [String: MessagePackValue] = [
+            "t": .string(ProxyTunnelProtocol.type),
+            "id": .string(id),
+            "kind": .string(ProxyTunnelProtocol.kindClose),
+        ]
+        if let reason, !reason.isEmpty { fields["reason"] = .string(String(reason.prefix(512))) }
+        return active.sendControl(fields)
     }
 
     // MARK: - WKNavigationDelegate / WKUIDelegate

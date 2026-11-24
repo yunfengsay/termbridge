@@ -38,6 +38,9 @@ export interface ViewElement {
   hidden: boolean;
   readonly childNodes: { length: number };
   appendChild(child: ViewElement): ViewElement;
+  insertBefore?(child: ViewElement, before: ViewElement | null): ViewElement;
+  removeChild?(child: ViewElement): ViewElement;
+  replaceChild?(next: ViewElement, prior: ViewElement): ViewElement;
   setAttribute(name: string, value: string): void;
   replaceChildren(...children: ViewElement[]): void;
   addEventListener?(type: string, listener: () => void): void;
@@ -170,12 +173,74 @@ export function createTranscriptView(options: TranscriptViewOptions): Transcript
     const top = nodes.get(saved.id)?.element.getBoundingClientRect?.().top;
     if (top !== undefined) options.root.scrollTop += top - saved.top;
   }
+  function rowSignature(row: TranscriptRow): string {
+    switch (row.kind) {
+      case 'prose':
+        return `p|${row.role}|${row.text.length}|${row.text}`;
+      case 'status':
+        return `s|${row.text}`;
+      case 'working':
+        return 'w';
+      case 'pending':
+        return `u|${row.state}|${row.error ?? ''}|${row.text}`;
+      case 'image':
+        return `i|${row.role}|${row.url ?? ''}|${row.name ?? ''}|${row.alt ?? ''}`;
+      case 'tool':
+        return `t|${row.state}|${row.name}|${row.summary}|${row.truncated ? 1 : 0}|${row.input?.length ?? 0}|${row.input ?? ''}|${row.output?.length ?? -1}|${row.output ?? ''}`;
+    }
+  }
+
+  function reconcileChildren(container: ViewElement, prev: ViewElement[], next: ViewElement[]): void {
+    if (!container.insertBefore || !container.removeChild || !container.replaceChild) {
+      container.replaceChildren(...next);
+      return;
+    }
+    // Fast path 1: pure append (most common during Agent streaming).
+    if (next.length >= prev.length && prev.every((el, idx) => el === next[idx])) {
+      for (let i = prev.length; i < next.length; i += 1) container.appendChild(next[i]);
+      return;
+    }
+    // Fast path 2: single in-place replacement (streaming token update on last row or tool completion).
+    if (next.length === prev.length) {
+      let diffIndex = -1;
+      for (let i = 0; i < next.length; i += 1) {
+        if (next[i] !== prev[i]) {
+          if (diffIndex !== -1) { diffIndex = -2; break; }
+          diffIndex = i;
+        }
+      }
+      if (diffIndex >= 0) {
+        container.replaceChild(next[diffIndex], prev[diffIndex]);
+        return;
+      }
+    }
+    // General incremental reconciliation: keep untouched DOM nodes attached in place.
+    const nextSet = new Set(next);
+    const live: ViewElement[] = [];
+    for (const el of prev) {
+      if (!nextSet.has(el)) container.removeChild(el);
+      else live.push(el);
+    }
+    let liveCursor = 0;
+    for (let i = 0; i < next.length; i += 1) {
+      const target = next[i];
+      if (liveCursor < live.length && live[liveCursor] === target) {
+        liveCursor += 1;
+        continue;
+      }
+      const before = liveCursor < live.length ? live[liveCursor] : null;
+      container.insertBefore(target, before);
+      const existingAt = live.indexOf(target, liveCursor + 1);
+      if (existingAt !== -1) live.splice(existingAt, 1);
+    }
+  }
+
   function renderRows(error?: string): void {
     rows = buildRows(merger.list, { status: lastStatus, ...(pendingSend ? { pending: pendingSend } : {}) });
     const live = new Set(rows.map(row => row.id));
     for (const id of nodes.keys()) if (!live.has(id)) nodes.delete(id);
     const children = rows.map(row => {
-      const signature = JSON.stringify(row);
+      const signature = rowSignature(row);
       const prior = nodes.get(row.id);
       if (prior?.signature === signature) return prior.element;
       const node = renderRow(doc, row);
@@ -190,7 +255,7 @@ export function createTranscriptView(options: TranscriptViewOptions): Transcript
       children.push(empty);
     }
     if (children.length !== rendered.length || children.some((node, i) => node !== rendered[i])) {
-      list.replaceChildren(...children);
+      reconcileChildren(list, rendered, children);
       rendered = children;
     }
   }

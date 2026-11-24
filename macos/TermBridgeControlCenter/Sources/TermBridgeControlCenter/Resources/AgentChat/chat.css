@@ -47,7 +47,7 @@ body {
 .tb-scroll { height: 100%; overflow-y: auto; overflow-x: hidden; overflow-anchor: none; padding: 10px 14px 16px; }
 .tb-earlier { display: block; margin: 0 auto 8px; padding: 3px 12px; border: 1px solid var(--tb-border); border-radius: 999px; background: var(--tb-surface); color: var(--tb-muted); font: inherit; font-size: 11px; cursor: pointer; }
 .tb-earlier[hidden] { display: none; }
-.tb-row { margin: 0 0 8px; }
+.tb-row { margin: 0 0 8px; content-visibility: auto; contain: layout style; contain-intrinsic-size: auto 72px; }
 .tb-prose { white-space: pre-wrap; overflow-wrap: anywhere; }
 .tb-user .tb-prose { background: var(--tb-user); border-radius: 8px; padding: 7px 10px; margin-left: 32px; }
 .tb-assistant .tb-prose { padding: 1px 0; }

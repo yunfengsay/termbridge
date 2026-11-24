@@ -157,6 +157,8 @@ class MainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         client.sendControl("t" to "session_list")
         client.sendControl("t" to "agents")
         val active = SettingsStore.load(this)
+        com.termbridge.android.network.WarmConnectionPool.prewarm(this, active)
+        runOnUiThread { com.termbridge.android.ui.WebViewPrewarmer.schedulePrewarm(this) }
         val pending = pendingNetworkPolicy?.takeIf { it.profileKey == active.profileKey }
         if (pending != null) sendNetworkPolicySet(client, pending)
         else requestNetworkPolicy(client, active.profileKey)
