@@ -12,6 +12,28 @@ Cross-machine terminal, coding-agent, and remote-automation bridge. Run Claude C
 
 ---
 
+## 📦 下载安装包（免编译，3 步上手）
+
+外部用户**无需安装 Xcode 或 Android Studio**，直接下载预构建安装包，再把本仓库交给你的 AI Coding Agent（Claude Code / Codex / Cursor）完成宿主机配置即可：
+
+| 平台 | 下载方式 | 说明 |
+|---|---|---|
+| **macOS App（Apple Silicon, macOS 13+）** | [GitHub Releases](https://github.com/yunfengsay/termbridge/releases/latest) · [下载页](https://termbridge-a0k.pages.dev/#downloads) · 或 `tb app install` | Apple Developer ID 签名并公证，支持 Sparkle 自动更新；内置控制中心、原生终端、Git 审查与代理浏览器（macOS 14+） |
+| **Android App（Android 7.0+）** | [GitHub Releases](https://github.com/yunfengsay/termbridge/releases/latest) · [下载页](https://termbridge-a0k.pages.dev/#downloads) | 直接安装 `.apk`，支持内置自动更新、原生终端/对话、全流量代理浏览器与全格式文件预览（SVG/PDF/HTML/图片/音视频/代码） |
+| **Windows App（x64）** | [GitHub Releases](https://github.com/yunfengsay/termbridge/releases/latest) · [下载页](https://termbridge-a0k.pages.dev/#downloads) | 原生 WinUI 3 + WebView2 客户端 |
+| **iOS App** | 从 [`ios/`](./ios) 使用 Xcode 构建 | 因苹果分发限制暂未提供直接 `.ipa` 下载 |
+| **宿主机 CLI（macOS / Linux / WSL2）** | `npm install -g agent-termbridge` | Node.js ≥ `22.19.0`；macOS 装完桌面 App 后也可直接在 App 设置里一键导出 CLI |
+
+### 用户自己需要准备什么？
+
+- **局域网 / Tailscale 使用**：**0 账号、0 API Key** — 装好电脑端与手机端 App，扫码即可连接。
+- **跨公网随时随地连接（推荐）**：只需 **1 个免费 Cloudflare 账号**（在 AI 提示时浏览器点一次 `tb cloudflare login`，AI 会自动部署到你自己的私有 Worker，流量与密码 100% 归你所有）+ **手机扫二维码**。
+- **可选高级能力**：
+  - 宿主机上你自己平时使用的 `claude` / `codex`（TermBridge 只做桥接，不收 Key）；
+  - 可选 Global Brain / 实时语音通话（BYOK）：仅启用语音大脑时需在宿主机本地 `.env` 配置你自己的 `DASHSCOPE_API_KEY`（及可选 `VOLCENGINE_S2S_API_KEY`）。
+
+---
+
 ## Screenshots
 
 ### macOS Control Center & Native Terminal
