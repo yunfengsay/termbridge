@@ -12,6 +12,13 @@ class ArtifactTargetTest {
         assertFalse(ArtifactTarget.parse("report.md")!!.remote)
         assertEquals("docs/my image.png", ArtifactTarget.parse("docs/my%20image.png")?.location)
         assertEquals("/project/src/app.ts", ArtifactTarget.parse("/project/src/app.ts:12")?.location)
+        assertTrue(ArtifactTarget.parse("diagram.svg")!!.svg)
+        assertTrue(ArtifactTarget.parse("report.html")!!.html)
+        assertTrue(ArtifactTarget.parse("slides.pdf")!!.pdf)
+        assertTrue(ArtifactTarget.parse("clip.mp4")!!.video)
+        assertTrue(ArtifactTarget.parse("voice.wav")!!.audio)
+        assertTrue(ArtifactTarget.parse("photo.heic")!!.image)
+        assertTrue(ArtifactTarget.parse("hero.avif")!!.image)
     }
     @Test fun modelAuthoredSchemesCannotLaunchAppsOrReadPhoneFiles() {
         for (url in listOf("javascript:alert(1)", "data:image/png,xxx", "file:///etc/passwd", "content://photos/1", "intent://x", "//evil.com/a", "https://user:pass@example.com/a", "a%00.png")) {

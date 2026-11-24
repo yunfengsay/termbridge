@@ -632,4 +632,10 @@
     <string name="remote_browser_invalid_url">Enter a valid http:// or https:// URL</string>
     <string name="remote_browser_unsupported">This Android WebView does not support in-app proxy override.</string>
     <string name="remote_browser_proxy_failed">Could not start local proxy listener.</string>
+    <string name="content_toggle_source">Source</string>
+    <string name="content_toggle_preview">Preview</string>
+    <string name="content_open_external">Open with system app</string>
+    <string name="content_open_external_failed">No installed app can open this file.</string>
+    <string name="content_pdf_pages">Showing %1$d of %2$d pages</string>
+    <string name="content_text_truncated">Showing first %1$d KB (%2$s total)</string>
 </resources>

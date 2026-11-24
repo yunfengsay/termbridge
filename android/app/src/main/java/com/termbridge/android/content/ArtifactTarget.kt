@@ -4,9 +4,14 @@ import java.net.URI
 
 /** Navigation data, never commands. Local paths always require a Host session. */
 data class ArtifactTarget(val location: String, val remote: Boolean) {
-    val image: Boolean get() = extension in setOf("png", "jpg", "jpeg", "webp", "gif", "bmp")
+    val extension: String get() = location.substringBefore('?').substringBefore('#').substringAfterLast('.', "").lowercase()
+    val image: Boolean get() = extension in setOf("png", "jpg", "jpeg", "webp", "gif", "bmp", "ico", "heic", "heif", "avif")
+    val svg: Boolean get() = extension == "svg"
+    val html: Boolean get() = extension in setOf("html", "htm")
+    val pdf: Boolean get() = extension == "pdf"
+    val video: Boolean get() = extension in setOf("mp4", "webm", "mov", "m4v", "mkv", "3gp")
+    val audio: Boolean get() = extension in setOf("mp3", "wav", "m4a", "ogg", "aac", "flac", "opus")
     val markdown: Boolean get() = extension in setOf("md", "markdown", "mdown")
-    private val extension get() = location.substringBefore('?').substringBefore('#').substringAfterLast('.', "").lowercase()
 
     companion object {
         fun parse(value: String, base: String? = null): ArtifactTarget? = runCatching {

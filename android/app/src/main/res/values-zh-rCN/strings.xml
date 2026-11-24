@@ -634,4 +634,10 @@
     <string name="remote_browser_invalid_url">请输入有效的 http:// 或 https:// 网址</string>
     <string name="remote_browser_unsupported">当前系统 WebView 不支持应用内代理接管。</string>
     <string name="remote_browser_proxy_failed">无法启动本机代理端口。</string>
+    <string name="content_toggle_source">源码</string>
+    <string name="content_toggle_preview">预览</string>
+    <string name="content_open_external">用其他应用打开</string>
+    <string name="content_open_external_failed">没有找到可打开此文件的应用。</string>
+    <string name="content_pdf_pages">共 %2$d 页（已渲染 %1$d 页）</string>
+    <string name="content_text_truncated">已显示前 %1$d KB（共 %2$s）</string>
 </resources>

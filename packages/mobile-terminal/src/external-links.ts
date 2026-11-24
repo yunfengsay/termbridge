@@ -15,7 +15,7 @@ export interface FilePathLink {
 const WEB_URL = /https?:\/\/[^\s<>"'`]+/giu;
 // Matches ~/path, /abs/path, ./rel/path, ../rel/path, or dir/sub/file.ext (with optional :line[:col] or #Lline(-Lline)).
 const FILE_PATH_TOKEN = /(?:(?:~\/|\.{1,2}\/|\/)(?:[A-Za-z0-9._+-]+\/)*|(?:[A-Za-z0-9._+-]+\/)+)[A-Za-z0-9._+-]+(?::\d+(?::\d+)?|#L\d+(?:-L\d+)?)?/gu;
-const KNOWN_FILE_EXTENSION = /\.(?:png|jpe?g|webp|gif|bmp|svg|pdf|md|markdown|txt|log|json|ya?ml|toml|xml|html?|css|scss|less|ts|tsx|js|jsx|mjs|cjs|kt|kts|java|swift|m|mm|h|hpp|c|cc|cpp|rs|go|py|rb|sh|zsh|bash|gradle|plist|ini|conf|cfg|sql|csv|apk|ipa|dmg|zip|tar|gz|lock|env|proto|d2|wgsl|metal|glsl)$/i;
+const KNOWN_FILE_EXTENSION = /\.(?:png|jpe?g|webp|gif|bmp|ico|heic|heif|avif|svgz?|pdf|mp4|webm|mov|m4v|mkv|mp3|wav|m4a|ogg|aac|flac|md|markdown|txt|log|json|ya?ml|toml|xml|html?|css|scss|less|ts|tsx|js|jsx|mjs|cjs|kt|kts|java|swift|m|mm|h|hpp|c|cc|cpp|rs|go|py|rb|sh|zsh|bash|gradle|plist|ini|conf|cfg|sql|csv|docx?|xlsx?|pptx?|apk|ipa|dmg|zip|tar|gz|lock|env|proto|d2|wgsl|metal|glsl)$/i;
 const SIMPLE_TRAILING_PUNCTUATION = /[.,;:!?，。；：！？、]$/u;
 const CLOSING_TO_OPENING: Record<string, string> = {
   ')': '(',
