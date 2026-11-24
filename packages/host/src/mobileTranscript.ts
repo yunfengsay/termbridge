@@ -1,4 +1,4 @@
-import { findExternalHttpLinks, safeExternalHttpUrl } from './httpLinks.js';
+import { findExternalHttpLinks, safeExternalHttpUrl, safeSessionFileTarget } from './httpLinks.js';
 import type { TranscriptLink } from './agentTranscriptLinks.js';
 
 const ANSI_SEQUENCE_SOURCE = String.raw`\x1b(?:\[([0-?]*)([ -/]*)([@-~])|\][^\x07]*(?:\x07|\x1b\\))`;
@@ -13,6 +13,7 @@ export interface MobileTranscriptSpan {
   text: string;
   style?: string;
   href?: string;
+  file?: string;
 }
 
 export interface MobileTranscriptLine {
@@ -47,6 +48,7 @@ interface AnsiStyle {
 interface ParserState {
   style: AnsiStyle;
   href?: string;
+  file?: string;
 }
 
 function defaultStyle(): AnsiStyle {
@@ -123,7 +125,11 @@ function parseAnsiLine(raw: string, state: ParserState): MobileTranscriptLine {
     const index = match.index ?? cursor;
     appendSpan(spans, raw.slice(cursor, index), state);
     if (match[3] === 'm' && !match[2]) applySgr(state.style, match[1] || '0');
-    else if (match[0].startsWith('\x1b]8;')) state.href = osc8Href(match[0]);
+    else if (match[0].startsWith('\x1b]8;')) {
+      const target = osc8Target(match[0]);
+      state.href = target.href;
+      state.file = target.file;
+    }
     cursor = index + match[0].length;
   }
   appendSpan(spans, raw.slice(cursor), state);
@@ -134,9 +140,15 @@ function appendSpan(spans: MobileTranscriptSpan[], rawText: string, state: Parse
   const text = rawText.replace(CONTROL_CHARACTER, '');
   if (!text) return;
   const style = cssStyle(state.style);
-  const links = state.href
-    ? [{ text, href: state.href, start: 0, end: text.length }]
-    : findExternalHttpLinks(text);
+  if (state.href) {
+    appendStyledSpan(spans, text, style, state.href);
+    return;
+  }
+  if (state.file) {
+    appendStyledSpan(spans, text, style, undefined, state.file);
+    return;
+  }
+  const links = findExternalHttpLinks(text);
   let cursor = 0;
   for (const link of links) {
     appendStyledSpan(spans, text.slice(cursor, link.start), style);
@@ -151,19 +163,32 @@ function appendStyledSpan(
   text: string,
   style?: string,
   href?: string,
+  file?: string,
 ): void {
   if (!text) return;
   const previous = spans.at(-1);
-  if (previous && previous.style === style && previous.href === href) {
+  if (previous && previous.style === style && previous.href === href && previous.file === file) {
     previous.text += text;
     return;
   }
-  spans.push({ text, ...(style ? { style } : {}), ...(href ? { href } : {}) });
+  spans.push({
+    text,
+    ...(style ? { style } : {}),
+    ...(href ? { href } : {}),
+    ...(file ? { file } : {}),
+  });
 }
 
-function osc8Href(sequence: string): string | undefined {
+function osc8Target(sequence: string): { href?: string; file?: string } {
   const match = /^\x1b\]8;[^;]*;([^\x07\x1b]*)(?:\x07|\x1b\\)$/.exec(sequence);
-  return match ? safeExternalHttpUrl(match[1]) : undefined;
+  if (!match || !match[1]) return {};
+  const href = safeExternalHttpUrl(match[1]);
+  if (href) return { href };
+  if (/^file:\/\//i.test(match[1])) {
+    const file = safeSessionFileTarget(match[1]);
+    if (file) return { file };
+  }
+  return {};
 }
 
 function applyKnownLinks(
@@ -172,18 +197,21 @@ function applyKnownLinks(
 ): MobileTranscriptLine {
   if (!knownLinks.length || !line.spans.length) return line;
   const text = line.spans.map((span) => span.text).join('');
-  const ranges: Array<{ start: number; end: number; href: string }> = [];
+  const ranges: Array<{ start: number; end: number; href?: string; file?: string }> = [];
   let offset = 0;
   for (const span of line.spans) {
-    if (span.href) ranges.push({ start: offset, end: offset + span.text.length, href: span.href });
+    if (span.href || span.file) {
+      ranges.push({ start: offset, end: offset + span.text.length, href: span.href, file: span.file });
+    }
     offset += span.text.length;
   }
   for (const link of knownLinks) {
-    const href = safeExternalHttpUrl(link.href);
-    if (!href || !link.text || link.text.length > 256) continue;
+    const href = link.href ? safeExternalHttpUrl(link.href) : undefined;
+    const file = !href && link.file ? safeSessionFileTarget(link.file) : undefined;
+    if ((!href && !file) || !link.text || link.text.length > 256) continue;
     let start = text.indexOf(link.text);
     while (start >= 0) {
-      const candidate = { start, end: start + link.text.length, href };
+      const candidate = { start, end: start + link.text.length, href, file };
       if (!ranges.some((range) => overlaps(range, candidate))) ranges.push(candidate);
       start = text.indexOf(link.text, start + link.text.length);
     }
@@ -206,7 +234,13 @@ function applyKnownLinks(
       const start = boundaries[index];
       const end = boundaries[index + 1];
       const range = ranges.find((candidate) => candidate.start <= start && candidate.end >= end);
-      appendStyledSpan(linked, span.text.slice(start - spanStart, end - spanStart), span.style, span.href ?? range?.href);
+      appendStyledSpan(
+        linked,
+        span.text.slice(start - spanStart, end - spanStart),
+        span.style,
+        span.href ?? range?.href,
+        span.file ?? range?.file,
+      );
     }
     offset = spanEnd;
   }

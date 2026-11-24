@@ -18,6 +18,7 @@ declare global {
       onBell(): void;
       onTranscriptResync(revision: number): void;
       onOpenLink(url: string): void;
+      onOpenFile?(path: string): void;
       onInputMode(bracketedPaste: boolean): void;
     };
     Termbridge?: {
@@ -32,6 +33,7 @@ declare global {
 }
 
 const openExternalLink = (href: string): void => window.TermbridgeNative?.onOpenLink(href);
+const openFileLink = (path: string): void => window.TermbridgeNative?.onOpenFile?.(path);
 
 const terminal = new Terminal({
   allowProposedApi: false,
@@ -47,7 +49,7 @@ const terminal = new Terminal({
   letterSpacing: 0,
   lineHeight: 1.16,
   linkHandler: {
-    activate: (_event, href) => openSafeExternalLink(href, openExternalLink),
+    activate: (_event, href) => openSafeExternalLink(href, openExternalLink, openFileLink),
   },
   minimumContrastRatio: 2.5,
   rightClickSelectsWord: true,
@@ -84,7 +86,7 @@ terminal.onWriteParsed(() => window.TermbridgeNative?.onInputMode(terminal.modes
 
 const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
-installBareHttpLinkProvider(terminal, openExternalLink);
+installBareHttpLinkProvider(terminal, openExternalLink, openFileLink);
 
 const host = document.getElementById('terminal');
 if (!host) throw new Error('terminal mount is missing');
@@ -112,7 +114,7 @@ let transcriptDirty = false;
 let renderingTranscript = false;
 const structuredTranscript = createMobileTranscriptController(host, transcript, (revision) => {
   window.TermbridgeNative?.onTranscriptResync(revision ?? -1);
-}, openExternalLink);
+}, openExternalLink, openFileLink);
 
 const markTranscriptScrolling = (): void => {
   if (renderingTranscript) return;

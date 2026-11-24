@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { extractMarkdownHttpLinks, resolveLocalAgentTranscriptLinks } from './agentTranscriptLinks.js';
+import { extractMarkdownHttpLinks, extractMarkdownLinks, resolveLocalAgentTranscriptLinks } from './agentTranscriptLinks.js';
 import { parseMobileTranscript } from './mobileTranscript.js';
 
 test('extractMarkdownHttpLinks keeps labels and only safe web targets', () => {
@@ -13,6 +13,19 @@ test('extractMarkdownHttpLinks keeps labels and only safe web targets', () => {
     '[local file](file:///tmp/private) ' +
     '[script](javascript:alert(1))',
   ), [{ text: 'Figma guide', href: 'https://help.figma.com/guide' }]);
+});
+
+test('extractMarkdownLinks keeps safe web and file targets while rejecting unsafe schemes', () => {
+  assert.deepEqual(extractMarkdownLinks(
+    '[Figma guide](https://help.figma.com/guide) ' +
+    '[Manifest](file:///repo/AndroidManifest.xml) ' +
+    '[Preview](~/artifacts/08.png) ' +
+    '[script](javascript:alert(1))',
+  ), [
+    { text: 'Figma guide', href: 'https://help.figma.com/guide' },
+    { text: 'Manifest', file: '/repo/AndroidManifest.xml' },
+    { text: 'Preview', file: '~/artifacts/08.png' },
+  ]);
 });
 
 test('extractMarkdownHttpLinks deduplicates repeated rendered messages', () => {

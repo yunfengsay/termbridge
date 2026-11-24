@@ -52,7 +52,7 @@ class ArtifactPreviewActivity : AppCompatActivity() {
         scroll.addView(text); root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
         setContentView(root); applyWindowInsets(root)
         val source = ArtifactReader(settings, session, this).also { reader = it }
-        val renderer = ArtifactMarkdown(this, source::read, { next -> open(this, next, session, settings.hostId) }, location).also { markdown = it }
+        val renderer = ArtifactMarkdown(this, source::read, { next -> open(this, next, session, settings.hostId, pin.endpointKey.ifEmpty { null }) }, location).also { markdown = it }
         worker.execute {
             val result = runCatching { source.read(target) }
             runOnUiThread {
@@ -77,7 +77,16 @@ class ArtifactPreviewActivity : AppCompatActivity() {
                         }
                     } else if (data.size <= 256 * 1024 && !data.contains(0.toByte())) {
                         if (target.markdown) renderer.bind(text, data.toString(Charsets.UTF_8))
-                        else { text.typeface = android.graphics.Typeface.MONOSPACE; text.text = data.toString(Charsets.UTF_8) }
+                        else {
+                            val content = data.toString(Charsets.UTF_8)
+                            text.typeface = android.graphics.Typeface.MONOSPACE
+                            text.textSize = 13f
+                            val highlighted = runCatching {
+                                com.termbridge.android.review.ReviewSyntaxHighlighter(applicationContext)
+                                    .highlight(target.location, content)
+                            }.getOrNull()
+                            text.text = highlighted ?: content
+                        }
                     } else text.setText(R.string.content_unsupported)
                 }, onFailure = { text.text = getString(R.string.content_failed) + "\n" + (it.cause?.message ?: it.message).orEmpty().take(200) })
             }
@@ -85,13 +94,23 @@ class ArtifactPreviewActivity : AppCompatActivity() {
     }
     override fun onDestroy() { markdown?.close(); reader?.close(); worker.shutdownNow(); super.onDestroy() }
     companion object {
-        fun open(context: Context, location: String, sessionId: String? = null, hostId: String? = null) {
+        fun open(
+            context: Context,
+            location: String,
+            sessionId: String? = null,
+            hostId: String? = null,
+            endpointKey: String? = null,
+        ) {
             val target = ArtifactTarget.parse(location) ?: return
             if (target.remote && !target.image && !target.markdown) {
                 runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target.location))) }; return
             }
             val settings = SettingsStore.load(context)
-            val pin = SessionHostPin.pin(hostId, settings, SettingsStore.profiles(context)) ?: return
+            val pin = if (!endpointKey.isNullOrBlank()) {
+                SessionPin(hostId.orEmpty(), endpointKey)
+            } else {
+                SessionHostPin.pin(hostId, settings, SettingsStore.profiles(context)) ?: return
+            }
             context.startActivity(Intent(context, ArtifactPreviewActivity::class.java)
                 .putExtra("location", target.location).putExtra("session", sessionId ?: SessionFileProtocol.GLOBAL_SESSION)
                 .putExtra("host", pin.hostId).putExtra("endpoint", pin.endpointKey))

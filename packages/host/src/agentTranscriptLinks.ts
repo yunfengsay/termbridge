@@ -3,11 +3,12 @@ import { homedir } from 'node:os';
 import { isAbsolute } from 'node:path';
 import { decoderFor, type AgentChatProvider } from '@termbridge/agent-chat';
 import { isLocated, locateTranscript, type AgentSessionRef } from './agentChat/transcriptLocator.js';
-import { safeExternalHttpUrl } from './httpLinks.js';
+import { safeExternalHttpUrl, safeSessionFileTarget } from './httpLinks.js';
 
 export interface TranscriptLink {
   text: string;
-  href: string;
+  href?: string;
+  file?: string;
 }
 
 export interface AgentTranscriptIdentity {
@@ -137,6 +138,26 @@ export function extractMarkdownHttpLinks(text: string): TranscriptLink[] {
   return links;
 }
 
+export function extractMarkdownLinks(text: string): TranscriptLink[] {
+  const links: TranscriptLink[] = [];
+  const seen = new Set<string>();
+  const pattern = /\[([^\]\r\n]{1,256})\]\(([^\s)]+)\)/gu;
+  for (const match of text.matchAll(pattern)) {
+    const label = match[1].trim();
+    const rawTarget = match[2].trim();
+    if (!label || !rawTarget) continue;
+    const href = safeExternalHttpUrl(rawTarget);
+    const file = href ? undefined : safeSessionFileTarget(rawTarget);
+    if (!href && !file) continue;
+    const key = `${label}\u0000${href ?? ''}\u0000${file ?? ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    links.push(href ? { text: label, href } : { text: label, file });
+    if (links.length >= MAX_LINKS) break;
+  }
+  return links;
+}
+
 function linksFromRolloutTail(tail: string, provider: AgentChatProvider): TranscriptLink[] {
   const texts: string[] = [];
   const lines = tail.split('\n');
@@ -154,7 +175,7 @@ function linksFromRolloutTail(tail: string, provider: AgentChatProvider): Transc
       // A concurrently-written final JSONL line is retried after the file grows.
     }
   }
-  return extractMarkdownHttpLinks(texts.join('\n'));
+  return extractMarkdownLinks(texts.join('\n'));
 }
 
 function validSessionId(value: string | undefined): value is string {

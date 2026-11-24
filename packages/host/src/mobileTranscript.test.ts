@@ -32,6 +32,23 @@ test('mobile transcript preserves safe OSC 8 hyperlink targets', () => {
   ] }]);
 });
 
+test('mobile transcript preserves OSC 8 file:// links across wrapped lines without polluting href', () => {
+  const lines = parseMobileTranscript(
+    'Open \x1b]8;;file:///repo/apps/android-host/AndroidManifest.xml\x07apps/android-\nhost/AndroidManifest.xml\x1b]8;;\x07 ok',
+  );
+
+  assert.deepEqual(lines, [
+    { spans: [
+      { text: 'Open ' },
+      { text: 'apps/android-', file: '/repo/apps/android-host/AndroidManifest.xml' },
+    ] },
+    { spans: [
+      { text: 'host/AndroidManifest.xml', file: '/repo/apps/android-host/AndroidManifest.xml' },
+      { text: ' ok' },
+    ] },
+  ]);
+});
+
 test('mobile transcript restores label links from the original Agent transcript', () => {
   const href = 'https://help.figma.com/hc/en-us/articles/1500007537281-Guide-to-the-Figma-mobile-app';
   const lines = parseMobileTranscript(

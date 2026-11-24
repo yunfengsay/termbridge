@@ -10,8 +10,8 @@ android {
         applicationId = "com.termbridge.android"
         minSdk = 24
         targetSdk = 36
-        versionCode = 20
-        versionName = "0.1.35"
+        versionCode = 21
+        versionName = "0.1.36"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "DEFAULT_RELAY_URL", "\"ws://10.0.2.2:7400\"")

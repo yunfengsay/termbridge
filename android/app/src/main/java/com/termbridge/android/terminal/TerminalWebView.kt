@@ -33,6 +33,7 @@ class TerminalWebView @JvmOverloads constructor(
         fun onSelectionCopied()
         fun onTerminalTouched()
         fun onTranscriptResync(revision: Int)
+        fun onOpenFile(path: String) = Unit
     }
 
     var listener: Listener? = null
@@ -192,6 +193,11 @@ class TerminalWebView @JvmOverloads constructor(
         @JavascriptInterface
         fun onOpenLink(url: String) {
             post { openExternalLink(url) }
+        }
+
+        @JavascriptInterface
+        fun onOpenFile(path: String) {
+            post { listener?.onOpenFile(path) }
         }
 
     }

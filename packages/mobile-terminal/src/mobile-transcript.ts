@@ -1,11 +1,17 @@
 import { applyRevisionedTranscriptPatch, type TranscriptPatch } from './transcript-patch.js';
 import { activateTranscriptSnapshot, updateTranscriptNodes } from './transcript-reconcile.js';
-import { safeExternalHttpUrl } from './external-links.js';
+import {
+  findFilePathLinks,
+  looksLikeFilePath,
+  safeExternalHttpUrl,
+  safeSessionFilePath,
+} from './external-links.js';
 
 interface TranscriptSpan {
   text: string;
   style?: string;
   href?: string;
+  file?: string;
 }
 
 interface TranscriptLine {
@@ -31,6 +37,7 @@ export function createMobileTranscriptController(
   transcript: HTMLElement,
   requestResync: (revision: number | undefined) => void,
   openExternalLink?: (href: string) => void,
+  openFileLink?: (file: string) => void,
 ): MobileTranscriptController {
   let revision: number | undefined;
   let nodes: HTMLElement[] = [];
@@ -51,7 +58,8 @@ export function createMobileTranscriptController(
         failClosed();
         return;
       }
-      const candidates = payload.lines.map((line) => createLineNode(line, openExternalLink));
+      const linkedLines = linkWrappedUnderlinedFilePaths(payload.lines);
+      const candidates = linkedLines.map((line) => createLineNode(line, openExternalLink, openFileLink));
       activateTranscriptSnapshot(host, transcript, candidates);
       nodes = Array.from(transcript.children) as HTMLElement[];
       revision = nextRevision;
@@ -68,8 +76,12 @@ export function createMobileTranscriptController(
         failClosed();
         return;
       }
-      const before = payload.before.map((line) => createLineNode(line, openExternalLink));
-      const after = payload.after.map((line) => createLineNode(line, openExternalLink));
+      const before = linkWrappedUnderlinedFilePaths(payload.before).map((line) =>
+        createLineNode(line, openExternalLink, openFileLink),
+      );
+      const after = linkWrappedUnderlinedFilePaths(payload.after).map((line) =>
+        createLineNode(line, openExternalLink, openFileLink),
+      );
       const update = applyRevisionedTranscriptPatch(revision, nodes, baseRevision, nextRevision, {
         oldStart: payload.oldStart,
         newStart: payload.newStart,
@@ -96,29 +108,136 @@ export function createMobileTranscriptController(
   };
 }
 
+/**
+ * Reconstruct long file paths that Herdr/Codex/Claude wrapped across adjacent lines
+ * with ANSI underline styling (works even when the Host is older and omits `span.file`).
+ */
+export function linkWrappedUnderlinedFilePaths(lines: readonly TranscriptLine[]): TranscriptLine[] {
+  const cloned: TranscriptLine[] = lines.map((line) => ({
+    spans: line.spans.map((span) => ({ ...span })),
+  }));
+  const isUnderlinedCandidate = (span: TranscriptSpan | undefined): boolean =>
+    Boolean(span && !span.href && !span.file && span.style?.includes('text-decoration:underline') && span.text.length > 0);
+
+  let lineIndex = 0;
+  while (lineIndex < cloned.length) {
+    const spans = cloned[lineIndex].spans;
+    const lastIndex = spans.length - 1;
+    if (lastIndex < 0 || !isUnderlinedCandidate(spans[lastIndex])) {
+      lineIndex += 1;
+      continue;
+    }
+    const run: Array<{ line: number; span: number }> = [{ line: lineIndex, span: lastIndex }];
+    let joined = spans[lastIndex].text;
+    let cursor = lineIndex + 1;
+    while (cursor < cloned.length) {
+      const nextSpans = cloned[cursor].spans;
+      if (!nextSpans.length || !isUnderlinedCandidate(nextSpans[0])) break;
+      run.push({ line: cursor, span: 0 });
+      joined += nextSpans[0].text;
+      // If this line has more spans after index 0, the wrapped underline ended on this line.
+      if (nextSpans.length > 1) break;
+      cursor += 1;
+    }
+    if (run.length > 1) {
+      const candidate = joined.trim();
+      const file = looksLikeFilePath(candidate) ? safeSessionFilePath(candidate) : undefined;
+      if (file) {
+        for (const ref of run) cloned[ref.line].spans[ref.span].file = file;
+      }
+      lineIndex = run[run.length - 1].line;
+      // If the ending line has another underlined span at its tail, let the loop re-check that line.
+      if (cloned[lineIndex].spans.length <= 1) lineIndex += 1;
+    } else {
+      lineIndex += 1;
+    }
+  }
+  return cloned;
+}
+
 function createLineNode(
   line: TranscriptLine,
   openExternalLink?: (href: string) => void,
+  openFileLink?: (file: string) => void,
 ): HTMLDivElement {
   const node = document.createElement('div');
   node.className = 'transcript-line';
   for (const segment of line.spans) {
     const href = segment.href && safeExternalHttpUrl(segment.href);
-    const span = href ? document.createElement('a') : document.createElement('span');
-    if (segment.style) span.setAttribute('style', segment.style);
-    span.textContent = segment.text;
-    if (href && span instanceof HTMLAnchorElement) {
-      span.href = href;
-      span.rel = 'noopener noreferrer';
-      span.addEventListener('click', (event) => {
-        event.preventDefault();
-        openExternalLink?.(href);
-      });
+    const file = !href && segment.file ? safeSessionFilePath(segment.file) : undefined;
+    if (href) {
+      node.appendChild(createLinkElement(segment.text, segment.style, href, () => openExternalLink?.(href)));
+      continue;
     }
-    node.appendChild(span);
+    if (file && openFileLink) {
+      node.appendChild(createFileLinkElement(segment.text, segment.style, file, openFileLink));
+      continue;
+    }
+    if (openFileLink) {
+      const matches = findFilePathLinks(segment.text);
+      if (matches.length > 0) {
+        let cursor = 0;
+        for (const match of matches) {
+          if (match.start > cursor) {
+            node.appendChild(createPlainSpan(segment.text.slice(cursor, match.start), segment.style));
+          }
+          node.appendChild(createFileLinkElement(match.text, segment.style, match.file, openFileLink));
+          cursor = match.end;
+        }
+        if (cursor < segment.text.length) {
+          node.appendChild(createPlainSpan(segment.text.slice(cursor), segment.style));
+        }
+        continue;
+      }
+    }
+    node.appendChild(createPlainSpan(segment.text, segment.style));
   }
   node.dataset.transcriptKey = JSON.stringify(line.spans);
   return node;
+}
+
+function createPlainSpan(text: string, style?: string): HTMLSpanElement {
+  const span = document.createElement('span');
+  if (style) span.setAttribute('style', style);
+  span.textContent = text;
+  return span;
+}
+
+function createLinkElement(
+  text: string,
+  style: string | undefined,
+  href: string,
+  onClick: () => void,
+): HTMLAnchorElement {
+  const anchor = document.createElement('a');
+  if (style) anchor.setAttribute('style', style);
+  anchor.textContent = text;
+  anchor.href = href;
+  anchor.rel = 'noopener noreferrer';
+  anchor.addEventListener('click', (event) => {
+    event.preventDefault();
+    onClick();
+  });
+  return anchor;
+}
+
+function createFileLinkElement(
+  text: string,
+  style: string | undefined,
+  file: string,
+  openFileLink: (file: string) => void,
+): HTMLAnchorElement {
+  const anchor = document.createElement('a');
+  if (style) anchor.setAttribute('style', style);
+  anchor.className = 'tb-file-link';
+  anchor.textContent = text;
+  anchor.href = '#';
+  anchor.dataset.tbFile = file;
+  anchor.addEventListener('click', (event) => {
+    event.preventDefault();
+    openFileLink(file);
+  });
+  return anchor;
 }
 
 function validRevision(value: number): boolean {
@@ -136,6 +255,7 @@ function validLines(value: unknown): value is TranscriptLine[] {
       if (!span || typeof span.text !== 'string') return false;
       if (span.style !== undefined && (typeof span.style !== 'string' || span.style.length > 256)) return false;
       if (span.href !== undefined && (typeof span.href !== 'string' || !safeExternalHttpUrl(span.href))) return false;
+      if (span.file !== undefined && (typeof span.file !== 'string' || !safeSessionFilePath(span.file))) return false;
       characters += span.text.length;
       if (characters > 1_000_000) return false;
     }

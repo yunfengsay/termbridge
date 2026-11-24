@@ -305,6 +305,17 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
         }
     }
 
+    override fun onOpenFile(path: String) {
+        val targetSession = sessionId ?: return
+        com.termbridge.android.content.ArtifactPreviewActivity.open(
+            context = this,
+            location = path,
+            sessionId = targetSession,
+            hostId = hostId,
+            endpointKey = pin?.endpointKey,
+        )
+    }
+
     override fun onConnectionState(state: ConnectionState) = runOnUiThread {
         when (state) {
             ConnectionState.Connecting -> showStatus(
