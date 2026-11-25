@@ -15,6 +15,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.BackgroundColorSpan
 import android.util.Base64
 import android.view.Gravity
 import android.view.View
@@ -67,15 +70,26 @@ class ArtifactPreviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val location = intent.getStringExtra("location") ?: return finish()
-        val target = ArtifactTarget.parse(location) ?: return finish()
+        val parsed = ArtifactTarget.parse(location) ?: return finish()
+        val extraLine = intent.getIntExtra("line", 0).takeIf { it > 0 }
+        val extraEndLine = intent.getIntExtra("endLine", 0).takeIf { it > 0 }
+        val target = parsed.copy(
+            line = parsed.line ?: extraLine,
+            endLine = parsed.endLine ?: extraEndLine,
+        )
         val session = intent.getStringExtra("session") ?: SessionFileProtocol.GLOBAL_SESSION
         val pin = SessionPin(intent.getStringExtra("host").orEmpty(), intent.getStringExtra("endpoint").orEmpty())
         val settings = SessionHostPin.resolve(pin, SettingsStore.load(this), SettingsStore.profiles(this)) ?: return finish()
 
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(getColor(R.color.surface)) }
-        val fileName = Uri.decode(location.substringBefore('?').substringAfterLast('/')).take(80)
+        val fileName = Uri.decode(target.location.substringBefore('?').substringAfterLast('/')).take(80)
+        val lineLabel = target.line?.let { start ->
+            val end = target.endLine?.takeIf { it > start }
+            if (end != null) "L$start–$end" else "L$start"
+        }
         toolbar = MaterialToolbar(this).apply {
             title = fileName
+            if (lineLabel != null) subtitle = lineLabel
             setNavigationIcon(R.drawable.ic_arrow_back)
             setNavigationOnClickListener { finish() }
             menu.add(getString(R.string.content_copy_link)).setIcon(R.drawable.ic_copy).setOnMenuItemClickListener {
@@ -357,30 +371,79 @@ class ArtifactPreviewActivity : AppCompatActivity() {
 
     private fun renderText(target: ArtifactTarget, data: ByteArray, renderer: ArtifactMarkdown) {
         showTextView()
-        if (target.markdown && data.size <= 512 * 1024) {
+        if (target.markdown && target.line == null && data.size <= 512 * 1024) {
             renderer.bind(text, data.toString(Charsets.UTF_8))
         } else {
-            renderSourceCode(target.location, data)
+            renderSourceCode(target.location, data, target.line, target.endLine)
         }
     }
 
-    private fun renderSourceCode(location: String, data: ByteArray) {
+    private fun renderSourceCode(location: String, data: ByteArray, targetLine: Int? = null, targetEndLine: Int? = null) {
         val truncated = data.size > MAX_TEXT_DISPLAY_BYTES
         val slice = if (truncated) data.copyOfRange(0, MAX_TEXT_DISPLAY_BYTES) else data
         val body = slice.toString(Charsets.UTF_8)
         text.typeface = android.graphics.Typeface.MONOSPACE
         text.textSize = 13f
-        val displayText = if (truncated) {
-            getString(R.string.content_text_truncated, MAX_TEXT_DISPLAY_BYTES / 1024, formatBytes(data.size)) + "\n\n" + body
-        } else body
-        if (!truncated && data.size <= 256 * 1024) {
-            val highlighted = runCatching {
+        val prefix = if (truncated) {
+            getString(R.string.content_text_truncated, MAX_TEXT_DISPLAY_BYTES / 1024, formatBytes(data.size)) + "\n\n"
+        } else ""
+        val displayText = prefix + body
+        val rendered: CharSequence = if (!truncated && data.size <= 256 * 1024) {
+            runCatching {
                 com.termbridge.android.review.ReviewSyntaxHighlighter(applicationContext)
                     .highlight(location, displayText)
-            }.getOrNull()
-            text.text = highlighted ?: displayText
+            }.getOrNull() ?: displayText
         } else {
-            text.text = displayText
+            displayText
+        }
+
+        if (targetLine != null && targetLine > 0) {
+            val prefixLines = prefix.count { it == '\n' }
+            val startLine = targetLine + prefixLines
+            val endLine = (targetEndLine?.coerceAtLeast(targetLine) ?: targetLine) + prefixLines
+            val spanRange = lineRangeOffsets(displayText, startLine, endLine)
+            if (spanRange != null) {
+                val styled = SpannableStringBuilder(rendered)
+                styled.setSpan(
+                    BackgroundColorSpan(Color.argb(48, 250, 179, 20)),
+                    spanRange.first,
+                    spanRange.second,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+                text.text = styled
+                scrollToOffset(spanRange.first)
+                return
+            }
+        }
+        text.text = rendered
+    }
+
+    private fun lineRangeOffsets(content: String, startLine: Int, endLine: Int): Pair<Int, Int>? {
+        var currentLine = 1
+        var index = 0
+        var rangeStart = -1
+        var rangeEnd = content.length
+        while (index <= content.length) {
+            if (currentLine == startLine && rangeStart == -1) rangeStart = index
+            val nextNewline = content.indexOf('\n', index)
+            if (currentLine == endLine) {
+                rangeEnd = if (nextNewline == -1) content.length else nextNewline
+                break
+            }
+            if (nextNewline == -1) break
+            index = nextNewline + 1
+            currentLine++
+        }
+        if (rangeStart < 0 || rangeStart > content.length) return null
+        return rangeStart to rangeEnd.coerceIn(rangeStart, content.length)
+    }
+
+    private fun scrollToOffset(charOffset: Int) {
+        text.post {
+            val layout = text.layout ?: return@post
+            val lineIndex = layout.getLineForOffset(charOffset.coerceIn(0, text.text.length))
+            val targetY = (layout.getLineTop(lineIndex) - (scroll.height / 4)).coerceAtLeast(0)
+            scroll.scrollTo(0, targetY)
         }
     }
 
@@ -543,7 +606,10 @@ class ArtifactPreviewActivity : AppCompatActivity() {
                 SessionHostPin.pin(hostId, settings, SettingsStore.profiles(context)) ?: return
             }
             context.startActivity(Intent(context, ArtifactPreviewActivity::class.java)
-                .putExtra("location", target.location).putExtra("session", sessionId ?: SessionFileProtocol.GLOBAL_SESSION)
+                .putExtra("location", target.location)
+                .putExtra("line", target.line ?: 0)
+                .putExtra("endLine", target.endLine ?: 0)
+                .putExtra("session", sessionId ?: SessionFileProtocol.GLOBAL_SESSION)
                 .putExtra("host", pin.hostId).putExtra("endpoint", pin.endpointKey))
         }
     }

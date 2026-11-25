@@ -27,13 +27,17 @@ test('safeSessionFilePath decodes file:// URIs and rejects unsafe schemes', () =
 });
 
 test('findFilePathLinks extracts bare workspace and home file paths without matching HTTP URLs', () => {
-  const line = 'See https://example.com/apps/a.kt and ~/artifacts/08-demo.png, (apps/android-host/app/src/main/AndroidManifest.xml:12).';
+  const line = 'See https://example.com/apps/a.kt and ~/artifacts/08-demo.png, (apps/android-host/app/src/main/AndroidManifest.xml:12-24), timeline.css:42, App.kt#L10-L25.';
   const links = findFilePathLinks(line);
   assert.deepEqual(links.map((item) => item.file), [
     '~/artifacts/08-demo.png',
-    'apps/android-host/app/src/main/AndroidManifest.xml:12',
+    'apps/android-host/app/src/main/AndroidManifest.xml:12-24',
+    'timeline.css:42',
+    'App.kt#L10-L25',
   ]);
   assert.equal(looksLikeFilePath('not-a-path'), false);
+  assert.equal(looksLikeFilePath('timeline.css'), false);
+  assert.equal(looksLikeFilePath('timeline.css:42-68'), true);
   assert.equal(looksLikeFilePath('apps/android-host/'), false);
 });
 

@@ -111,13 +111,19 @@ function metadataElementAt(source: string, index: number): number | undefined {
   return undefined;
 }
 
+const OPENABLE_LINE_SUFFIX = /(?::\d+(?::\d+)?(?:-\d+(?::\d+)?)?|#L?\d+(?:C\d+)?(?:-L?\d+(?:C\d+)?)?)$/i;
+const OPENABLE_FILE_EXTENSION = /\.(?:png|jpe?g|webp|gif|bmp|ico|heic|heif|avif|svgz?|pdf|mp4|webm|mov|m4v|mkv|mp3|wav|m4a|ogg|aac|flac|md|markdown|mdown|txt|log|json|ya?ml|toml|xml|html?|css|scss|less|ts|tsx|js|jsx|mjs|cjs|kt|kts|java|swift|m|mm|h|hpp|c|cc|cpp|rs|go|py|rb|sh|zsh|bash|gradle|plist|ini|conf|cfg|sql|csv|proto|d2|wgsl|metal|glsl)$/i;
+
 /** Only a scheme the shell will actually open becomes a link. */
 export function isOpenableHref(href: string): boolean {
   const value = href.trim();
   if (!value || value.length > 4096 || /[\x00-\x1f\x7f\\]/.test(value) || value.startsWith('//')) return false;
   if (/^https?:\/\//i.test(value)) return /^https?:\/\/[^\s@/]+(?:[/?#][^\s]*)?$/i.test(value);
-  if (/^[a-z][a-z\d+.-]*:/i.test(value) || value.startsWith('#')) return false;
-  return /^(?:\.?\.?\/|~\/)/.test(value) || /\.(?:md|markdown|txt|png|jpe?g|webp|gif|bmp)(?:#.*)?$/i.test(value);
+  if (value.startsWith('#')) return false;
+  const withoutLine = value.replace(OPENABLE_LINE_SUFFIX, '');
+  if (/^[a-z][a-z\d+.-]*:/i.test(withoutLine)) return false;
+  const pathOnly = withoutLine.split('#')[0] ?? withoutLine;
+  return /^(?:\.?\.?\/|~\/)/.test(pathOnly) || OPENABLE_FILE_EXTENSION.test(pathOnly);
 }
 
 const lexer = (source: string): Token[] =>

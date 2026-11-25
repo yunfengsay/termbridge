@@ -12,6 +12,17 @@ class ArtifactTargetTest {
         assertFalse(ArtifactTarget.parse("report.md")!!.remote)
         assertEquals("docs/my image.png", ArtifactTarget.parse("docs/my%20image.png")?.location)
         assertEquals("/project/src/app.ts", ArtifactTarget.parse("/project/src/app.ts:12")?.location)
+        assertEquals(12, ArtifactTarget.parse("/project/src/app.ts:12")?.line)
+        assertEquals("timeline.css", ArtifactTarget.parse("timeline.css:42")?.location)
+        assertEquals(42, ArtifactTarget.parse("timeline.css:42")?.line)
+        val range = ArtifactTarget.parse("design-system/app/features/timeline/timeline.css:12:4-45:8")!!
+        assertEquals("design-system/app/features/timeline/timeline.css", range.location)
+        assertEquals(12, range.line)
+        assertEquals(45, range.endLine)
+        val hashRange = ArtifactTarget.parse("timeline.css#L18-L32")!!
+        assertEquals("timeline.css", hashRange.location)
+        assertEquals(18, hashRange.line)
+        assertEquals(32, hashRange.endLine)
         assertTrue(ArtifactTarget.parse("diagram.svg")!!.svg)
         assertTrue(ArtifactTarget.parse("report.html")!!.html)
         assertTrue(ArtifactTarget.parse("slides.pdf")!!.pdf)

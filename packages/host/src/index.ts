@@ -1839,7 +1839,7 @@ async function handleClientControl(clientId: number, msg: ControlMessage): Promi
         const roots = global ? [] : await sessionPreviewRoots(msg.sessionId);
         const result = msg.revision === 'HEAD'
           ? await readSessionRevision(cwd, msg, gitReview, roots)
-          : await readSessionFile(cwd, msg, roots);
+          : await readSessionFile(cwd, msg, roots, { allowSafeHomePaths: true });
         if (clients.has(clientId)) sendToClient(clientId, encodeControl({
           t: 'session_file_result', requestId: msg.requestId, sessionId: msg.sessionId, ...result,
         }));

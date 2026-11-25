@@ -13,8 +13,13 @@ export interface FilePathLink {
 }
 
 const WEB_URL = /https?:\/\/[^\s<>"'`]+/giu;
-// Matches ~/path, /abs/path, ./rel/path, ../rel/path, or dir/sub/file.ext (with optional :line[:col] or #Lline(-Lline)).
-const FILE_PATH_TOKEN = /(?:(?:~\/|\.{1,2}\/|\/)(?:[A-Za-z0-9._+-]+\/)*|(?:[A-Za-z0-9._+-]+\/)+)[A-Za-z0-9._+-]+(?::\d+(?::\d+)?|#L\d+(?:-L\d+)?)?/gu;
+const LINE_LOCATOR_PATTERN = '(?::\\d+(?::\\d+)?(?:-\\d+(?::\\d+)?)?|#L\\d+(?:C\\d+)?(?:-L?\\d+(?:C\\d+)?)?)';
+const LINE_LOCATOR_END = new RegExp(`${LINE_LOCATOR_PATTERN}$`, 'iu');
+// Matches ~/path, /abs/path, ./rel/path, ../rel/path, dir/sub/file.ext, or bare file.ext:line[-end] / file.ext#Lline.
+const FILE_PATH_TOKEN = new RegExp(
+  `(?:(?:(?:~\\/|\\.{1,2}\\/|\\/)(?:[A-Za-z0-9._+-]+\\/)*|(?:[A-Za-z0-9._+-]+\\/)+)[A-Za-z0-9._+-]+(?:${LINE_LOCATOR_PATTERN})?|[A-Za-z0-9._+-]+\\.[A-Za-z0-9]+${LINE_LOCATOR_PATTERN})`,
+  'giu',
+);
 const KNOWN_FILE_EXTENSION = /\.(?:png|jpe?g|webp|gif|bmp|ico|heic|heif|avif|svgz?|pdf|mp4|webm|mov|m4v|mkv|mp3|wav|m4a|ogg|aac|flac|md|markdown|txt|log|json|ya?ml|toml|xml|html?|css|scss|less|ts|tsx|js|jsx|mjs|cjs|kt|kts|java|swift|m|mm|h|hpp|c|cc|cpp|rs|go|py|rb|sh|zsh|bash|gradle|plist|ini|conf|cfg|sql|csv|docx?|xlsx?|pptx?|apk|ipa|dmg|zip|tar|gz|lock|env|proto|d2|wgsl|metal|glsl)$/i;
 const SIMPLE_TRAILING_PUNCTUATION = /[.,;:!?，。；：！？、]$/u;
 const CLOSING_TO_OPENING: Record<string, string> = {
@@ -57,9 +62,11 @@ export function safeSessionFilePath(value: string): string | undefined {
       return undefined;
     }
   }
-  // Reject protocol-relative paths and other URI schemes (http:, javascript:, data:, content:, intent:, etc.).
+  // Reject protocol-relative paths and other URI schemes (http:, javascript:, data:, content:, intent:, etc.),
+  // while permitting bare filenames with a line locator such as `timeline.css:42` or `timeline.css:42-68`.
   if (trimmed.startsWith('//') || trimmed.startsWith('#')) return undefined;
-  if (/^[A-Za-z][A-Za-z0-9+.-]*:/.test(trimmed)) return undefined;
+  const withoutLocator = trimmed.replace(LINE_LOCATOR_END, '');
+  if (/^[A-Za-z][A-Za-z0-9+.-]*:/.test(withoutLocator)) return undefined;
   return trimmed;
 }
 
@@ -67,9 +74,12 @@ export function safeSessionFilePath(value: string): string | undefined {
 export function looksLikeFilePath(value: string): boolean {
   const safe = safeSessionFilePath(value);
   if (!safe) return false;
-  const clean = safe.replace(/(?::\d+(?::\d+)?|#L\d+(?:-L\d+)?)$/u, '');
-  if (!clean.includes('/')) return false;
+  const hasLocator = LINE_LOCATOR_END.test(safe);
+  const clean = safe.replace(LINE_LOCATOR_END, '');
   if (clean.endsWith('/')) return false;
+  if (!clean.includes('/')) {
+    return hasLocator && KNOWN_FILE_EXTENSION.test(clean);
+  }
   if (clean.startsWith('~/') || clean.startsWith('./') || clean.startsWith('../')) {
     return KNOWN_FILE_EXTENSION.test(clean) || clean.split('/').filter(Boolean).length >= 2;
   }

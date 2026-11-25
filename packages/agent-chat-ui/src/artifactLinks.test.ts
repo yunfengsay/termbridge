@@ -3,7 +3,15 @@ import assert from 'node:assert/strict';
 import { isOpenableHref, parseMarkdown } from './markdown.js';
 
 test('Markdown artifact paths survive parsing while unsafe schemes remain inert', () => {
-  for (const href of ['docs/report.md', '/project/a.png', './src/a.ts:12', 'https://example.com/a.png']) {
+  for (const href of [
+    'docs/report.md',
+    '/project/a.png',
+    './src/a.ts:12',
+    'design-system/app/features/timeline/timeline.css:12-45',
+    'timeline.css:42',
+    'timeline.css#L10-L20',
+    'https://example.com/a.png',
+  ]) {
     assert.ok(isOpenableHref(href), href);
     assert.match(JSON.stringify(parseMarkdown(`[View](${href})`)), /"type":"link"/);
   }
