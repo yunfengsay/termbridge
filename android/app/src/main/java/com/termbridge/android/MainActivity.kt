@@ -33,6 +33,7 @@ import com.termbridge.android.protocol.ControlMessage
 import com.termbridge.android.protocol.HostNetworkPolicy
 import com.termbridge.android.protocol.SessionInfo
 import com.termbridge.android.ui.SessionAdapter
+import com.termbridge.android.ui.SessionOrder
 import com.termbridge.android.ui.applyWindowInsets
 import com.termbridge.android.watch.WatchGatewayService
 import java.util.UUID
@@ -174,9 +175,7 @@ class MainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         when (message.type) {
             "session_list_result" -> {
                 loaded = true
-                sessions = message.sessions().sortedWith(
-                    compareByDescending<SessionInfo> { it.isActive }.thenByDescending { it.createdAt },
-                )
+                sessions = SessionOrder.sort(message.sessions())
                 adapter.submitList(sessions)
                 renderSessions()
             }

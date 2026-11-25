@@ -185,11 +185,17 @@ extension SessionListViewModel: TermbridgeClientListener {
         for completed in completionTracker.update(next) {
           NotificationCoordinator.shared.notifyCompletion(completed, profile: activeProfile)
         }
-        sessions = next.sorted {
-          if $0.isWorking != $1.isWorking { return $0.isWorking }
-          if $0.isDone != $1.isDone { return !$0.isDone }
-          return ($0.completedAtMilliseconds ?? $0.createdAtMilliseconds)
-            > ($1.completedAtMilliseconds ?? $1.createdAtMilliseconds)
+        sessions = next.sorted { lhs, rhs in
+          let lhsBlank = lhs.workspace?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
+          let rhsBlank = rhs.workspace?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
+          if lhsBlank != rhsBlank { return !lhsBlank }
+          let wsCmp = (lhs.workspace ?? "").localizedStandardCompare(rhs.workspace ?? "")
+          if wsCmp != .orderedSame { return wsCmp == .orderedAscending }
+          if lhs.isHerdr != rhs.isHerdr { return lhs.isHerdr }
+          if lhsBlank && lhs.createdAtMilliseconds != rhs.createdAtMilliseconds {
+            return lhs.createdAtMilliseconds < rhs.createdAtMilliseconds
+          }
+          return lhs.sessionID.localizedStandardCompare(rhs.sessionID) == .orderedAscending
         }
         schedulePoll()
       case "agents_result": agents = Array(Set(message.strings("names"))).sorted()
