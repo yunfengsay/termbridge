@@ -2831,20 +2831,35 @@ async function handleClientControl(clientId: number, msg: ControlMessage): Promi
       break;
     }
     case 'config_set': {
-      config = { ...config, agents: { ...config.agents, [msg.name]: msg.command } };
+      const name = msg.name.trim();
+      const command = msg.command.trim();
+      if (!name || name === 'shell' || name.length > 64 || /[\s\x00-\x1f\x7f]/.test(name)) {
+        sendToClient(clientId, encodeControl({ t: 'error', message: 'Invalid agent name' }));
+        break;
+      }
+      if (!command || command.length > 2048 || /[\r\n\x00]/.test(command)) {
+        sendToClient(clientId, encodeControl({ t: 'error', message: 'Invalid agent command' }));
+        break;
+      }
+      config = { ...config, agents: { ...config.agents, [name]: command } };
       agentRegistry = createAgentRegistry(config);
       saveConfig(config);
-      console.log(`[host] set agent "${msg.name}"`);
+      console.log(`[host] set agent "${name}"`);
       sendToClient(clientId, configInfo());
       break;
     }
     case 'config_remove': {
+      const name = msg.name.trim();
+      if (!name || name === 'shell') {
+        sendToClient(clientId, encodeControl({ t: 'error', message: 'Invalid agent name' }));
+        break;
+      }
       const next = { ...config.agents };
-      delete next[msg.name];
+      delete next[name];
       config = { ...config, agents: next };
       agentRegistry = createAgentRegistry(config);
       saveConfig(config);
-      console.log(`[host] removed agent "${msg.name}"`);
+      console.log(`[host] removed agent "${name}"`);
       sendToClient(clientId, configInfo());
       break;
     }

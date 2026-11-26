@@ -1082,6 +1082,13 @@ data class ControlMessage(
     fun stringList(name: String): List<String> =
         (fields[name] as? List<*>)?.filterIsInstance<String>().orEmpty()
 
+    fun stringMap(name: String): Map<String, String> =
+        (fields[name] as? Map<*, *>)
+            ?.entries
+            ?.mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? String)?.let { value -> key to value } } }
+            ?.toMap()
+            .orEmpty()
+
     @Suppress("UNCHECKED_CAST")
     fun sessions(): List<SessionInfo> =
         (fields["sessions"] as? List<*>)

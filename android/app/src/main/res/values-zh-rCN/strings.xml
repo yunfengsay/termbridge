@@ -365,6 +365,17 @@
     <string name="agent_failed">Agent 执行失败</string>
     <string name="agent_state_detail">%1$s · %2$s</string>
     <string name="shell">Shell</string>
+    <string name="manage_agent_commands">管理启动命令…</string>
+    <string name="manage_agent_commands_title">Agent 启动命令</string>
+    <string name="add_agent_command">新增 Agent</string>
+    <string name="edit_agent_command_title">编辑 %1$s</string>
+    <string name="agent_command_name_hint">Agent 名称（如 agy）</string>
+    <string name="agent_command_value_hint">启动命令（如 proxy &amp;&amp; agy --dangerously-skip-permissions）</string>
+    <string name="agent_command_helper">在主机交互式登录 Shell（-lic）中执行，因此 ~/.zshrc 里的 proxy 函数和别名都会自动生效。</string>
+    <string name="agent_command_invalid_name">请输入有效的 Agent 名称（不含空格，不能是 shell）。</string>
+    <string name="agent_command_invalid_value">请输入单行启动命令。</string>
+    <string name="agent_command_saved">已保存 %1$s 启动命令</string>
+    <string name="agent_command_removed">已删除 %1$s</string>
     <string name="connecting">正在连接…</string>
     <string name="authenticating">正在验证身份…</string>
     <string name="connected">已连接</string>

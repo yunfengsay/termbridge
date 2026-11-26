@@ -18,6 +18,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -207,8 +208,9 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
         )
         terminalView.listener = this
         if (warmed?.second == true) {
-            terminalReady = true
-            terminalView.fitTerminal()
+            binding.terminalContainer.doOnLayout {
+                terminalView.fitAndReportReady()
+            }
         }
         paintCachedTerminalSnapshot()
         binding.voiceMiniOrb.setCompactMode(true)
@@ -282,16 +284,34 @@ class TerminalActivity : AppCompatActivity(), TermbridgeClient.Listener, Termina
     }
 
     override fun onTerminalReady(cols: Int, rows: Int) {
+        if (cols < 10 || rows < 4) {
+            binding.terminalContainer.doOnLayout {
+                terminalView.fitAndReportReady()
+            }
+            return
+        }
+        val wasReady = terminalReady
         terminalReady = true
         this.cols = cols
         this.rows = rows
-        if (started) connectNow()
+        if (started && !wasReady) {
+            connectNow()
+        } else {
+            sid?.let { client?.sendResize(it, cols, rows) }
+        }
     }
 
     override fun onTerminalResize(cols: Int, rows: Int) {
+        if (cols < 10 || rows < 4) return
         this.cols = cols
         this.rows = rows
         sid?.let { client?.sendResize(it, cols, rows) }
+    }
+
+    override fun onTerminalResponse(data: String) {
+        if (isHerdr) return
+        val attachedSid = sid ?: return
+        client?.sendPtyInput(attachedSid, data.toByteArray(Charsets.UTF_8))
     }
 
     override fun onTerminalTitle(title: String) {

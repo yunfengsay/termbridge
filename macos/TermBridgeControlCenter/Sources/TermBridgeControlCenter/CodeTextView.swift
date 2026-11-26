@@ -176,6 +176,8 @@ final class CodeTextView: NSView, @preconcurrency NSTextFinderClient {
         return true
     }
     @objc func showFind() { finder.performAction(.showFindInterface) }
+    @objc func findNext() { finder.performAction(.nextMatch) }
+    @objc func findPrevious() { finder.performAction(.previousMatch) }
 
     // MARK: Native find bar (⌘F)
     override var isSelectable: Bool { true }

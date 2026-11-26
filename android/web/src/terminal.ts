@@ -20,12 +20,14 @@ declare global {
       onOpenLink(url: string): void;
       onOpenFile?(path: string): void;
       onInputMode(bracketedPaste: boolean): void;
+      onTerminalData?(data: string): void;
     };
     Termbridge?: {
       writeBase64(base64: string): void;
       applyMobileSnapshot(revision: number, payloadBase64: string): void;
       applyMobilePatch(baseRevision: number, revision: number, payloadBase64: string): void;
       fit(): void;
+      fitAndReportReady(): void;
       reset(): void;
       copySelection(): void;
     };
@@ -83,6 +85,27 @@ const terminal = new Terminal({
 });
 
 terminal.onWriteParsed(() => window.TermbridgeNative?.onInputMode(terminal.modes.bracketedPasteMode));
+// Forward automatic emulator query responses (DSR \x1b[6n, DA1 \x1b[c, etc.) back to the PTY.
+// Keyboard input stays disabled via disableStdin: true, so onData only emits protocol replies.
+terminal.onData((data) => {
+  if (data) window.TermbridgeNative?.onTerminalData?.(data);
+});
+// Answer OSC 10/11 foreground/background queries immediately so TUIs (codex, agy, claude)
+// detect dark theme without waiting for a 2-5s startup timeout.
+terminal.parser.registerOscHandler(10, (data) => {
+  if (data === '?') {
+    window.TermbridgeNative?.onTerminalData?.('\x1b]10;rgb:dddd/e5e5/dbdb\x1b\\');
+    return true;
+  }
+  return false;
+});
+terminal.parser.registerOscHandler(11, (data) => {
+  if (data === '?') {
+    window.TermbridgeNative?.onTerminalData?.('\x1b]11;rgb:0d0d/1010/0e0e\x1b\\');
+    return true;
+  }
+  return false;
+});
 
 const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
@@ -128,15 +151,39 @@ const markTranscriptScrolling = (): void => {
 
 transcript.addEventListener('touchstart', markTranscriptScrolling, { passive: true });
 transcript.addEventListener('scroll', markTranscriptScrolling, { passive: true });
+function hasUsableViewport(): boolean {
+  return host.clientWidth >= 32 && host.clientHeight >= 32;
+}
+
+function fitNow(): boolean {
+  if (!hasUsableViewport()) return false;
+  try {
+    fitAddon.fit();
+    return terminal.cols >= 10 && terminal.rows >= 4;
+  } catch {
+    return false;
+  }
+}
+
 function fit(): void {
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => {
-    try {
-      fitAddon.fit();
-    } catch {
-      // A transient zero-sized viewport while the Android keyboard animates.
-    }
+    fitNow();
   }, 40);
+}
+
+function fitAndReportReady(attempt = 0): void {
+  requestAnimationFrame(() => {
+    if (fitNow()) {
+      window.TermbridgeNative?.onReady(terminal.cols, terminal.rows);
+      return;
+    }
+    if (attempt < 30) {
+      fitAndReportReady(attempt + 1);
+    } else {
+      window.TermbridgeNative?.onReady(Math.max(terminal.cols, 40), Math.max(terminal.rows, 20));
+    }
+  });
 }
 
 new ResizeObserver(fit).observe(host);
@@ -170,6 +217,7 @@ window.Termbridge = {
     structuredTranscript.applyPatch(baseRevision, revision, payloadBase64);
   },
   fit,
+  fitAndReportReady,
   reset(): void {
     mobileReading = false;
     structuredTranscript.reset();
@@ -289,6 +337,11 @@ function ansiPaletteColor(index: number): string {
 }
 
 requestAnimationFrame(() => {
-  fitAddon.fit();
-  window.TermbridgeNative?.onReady(terminal.cols, terminal.rows);
+  if (fitNow()) {
+    window.TermbridgeNative?.onReady(terminal.cols, terminal.rows);
+  } else {
+    // Pre-warmed off-screen WebView (0x0 viewport): signal warm readiness without
+    // collapsing xterm to 2x1; the host Activity will call fitAndReportReady() after layout.
+    window.TermbridgeNative?.onReady(0, 0);
+  }
 });

@@ -35,6 +35,7 @@ class TerminalWebView @JvmOverloads constructor(
         fun onTranscriptResync(revision: Int)
         fun onOpenLink(url: String): Boolean = false
         fun onOpenFile(path: String) = Unit
+        fun onTerminalResponse(data: String) = Unit
     }
 
     var listener: Listener? = null
@@ -133,6 +134,17 @@ class TerminalWebView @JvmOverloads constructor(
         evaluateJavascript("window.Termbridge?.fit()", null)
     }
 
+    fun fitAndReportReady() = post {
+        evaluateJavascript("window.Termbridge?.fitAndReportReady()", null)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w > 0 && h > 0 && (w != oldw || h != oldh)) {
+            fitTerminal()
+        }
+    }
+
     fun copySelection() = post {
         evaluateJavascript("window.Termbridge?.copySelection()", null)
     }
@@ -199,6 +211,11 @@ class TerminalWebView @JvmOverloads constructor(
         @JavascriptInterface
         fun onOpenFile(path: String) {
             post { listener?.onOpenFile(path) }
+        }
+
+        @JavascriptInterface
+        fun onTerminalData(data: String) {
+            if (data.isNotEmpty()) post { listener?.onTerminalResponse(data) }
         }
 
     }

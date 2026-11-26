@@ -103,12 +103,16 @@ test('safe home path preview allows explicit non-hidden home files while blockin
     const cwd = join(home, 'code', 'app');
     await mkdir(cwd, { recursive: true });
     await mkdir(join(home, 'canvas-private', 'artifacts'), { recursive: true });
+    await mkdir(join(home, '.gemini', 'antigravity-cli', 'brain', 'conv-1'), { recursive: true });
     await mkdir(join(home, '.ssh'), { recursive: true });
     await mkdir(join(home, '.config', 'app'), { recursive: true });
     await mkdir(join(home, 'Library', 'Keychains'), { recursive: true });
 
     const artifact = join(home, 'canvas-private', 'artifacts', 'tdesktop-phase2-qa.png');
     await writeFile(artifact, 'PNGDATA');
+    const brainImg = join(home, '.gemini', 'antigravity-cli', 'brain', 'conv-1', 'preview.jpg');
+    await writeFile(brainImg, 'JPGDATA');
+    await writeFile(join(home, '.gemini', 'oauth_creds.json'), '{}');
     await writeFile(join(home, 'canvas-private', 'secrets.json'), '{}');
     await writeFile(join(home, 'canvas-private', 'dev.key'), 'KEY');
     await writeFile(join(home, '.ssh', 'id_rsa'), 'PRIVATE');
@@ -123,6 +127,10 @@ test('safe home path preview allows explicit non-hidden home files while blockin
     assert.equal(fromTilde.name, 'tdesktop-phase2-qa.png');
     assert.equal(fromTilde.data.toString(), 'PNGDATA');
 
+    const fromBrain = await readSessionFile(cwd, { path: '~/.gemini/antigravity-cli/brain/conv-1/preview.jpg', offset: 0 }, [], opts);
+    assert.equal(fromBrain.name, 'preview.jpg');
+    assert.equal(fromBrain.data.toString(), 'JPGDATA');
+
     const fromAbs = await readSessionFile(cwd, { path: artifact, offset: 0 }, [], opts);
     assert.equal(fromAbs.data.toString(), 'PNGDATA');
 
@@ -130,7 +138,8 @@ test('safe home path preview allows explicit non-hidden home files while blockin
     await assert.rejects(readSessionFile(cwd, { path: '../../sibling.txt', offset: 0 }, [], opts), /outside/);
     await assert.rejects(readSessionFile(cwd, { path: 'escape.txt', offset: 0 }, [], opts), /outside/);
 
-    // Dotfiles, Library, private files, and paths outside home must remain blocked.
+    // Dotfiles outside allowlisted artifact dirs, Library, private files, and paths outside home must remain blocked.
+    await assert.rejects(readSessionFile(cwd, { path: '~/.gemini/oauth_creds.json', offset: 0 }, [], opts), /outside/);
     await assert.rejects(readSessionFile(cwd, { path: '~/.ssh/id_rsa', offset: 0 }, [], opts), /Private|outside/);
     await assert.rejects(readSessionFile(cwd, { path: '~/.config/app/token.json', offset: 0 }, [], opts), /outside/);
     await assert.rejects(readSessionFile(cwd, { path: '~/Library/Keychains/login.keychain', offset: 0 }, [], opts), /outside/);

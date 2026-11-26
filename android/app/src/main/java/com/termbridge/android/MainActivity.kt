@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity(), TermbridgeClient.Listener {
     private var loaded = false
     private var sessions: List<SessionInfo> = emptyList()
     private var agentNames: List<String> = emptyList()
+    private var agentCommands: Map<String, String> = emptyMap()
     private val hostChipViews = linkedMapOf<String, Chip>()
     private val networkPolicyRequests = mutableMapOf<String, NetworkPolicyRequest>()
     private var pendingNetworkPolicy: PendingNetworkPolicy? = null
@@ -157,6 +158,7 @@ class MainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         client.sendControl("t" to "desktop_subscribe", "deviceId" to com.termbridge.android.peer.AndroidPeerIdentity.deviceId(this), "foreground" to true)
         client.sendControl("t" to "session_list")
         client.sendControl("t" to "agents")
+        client.sendControl("t" to "config_get")
         val active = SettingsStore.load(this)
         com.termbridge.android.network.WarmConnectionPool.prewarm(this, active)
         runOnUiThread { com.termbridge.android.ui.WebViewPrewarmer.schedulePrewarm(this) }
@@ -197,6 +199,13 @@ class MainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                 renderHosts(selected.profileKey)
             }
             "agents_result" -> agentNames = message.stringList("names").distinct().sorted()
+            "config_info" -> {
+                val configured = message.stringMap("agents")
+                agentCommands = configured
+                if (configured.isNotEmpty()) {
+                    agentNames = configured.keys.distinct().sorted()
+                }
+            }
             "network_policy_result" -> handleNetworkPolicyResult(message)
             "error" -> showFailure(message.string("message") ?: "Host rejected the request", retry = false)
             "tool_request" -> rejectToolRequest(message)
@@ -617,6 +626,7 @@ class MainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                 val key = agent.lowercase()
                 val label = when (key) {
                     "shell" -> getString(R.string.shell)
+                    "agy", "antigravity" -> "Antigravity (agy)"
                     "cc", "claude", "claude-code" -> "Claude Code"
                     "codex" -> "Codex"
                     else -> agent
@@ -633,6 +643,13 @@ class MainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                         true
                     }
             }
+            agentMenu.add(1, View.generateViewId(), agents.size + 1, R.string.manage_agent_commands)
+                .setIcon(R.drawable.ic_settings)
+                .setOnMenuItemClickListener {
+                    if (connected) showAgentCommandsDialog()
+                    else Snackbar.make(binding.root, R.string.disconnected, Snackbar.LENGTH_LONG).show()
+                    true
+                }
             setOnMenuItemClickListener { item ->
                 if (item.itemId == R.id.action_desktop) {
                     startActivity(com.termbridge.android.desktop.RemoteDesktopActivity.intent(this@MainActivity))
@@ -661,6 +678,91 @@ class MainActivity : AppCompatActivity(), TermbridgeClient.Listener {
 
     private fun openNewSession(agent: String) {
         startActivity(TerminalActivity.createIntent(this, agent))
+    }
+
+    private fun showAgentCommandsDialog() {
+        val entries = agentCommands.entries.sortedBy { it.key.lowercase() }
+        if (entries.isEmpty()) {
+            showEditAgentCommandDialog(existingName = null, existingCommand = "")
+            return
+        }
+        val labels = entries.map { (name, command) -> "$name\n$command" }.toTypedArray()
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.manage_agent_commands_title)
+            .setItems(labels) { _, which ->
+                val (name, command) = entries[which]
+                showEditAgentCommandDialog(existingName = name, existingCommand = command)
+            }
+            .setPositiveButton(R.string.add_agent_command) { _, _ ->
+                showEditAgentCommandDialog(existingName = null, existingCommand = "")
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showEditAgentCommandDialog(existingName: String?, existingCommand: String) {
+        val dp = resources.displayMetrics.density
+        val padH = (20 * dp).toInt()
+        val padV = (8 * dp).toInt()
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(padH, (12 * dp).toInt(), padH, padV)
+        }
+        val nameInput = android.widget.EditText(this).apply {
+            hint = getString(R.string.agent_command_name_hint)
+            setSingleLine(true)
+            setText(existingName.orEmpty())
+            isEnabled = existingName == null
+        }
+        val commandInput = android.widget.EditText(this).apply {
+            hint = getString(R.string.agent_command_value_hint)
+            setText(existingCommand)
+            typeface = android.graphics.Typeface.MONOSPACE
+            textSize = 13f
+            minLines = 2
+            maxLines = 4
+        }
+        val helper = android.widget.TextView(this).apply {
+            setText(R.string.agent_command_helper)
+            textSize = 12f
+            setTextColor(ContextCompat.getColor(this@MainActivity, R.color.ink_muted))
+            setPadding(0, (8 * dp).toInt(), 0, 0)
+        }
+        if (existingName == null) {
+            container.addView(nameInput)
+        }
+        container.addView(commandInput)
+        container.addView(helper)
+
+        val builder = MaterialAlertDialogBuilder(this)
+            .setTitle(
+                if (existingName == null) getString(R.string.add_agent_command)
+                else getString(R.string.edit_agent_command_title, existingName),
+            )
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val name = (existingName ?: nameInput.text?.toString().orEmpty()).trim()
+                val command = commandInput.text?.toString().orEmpty().trim()
+                if (name.isEmpty() || name.equals("shell", ignoreCase = true) || name.any { it.isWhitespace() }) {
+                    Snackbar.make(binding.root, R.string.agent_command_invalid_name, Snackbar.LENGTH_LONG).show()
+                    return@setPositiveButton
+                }
+                if (command.isEmpty() || '\n' in command || '\r' in command) {
+                    Snackbar.make(binding.root, R.string.agent_command_invalid_value, Snackbar.LENGTH_LONG).show()
+                    return@setPositiveButton
+                }
+                client?.sendControl("t" to "config_set", "name" to name, "command" to command)
+                Snackbar.make(binding.root, getString(R.string.agent_command_saved, name), Snackbar.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(R.string.cancel, null)
+
+        if (existingName != null) {
+            builder.setNeutralButton(R.string.delete_session) { _, _ ->
+                client?.sendControl("t" to "config_remove", "name" to existingName)
+                Snackbar.make(binding.root, getString(R.string.agent_command_removed, existingName), Snackbar.LENGTH_SHORT).show()
+            }
+        }
+        builder.show()
     }
 
     private fun confirmKill(session: SessionInfo) {

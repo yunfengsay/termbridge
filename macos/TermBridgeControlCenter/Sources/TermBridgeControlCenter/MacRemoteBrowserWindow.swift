@@ -7,6 +7,7 @@ final class MacRemoteBrowserWindow: NSWindowController, NSWindowDelegate {
     private static var openWindows: [UUID: MacRemoteBrowserWindow] = [:]
 
     let session: MacRemoteBrowserSession
+    private let findBar = MacFindBarView(frame: .zero)
     var onClose: (() -> Void)?
 
     static func present(profile: ConnectionSettings, url: URL? = nil) {
@@ -40,11 +41,47 @@ final class MacRemoteBrowserWindow: NSWindowController, NSWindowDelegate {
         window.toolbarStyle = .unifiedCompact
         super.init(window: window)
         window.delegate = self
-        window.contentView = NSHostingView(rootView: MacRemoteBrowserView(session: session))
+        let container = NSView()
+        let hosting = NSHostingView(rootView: MacRemoteBrowserView(session: session))
+        hosting.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(hosting)
+        container.addSubview(findBar)
+        NSLayoutConstraint.activate([
+            hosting.topAnchor.constraint(equalTo: container.topAnchor),
+            hosting.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            hosting.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            hosting.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            findBar.topAnchor.constraint(equalTo: container.topAnchor, constant: 48),
+            findBar.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
+        ])
+        findBar.onQueryChange = { [weak self] query, cs in self?.performWebFind(query: query, backwards: false, caseSensitive: cs) }
+        findBar.onFindNext = { [weak self] query, cs in self?.performWebFind(query: query, backwards: false, caseSensitive: cs) }
+        findBar.onFindPrevious = { [weak self] query, cs in self?.performWebFind(query: query, backwards: true, caseSensitive: cs) }
+        findBar.onClose = { [weak self] in
+            guard let self else { return }
+            MacWebViewFind.clear(self.session.web)
+            self.window?.makeFirstResponder(self.session.web)
+        }
+        window.contentView = container
         window.center()
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    @objc func showFindBar(_ sender: Any?) { findBar.present() }
+    @objc func findNextMatch(_ sender: Any?) { if findBar.isHidden { findBar.present() } else { findBar.findNext() } }
+    @objc func findPreviousMatch(_ sender: Any?) { if findBar.isHidden { findBar.present() } else { findBar.findPrevious() } }
+
+    private func performWebFind(query: String, backwards: Bool, caseSensitive: Bool) {
+        if query.isEmpty {
+            MacWebViewFind.clear(session.web)
+            findBar.updateMatchStatus(found: false, hasQuery: false)
+            return
+        }
+        MacWebViewFind.search(session.web, query: query, backwards: backwards, caseSensitive: caseSensitive) { [weak self] found in
+            self?.findBar.updateMatchStatus(found: found, hasQuery: !query.isEmpty)
+        }
+    }
 
     func present() {
         showWindow(nil)

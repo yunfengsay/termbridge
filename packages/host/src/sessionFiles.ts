@@ -31,13 +31,19 @@ export interface CommittedFiles {
 }
 
 export interface SessionFileOptions {
-  /** Permit explicit non-hidden `~/` or absolute paths inside the user's home directory (excluding dotfiles, `Library`, and private files). */
+  /** Permit explicit non-private `~/` or absolute paths inside safe home/artifact locations (still blocking credentials, dotfiles, `Library`, and system paths). */
   allowSafeHomePaths?: boolean;
   /** Overridable home directory for tests. */
   homeDir?: string;
 }
 
 const BLOCKED_HOME_TOP_DIRS = new Set(['library', 'applications']);
+/** Well-known agent artifact directories under `$HOME` whose non-private files may be previewed directly. */
+const SAFE_HOME_DOT_PREFIXES: readonly (readonly string[])[] = [
+  ['.gemini', 'antigravity-cli', 'brain'],
+  ['.meta-canvas'],
+  ['.claude', 'plans'],
+];
 
 /** Explicit file clicks: bounded reads rooted in this session, never arbitrary shell/HTTP. */
 export async function readSessionFile(cwd: string, request: SessionFileRequest,
@@ -176,8 +182,14 @@ function isSafeHomeTarget(homeReal: string, targetReal: string): boolean {
   if (segments.length === 0) return false;
   if (BLOCKED_HOME_TOP_DIRS.has(segments[0]!.toLowerCase())) return false;
   for (const segment of segments) {
-    if (segment.startsWith('.')) return false;
     if (isPrivateName(segment)) return false;
+  }
+  const matchedPrefix = SAFE_HOME_DOT_PREFIXES.find(prefix =>
+    segments.length > prefix.length && prefix.every((part, i) => segments[i] === part),
+  );
+  const checkedSegments = matchedPrefix ? segments.slice(matchedPrefix.length) : segments;
+  for (const segment of checkedSegments) {
+    if (segment.startsWith('.')) return false;
   }
   return true;
 }

@@ -21,6 +21,21 @@ struct TermBridgeControlCenterApp: App {
         .commands {
             NewSessionCommands(model: model)
             CommandGroup(after: .appInfo) { CheckAppUpdateButton(updater: .shared) }
+            CommandGroup(after: .textEditing) {
+                Divider()
+                Button("查找…") {
+                    NSApp.sendAction(#selector(TermBridgeFindResponder.showFindBar(_:)), to: nil, from: nil)
+                }
+                .keyboardShortcut("f", modifiers: .command)
+                Button("查找下一个") {
+                    NSApp.sendAction(#selector(TermBridgeFindResponder.findNextMatch(_:)), to: nil, from: nil)
+                }
+                .keyboardShortcut("g", modifiers: .command)
+                Button("查找上一个") {
+                    NSApp.sendAction(#selector(TermBridgeFindResponder.findPreviousMatch(_:)), to: nil, from: nil)
+                }
+                .keyboardShortcut("g", modifiers: [.command, .shift])
+            }
             // The secondary way back to a session's own terminal. Which view a
             // session opens in belongs in settings; this is here for the case
             // where the conversation cannot be shown and the user needs the

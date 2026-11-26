@@ -3,9 +3,16 @@ import test from 'node:test';
 import { createAgentRegistry, resolveAgent, resolveBrainAgent, type Config } from './config.js';
 
 test('coding agents unset the Brain API key after interactive shell startup', () => {
-  const zsh: Config = { shell: '/bin/zsh', agents: { codex: 'proxy && codex' } };
+  const zsh: Config = {
+    shell: '/bin/zsh',
+    agents: {
+      codex: 'proxy && codex',
+      agy: 'proxy && agy --dangerously-skip-permissions',
+    },
+  };
   assert.equal(resolveAgent(zsh, 'codex')?.args[0], '-lic', 'Load the same login and interactive startup files as a local terminal');
   assert.equal(resolveAgent(zsh, 'codex')?.args[1], 'unset DASHSCOPE_API_KEY; proxy && codex');
+  assert.equal(resolveAgent(zsh, 'agy')?.args[1], 'unset DASHSCOPE_API_KEY; proxy && agy --dangerously-skip-permissions');
 
   const fish: Config = { shell: '/opt/homebrew/bin/fish', agents: { claude: 'claude' } };
   assert.equal(resolveAgent(fish, 'claude')?.args[1], 'set -e DASHSCOPE_API_KEY; claude');

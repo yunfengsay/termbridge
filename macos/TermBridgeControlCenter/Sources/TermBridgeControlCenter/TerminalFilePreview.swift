@@ -322,6 +322,10 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         }
     }
 
+    @objc func showFindBar(_ sender: Any?) { codeView.showFind() }
+    @objc func findNextMatch(_ sender: Any?) { codeView.findNext() }
+    @objc func findPreviousMatch(_ sender: Any?) { codeView.findPrevious() }
+
     func windowWillClose(_ notification: Notification) { disconnect(); clearDetail() }
 
     func windowDidBecomeKey(_ notification: Notification) {

@@ -38,10 +38,17 @@ const DEFAULTS: Config = {
   shell: DEFAULT_SHELL,
   agents: {
     // Edit these to taste (e.g. via `tb set claude "..."`). Values are run as: <shell> -lic "<value>"
+    agy: 'agy',
     claude: 'claude',
     codex: 'codex',
   },
   agentProfiles: {
+    agy: {
+      name: 'Antigravity',
+      runtime: 'custom',
+      purpose: 'Implement, inspect, test, and review software changes.',
+      capabilities: ['coding', 'terminal', 'files'],
+    },
     codex: {
       name: 'Codex',
       runtime: 'codex',

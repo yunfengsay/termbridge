@@ -269,6 +269,9 @@ final class SessionNavigatorController: NSWindowController, NSWindowDelegate, NS
     @objc func showTerminalForSession(_ sender: Any?) { visibleSession?.selectChat(false) }
     @objc func showChatForSession(_ sender: Any?) { visibleSession?.selectChat(true) }
     @objc func showChangesForSession(_ sender: Any?) { visibleSession?.openChanges() }
+    @objc func showFindBar(_ sender: Any?) { visibleSession?.showFindBar() }
+    @objc func findNextMatch(_ sender: Any?) { visibleSession?.findNextMatch() }
+    @objc func findPreviousMatch(_ sender: Any?) { visibleSession?.findPreviousMatch() }
 
     private func choose(_ row: SessionDirectory.Row) {
         focusIntent = NSApp.currentEvent?.type != .keyDown

@@ -369,6 +369,17 @@
     <string name="agent_failed">Agent failed</string>
     <string name="agent_state_detail">%1$s · %2$s</string>
     <string name="shell">Shell</string>
+    <string name="manage_agent_commands">Manage launch commands…</string>
+    <string name="manage_agent_commands_title">Agent launch commands</string>
+    <string name="add_agent_command">Add agent</string>
+    <string name="edit_agent_command_title">Edit %1$s</string>
+    <string name="agent_command_name_hint">Agent name (e.g. agy)</string>
+    <string name="agent_command_value_hint">Command (e.g. proxy &amp;&amp; agy --dangerously-skip-permissions)</string>
+    <string name="agent_command_helper">Runs in your host’s login interactive shell (-lic), so shell functions and aliases such as proxy work automatically.</string>
+    <string name="agent_command_invalid_name">Enter a valid agent name (no spaces, not shell).</string>
+    <string name="agent_command_invalid_value">Enter a single-line command.</string>
+    <string name="agent_command_saved">Saved command for %1$s</string>
+    <string name="agent_command_removed">Removed %1$s</string>
     <string name="connecting">Connecting…</string>
     <string name="authenticating">Authenticating…</string>
     <string name="connected">Connected</string>

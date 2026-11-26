@@ -83,6 +83,10 @@ final class TerminalWindowController: NSWindowController, NSWindowDelegate {
     /// The Git repositories and files this conversation changed.
     @objc func showChangesForSession(_ sender: Any?) { session.openChanges() }
 
+    @objc func showFindBar(_ sender: Any?) { session.showFindBar() }
+    @objc func findNextMatch(_ sender: Any?) { session.findNextMatch() }
+    @objc func findPreviousMatch(_ sender: Any?) { session.findPreviousMatch() }
+
     func selectChat(_ value: Bool) { session.selectChat(value) }
     func openFromNotification(_ route: MacNotificationRoute?) { session.openFromNotification(route) }
     func usesConnection(_ profile: ConnectionSettings?) -> Bool { session.usesConnection(profile) }

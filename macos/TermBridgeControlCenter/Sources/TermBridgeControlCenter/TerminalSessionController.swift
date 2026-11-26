@@ -31,6 +31,7 @@ final class TerminalSessionController: NSObject, @preconcurrency LocalProcessTer
     private var usingCompatibleTerminal = false
     private var supportsHistoryScroll = false
     let terminal = AttachmentTerminalView(frame: NSRect(x: 0, y: 0, width: 960, height: 600))
+    let findBar = MacFindBarView(frame: .zero)
     let attachments: TerminalAttachments
     let attachmentComposer = TerminalAttachmentComposer(frame: .zero)
     private var attachmentUpdateScheduled = false
@@ -249,6 +250,26 @@ final class TerminalSessionController: NSObject, @preconcurrency LocalProcessTer
             connectionStatus.leadingAnchor.constraint(equalTo: terminal.leadingAnchor),
             connectionStatus.trailingAnchor.constraint(equalTo: terminal.trailingAnchor),
         ])
+        view.addSubview(findBar)
+        NSLayoutConstraint.activate([
+            findBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            findBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -14),
+        ])
+        findBar.onQueryChange = { [weak self] query, caseSensitive in
+            self?.performFind(query: query, backwards: false, caseSensitive: caseSensitive, resetFirst: true)
+        }
+        findBar.onFindNext = { [weak self] query, caseSensitive in
+            self?.performFind(query: query, backwards: false, caseSensitive: caseSensitive, resetFirst: false)
+        }
+        findBar.onFindPrevious = { [weak self] query, caseSensitive in
+            self?.performFind(query: query, backwards: true, caseSensitive: caseSensitive, resetFirst: false)
+        }
+        findBar.onClose = { [weak self] in
+            guard let self else { return }
+            self.terminal.clearSearch()
+            if let web = self.chatView?.web { MacWebViewFind.clear(web) }
+            self.focus()
+        }
         if connection != nil && agent.source == "herdr" {
             scrollMonitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
                 // A session off screen has no window and never takes the event.
@@ -275,6 +296,49 @@ final class TerminalSessionController: NSObject, @preconcurrency LocalProcessTer
     func focus() {
         if showingChat { chatView?.focusComposer() }
         else { window?.makeFirstResponder(attachments.items.isEmpty && attachments.draft.isEmpty ? terminal : attachmentComposer.input) }
+    }
+
+    func showFindBar() {
+        findBar.appearance = showingChat ? nil : NSAppearance(named: .darkAqua)
+        let selected = showingChat ? nil : terminal.getSelection()?.trimmingCharacters(in: .newlines)
+        let initial = (selected?.isEmpty == false && (selected?.count ?? 0) <= 120) ? selected : nil
+        findBar.present(initialQuery: initial)
+    }
+
+    func findNextMatch() {
+        if findBar.isHidden { showFindBar() } else { findBar.findNext() }
+    }
+
+    func findPreviousMatch() {
+        if findBar.isHidden { showFindBar() } else { findBar.findPrevious() }
+    }
+
+    private func performFind(query: String, backwards: Bool, caseSensitive: Bool, resetFirst: Bool) {
+        if showingChat, let web = chatView?.web {
+            if query.isEmpty {
+                MacWebViewFind.clear(web)
+                findBar.updateMatchStatus(found: false, hasQuery: false)
+                return
+            }
+            MacWebViewFind.search(web, query: query, backwards: backwards, caseSensitive: caseSensitive) { [weak self] found in
+                self?.findBar.updateMatchStatus(found: found, hasQuery: !query.isEmpty)
+            }
+            return
+        }
+        if resetFirst { terminal.clearSearch() }
+        guard !query.isEmpty else {
+            terminal.clearSearch()
+            findBar.updateCount(index: 0, total: 0)
+            return
+        }
+        let options = SearchOptions(caseSensitive: caseSensitive)
+        if backwards {
+            terminal.findPrevious(query, options: options, scrollToResult: true)
+        } else {
+            terminal.findNext(query, options: options, scrollToResult: true)
+        }
+        let summary = terminal.searchMatchSummary(query, options: options)
+        findBar.updateCount(index: summary.index, total: summary.total)
     }
 
     /// Ends this viewer: its scroll monitor and every connection. The Host keeps
@@ -322,6 +386,7 @@ final class TerminalSessionController: NSObject, @preconcurrency LocalProcessTer
     /// remains a setting; containers expose this as a menu action.
     func selectChat(_ value: Bool) {
         guard chatView != nil else { return }
+        findBar.dismiss()
         showingChat = value
         onSurfaceChange?()
         terminalContainer.isHidden = value; chatView?.isHidden = !value
