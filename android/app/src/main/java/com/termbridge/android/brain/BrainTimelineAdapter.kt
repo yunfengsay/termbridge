@@ -96,23 +96,107 @@ fun buildBrainTimelineItems(
     toolResults: List<BrainToolResultInfo>,
     deliverables: List<BrainDeliverableInfo> = emptyList(),
     executionEvents: List<ExecutionForkEventInfo> = emptyList(),
-): List<BrainTimelineItem> = buildList {
-    messages.forEach { add(BrainTimelineItem.Message(it)) }
-    tasks.forEach { add(BrainTimelineItem.Task(it)) }
-    toolResults.forEach { add(BrainTimelineItem.ToolResult(it)) }
-    deliverables.forEach { add(BrainTimelineItem.Deliverable(it)) }
-    buildBrainExecutionTraces(executionEvents).forEach { add(BrainTimelineItem.Execution(it)) }
-}.sortedWith(
-    compareBy<BrainTimelineItem> { it.sortAt }.thenBy {
-        when (it) {
-            is BrainTimelineItem.Message -> 0
-            is BrainTimelineItem.ToolResult -> 1
-            is BrainTimelineItem.Deliverable -> 2
-            is BrainTimelineItem.Task -> 3
-            is BrainTimelineItem.Execution -> 1
+): List<BrainTimelineItem> {
+    val sorted = buildList {
+        messages.forEach { add(BrainTimelineItem.Message(it)) }
+        tasks.forEach { add(BrainTimelineItem.Task(it)) }
+        toolResults.forEach { add(BrainTimelineItem.ToolResult(it)) }
+        deliverables.forEach { add(BrainTimelineItem.Deliverable(it)) }
+        buildBrainExecutionTraces(executionEvents).forEach { add(BrainTimelineItem.Execution(it)) }
+    }.sortedWith(
+        compareBy<BrainTimelineItem> { it.sortAt }.thenBy {
+            when (it) {
+                is BrainTimelineItem.Message -> 0
+                is BrainTimelineItem.ToolResult -> 1
+                is BrainTimelineItem.Deliverable -> 2
+                is BrainTimelineItem.Task -> 3
+                is BrainTimelineItem.Execution -> 1
+            }
+        },
+    )
+    return coalesceConsecutiveToolResults(sorted)
+}
+
+internal fun coalesceConsecutiveToolResults(items: List<BrainTimelineItem>): List<BrainTimelineItem> {
+    if (items.size <= 1) return items
+    val result = ArrayList<BrainTimelineItem>(items.size)
+    val run = ArrayList<BrainTimelineItem.ToolResult>()
+
+    fun flushRun() {
+        if (run.isEmpty()) return
+        if (run.size == 1) {
+            result.add(run[0])
+        } else {
+            result.add(mergeToolResultRun(run))
         }
-    },
-)
+        run.clear()
+    }
+
+    for (item in items) {
+        if (item is BrainTimelineItem.ToolResult) {
+            run.add(item)
+        } else {
+            flushRun()
+            result.add(item)
+        }
+    }
+    flushRun()
+    return result
+}
+
+private fun mergeToolResultRun(run: List<BrainTimelineItem.ToolResult>): BrainTimelineItem.ToolResult {
+    val first = run.first().value
+    val last = run.last().value
+
+    data class DedupeKey(
+        val sessionId: String,
+        val title: String,
+        val detail: String,
+        val subtitle: String,
+        val status: String,
+    )
+
+    val counts = LinkedHashMap<DedupeKey, Int>()
+    val latestByKey = LinkedHashMap<DedupeKey, VoiceToolViewItemInfo>()
+    for (entry in run) {
+        for (row in entry.value.view.items) {
+            val key = DedupeKey(
+                sessionId = row.sessionId.orEmpty(),
+                title = row.title,
+                detail = row.detail.orEmpty(),
+                subtitle = row.subtitle.orEmpty(),
+                status = row.status.orEmpty(),
+            )
+            counts[key] = (counts[key] ?: 0) + 1
+            // Re-insert so the latest occurrence moves to the end in chronological order.
+            latestByKey.remove(key)
+            latestByKey[key] = row
+        }
+    }
+
+    val mergedItems = latestByKey.map { (key, row) ->
+        val repeat = counts[key] ?: 1
+        if (repeat > 1) row.copy(title = "${row.title} ×$repeat") else row
+    }
+
+    val distinctTitles = run.map { it.value.view.title.trim() }.filter { it.isNotEmpty() }.distinct()
+    val mergedTitle = when {
+        distinctTitles.isEmpty() -> last.view.title
+        distinctTitles.size == 1 -> distinctTitles.first()
+        distinctTitles.size == 2 -> "${distinctTitles[0]} · ${distinctTitles[1]}"
+        else -> "${distinctTitles.last()} 等 ${distinctTitles.size} 项"
+    }
+
+    return BrainTimelineItem.ToolResult(
+        last.copy(
+            id = "${first.id}..${last.id}",
+            view = last.view.copy(
+                title = mergedTitle,
+                items = mergedItems,
+            ),
+        ),
+    )
+}
 
 fun shouldFollowLatestTimelineItem(
     firstRender: Boolean,
@@ -127,6 +211,7 @@ class BrainTimelineAdapter(
     private val openDeliverable: (BrainDeliverableInfo) -> Unit,
     private val markdown: com.termbridge.android.content.ArtifactMarkdown,
 ) : ListAdapter<BrainTimelineItem, RecyclerView.ViewHolder>(Diff) {
+    private val expandedToolCards = hashSetOf<String>()
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is BrainTimelineItem.Message -> TYPE_MESSAGE
         is BrainTimelineItem.Task -> TYPE_TASK
@@ -180,7 +265,8 @@ class BrainTimelineAdapter(
                 when {
                     fromUser -> R.string.brain_you
                     message.voiceStatus == "interrupted" -> R.string.brain_voice_interrupted
-                    message.voiceStatus == "streaming" -> R.string.brain_voice_streaming
+                    message.voiceStatus == "streaming" && message.modality == "voice" -> R.string.brain_voice_streaming
+                    message.voiceStatus == "streaming" -> R.string.brain_text_streaming
                     message.modality == "voice" -> R.string.brain_voice_reply
                     else -> R.string.brain
                 },
@@ -223,7 +309,18 @@ class BrainTimelineAdapter(
     private inner class ToolResultHolder(
         private val view: VoiceToolResultView,
     ) : RecyclerView.ViewHolder(view) {
-        fun bind(result: BrainToolResultInfo) = view.bind(result.view, openToolItem, markdown)
+        fun bind(result: BrainToolResultInfo) {
+            val groupKey = result.id.substringBefore("..")
+            view.bind(
+                view = result.view,
+                openItem = openToolItem,
+                markdown = markdown,
+                expanded = groupKey in expandedToolCards,
+                onToggleExpanded = { expand ->
+                    if (expand) expandedToolCards.add(groupKey) else expandedToolCards.remove(groupKey)
+                },
+            )
+        }
     }
 
     private inner class DeliverableHolder(
@@ -303,7 +400,7 @@ private fun VoiceToolResultView.asTimelineItem(): VoiceToolResultView = apply {
     ).apply {
         marginStart = (16 * density).toInt()
         marginEnd = (16 * density).toInt()
-        topMargin = (4 * density).toInt()
-        bottomMargin = (8 * density).toInt()
+        topMargin = (2 * density).toInt()
+        bottomMargin = (6 * density).toInt()
     }
 }

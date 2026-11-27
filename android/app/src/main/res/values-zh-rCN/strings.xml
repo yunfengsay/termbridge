@@ -512,6 +512,7 @@
     <string name="phone_action_policy_inline_title">逐项审批设置</string>
     <string name="brain_voice_interrupted">语音 · 已中断</string>
     <string name="brain_voice_streaming">语音 · 正在回复</string>
+    <string name="brain_text_streaming">正在回复…</string>
     <string name="voice_mode_continuous">持续对话</string>
     <string name="voice_mode_wake_word">唤醒词</string>
     <string name="voice_wake_standby">本地等待唤醒</string>
@@ -650,5 +651,7 @@
     <string name="content_open_external">用其他应用打开</string>
     <string name="content_open_external_failed">没有找到可打开此文件的应用。</string>
     <string name="content_pdf_pages">共 %2$d 页（已渲染 %1$d 页）</string>
+    <string name="brain_tool_expand_more">展开其余 %1$d 项</string>
+    <string name="brain_tool_collapse">收起</string>
     <string name="content_text_truncated">已显示前 %1$d KB（共 %2$s）</string>
 </resources>

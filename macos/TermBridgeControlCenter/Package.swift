@@ -14,7 +14,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(name: "TermBridgeControlCenter", dependencies: ["SwiftTerm", "Sparkle", "CodeEditTextView"],
-            resources: [.copy("Resources/AgentChat"), .copy("Resources/Desktop"), .copy("Resources/CodeEditor-LICENSES.txt")],
+            resources: [.copy("Resources/AgentChat"), .copy("Resources/Desktop"), .copy("Resources/MarkdownPreview"), .copy("Resources/CodeEditor-LICENSES.txt")],
             linkerSettings: [.unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])]),
         .testTarget(
             name: "TermBridgeControlCenterTests",

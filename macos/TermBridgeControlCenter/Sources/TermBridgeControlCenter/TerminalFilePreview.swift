@@ -45,11 +45,13 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         case change(repository: String, path: String)
     }
 
-    private enum Purpose {
+    private enum Purpose: Hashable {
         case preview
         case before
         case after
         case changedFile
+        case changedMarkdown
+        case asset(String)
     }
 
     @MainActor
@@ -112,7 +114,12 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
     private var previewContent: FilePreviewContent?
     private var previewData: Data?
     private var previewName = ""
+    private var previewResolvedPath = ""
     private var previewLine: Int?
+    private var assetCallbacks: [String: [@MainActor (Result<(Data, String), Error>) -> Void]] = [:]
+    private var assetCache: [String: (data: Data, mimeType: String)] = [:]
+    private var assetCacheBytes = 0
+    private static let maxAssetCacheBytes = 64 * 1024 * 1024
     private var images: [Purpose: (data: Data?, note: String?)] = [:]
     private var expectedImages: Set<Purpose> = []
     private var changeFile: ReviewFileInfo?
@@ -135,6 +142,7 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
     private let progress = NSProgressIndicator()
     private let content = NSView()
     let codeView = CodeTextView(frame: .zero)
+    let markdownView = MarkdownPreviewView(frame: .zero)
     let imageView = ImageComparisonView(frame: .zero)
     private let preview = QLPreviewView(frame: .zero, style: .normal)!
     private let message = NSTextField(wrappingLabelWithString: "")
@@ -225,9 +233,9 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         detailControl.isHidden = true
         detailControl.setAccessibilityLabel("显示方式")
         let spacer = NSView(); spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        findButton.target = codeView; findButton.action = #selector(CodeTextView.showFind)
-        findButton.image = NSImage(systemSymbolName: "magnifyingglass", accessibilityDescription: "查找代码")
-        findButton.bezelStyle = .texturedRounded; findButton.toolTip = "查找代码 · ⌘F"
+        findButton.target = self; findButton.action = #selector(showFindBar(_:))
+        findButton.image = NSImage(systemSymbolName: "magnifyingglass", accessibilityDescription: "查找")
+        findButton.bezelStyle = .texturedRounded; findButton.toolTip = "查找 · ⌘F"
         let heading = NSStackView(views: [toggle, refresh, label, spacer, findButton, detailControl]); heading.spacing = 12
         // The heading keeps its own height; the content below takes all the rest,
         // whatever size a preview or picture would like to be.
@@ -239,7 +247,7 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         message.alignment = .center
         message.textColor = .secondaryLabelColor
         message.font = .systemFont(ofSize: 13)
-        for view in [codeView, imageView, preview, message] as [NSView] {
+        for view in [codeView, markdownView, imageView, preview, message] as [NSView] {
             view.translatesAutoresizingMaskIntoConstraints = false
             for axis in [NSLayoutConstraint.Orientation.horizontal, .vertical] {
                 view.setContentHuggingPriority(.defaultLow, for: axis)
@@ -261,6 +269,10 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
             }
         }
         codeView.onLink = { [weak self] url in self?.openLink(url) }
+        markdownView.onLoadAsset = { [weak self] path, completion in
+            self?.loadMarkdownAsset(path: path, completion: completion)
+        }
+        markdownView.onLink = { [weak self] raw in self?.openMarkdownLink(raw) }
         for view in [heading, progress, content] { view.translatesAutoresizingMaskIntoConstraints = false; detailController.view.addSubview(view) }
         NSLayoutConstraint.activate([
             heading.leadingAnchor.constraint(equalTo: detailController.view.leadingAnchor, constant: 12),
@@ -322,9 +334,18 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         }
     }
 
-    @objc func showFindBar(_ sender: Any?) { codeView.showFind() }
-    @objc func findNextMatch(_ sender: Any?) { codeView.findNext() }
-    @objc func findPreviousMatch(_ sender: Any?) { codeView.findPrevious() }
+    @objc func showFindBar(_ sender: Any?) {
+        if !markdownView.isHidden { markdownView.showFind() }
+        else if !codeView.isHidden { codeView.showFind() }
+    }
+    @objc func findNextMatch(_ sender: Any?) {
+        if !markdownView.isHidden { markdownView.findNext() }
+        else if !codeView.isHidden { codeView.findNext() }
+    }
+    @objc func findPreviousMatch(_ sender: Any?) {
+        if !markdownView.isHidden { markdownView.findPrevious() }
+        else if !codeView.isHidden { codeView.findPrevious() }
+    }
 
     func windowWillClose(_ notification: Notification) { disconnect(); clearDetail() }
 
@@ -342,6 +363,7 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         snapshotRequests.removeAll()
         snapshotTimeouts.values.forEach { $0.cancel() }; snapshotTimeouts.removeAll()
         downloads.values.forEach { $0.timeout?.cancel() }; downloads.removeAll()
+        failAllAssets(MarkdownAssetError.cancelled)
     }
 
     // MARK: - Modes
@@ -455,7 +477,10 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         }
         preview.previewItem = nil
         if let previewDirectory { try? FileManager.default.removeItem(at: previewDirectory) }
-        previewDirectory = nil; previewContent = nil; previewData = nil
+        previewDirectory = nil; previewContent = nil; previewData = nil; previewResolvedPath = ""
+        failAllAssets(MarkdownAssetError.cancelled)
+        assetCache.removeAll(); assetCacheBytes = 0
+        markdownView.clear()
         images = [:]; expectedImages = []; changeFile = nil
         detailModes = []; detailControl.isHidden = true
         stopProgress()
@@ -467,8 +492,8 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
     }
 
     private func show(_ view: NSView) {
-        for candidate in [codeView, imageView, preview, message] as [NSView] { candidate.isHidden = candidate !== view }
-        findButton.isHidden = view !== codeView
+        for candidate in [codeView, markdownView, imageView, preview, message] as [NSView] { candidate.isHidden = candidate !== view }
+        findButton.isHidden = view !== codeView && view !== markdownView
     }
 
     private func startProgress(indeterminate: Bool) {
@@ -503,7 +528,11 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         case .change(let repository, let path):
             if choice == "差异", let file = changeFile {
                 codeView.show(DiffDocument.file(file, touched: changeTouched)); show(codeView)
-            } else if choice == "文件" {
+            } else if choice == "预览" {
+                let deleted = changeFile?.status == "deleted"
+                startProgress(indeterminate: true)
+                startDownload(path: absolute(path, in: repository), revision: deleted ? ReviewProtocol.headRevision : nil, purpose: .changedMarkdown)
+            } else if choice == "文件" || choice == "源码" {
                 // The whole current file, or the committed one for a deletion.
                 let deleted = changeFile?.status == "deleted"
                 startProgress(indeterminate: true)
@@ -517,6 +546,9 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
 
     private func render(_ content: FilePreviewContent, data: Data, mode: FilePreviewContent.Mode) {
         switch mode {
+        case .markdown:
+            markdownView.show(markdown: content.text ?? "", path: previewResolvedPath)
+            show(markdownView)
         case .code:
             let (document, truncated) = CodeDocument.source(content.text ?? "", language: content.language,
                                                             focusLine: previewLine.map { max(0, $0 - 1) })
@@ -554,12 +586,22 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         previewContent = content
         previewData = download.data
         previewName = download.name
-        var title = download.resolvedPath ?? download.path
-        if let language = content.language, content.modes.first == .code { title += " · \(language.title)" }
-        else if content.modes.first == .hex { title += " · 二进制文件，显示原始字节" }
+        previewResolvedPath = download.resolvedPath ?? download.path
+        var title = previewResolvedPath
+        if let language = content.language, content.modes.first == .code || content.modes.first == .markdown {
+            title += " · \(language.title)"
+        } else if content.modes.first == .hex {
+            title += " · 二进制文件，显示原始字节"
+        }
         label.stringValue = title
-        setDetailModes(content.modes.map(\.title), selected: 0)
-        render(content, data: download.data, mode: content.modes[0])
+        let initialIndex: Int
+        if previewLine != nil, let codeIndex = content.modes.firstIndex(of: .code) {
+            initialIndex = codeIndex
+        } else {
+            initialIndex = 0
+        }
+        setDetailModes(content.modes.map(\.title), selected: initialIndex)
+        render(content, data: download.data, mode: content.modes[initialIndex])
         if let path = download.resolvedPath, let rootPath = download.rootPath { reveal(path, rootPath: rootPath) }
     }
 
@@ -693,7 +735,7 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
             download.resolvedPath = chunk.path; download.rootPath = chunk.rootPath
         }
         download.data.append(chunk.data)
-        if download.purpose == .preview || download.purpose == .changedFile {
+        if download.purpose == .preview || download.purpose == .changedFile || download.purpose == .changedMarkdown {
             progress.isIndeterminate = false; progress.maxValue = Double(max(1, chunk.size)); progress.doubleValue = Double(download.data.count)
             if download.purpose == .preview {
                 label.stringValue = "正在读取 \(chunk.name) · \(download.data.count / 1024) / \(chunk.size / 1024) KB"
@@ -702,7 +744,10 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         guard chunk.eof else { requestChunk(download); return }
         download.timeout?.cancel()
         downloads.removeValue(forKey: id)
-        guard download.generation == generation else { return }
+        guard download.generation == generation else {
+            if case .asset(let path) = download.purpose { resolveAsset(path, result: .failure(MarkdownAssetError.cancelled)) }
+            return
+        }
         switch download.purpose {
         case .preview: finishPreview(download)
         case .before, .after:
@@ -719,18 +764,81 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
                     attributes: [.font: CodeDocument.font, .foregroundColor: NSColor.labelColor]), gutter: []))
             }
             show(codeView)
+        case .changedMarkdown:
+            stopProgress()
+            previewResolvedPath = download.resolvedPath ?? download.path
+            if let text = FileText.decode(download.data) {
+                markdownView.show(markdown: text, path: previewResolvedPath)
+                show(markdownView)
+            } else {
+                codeView.show(CodeDocument(text: NSAttributedString(string: FilePreviewContent.hexDump(download.data),
+                    attributes: [.font: CodeDocument.font, .foregroundColor: NSColor.labelColor]), gutter: []))
+                show(codeView)
+            }
+        case .asset(let path):
+            guard let mimeType = MarkdownPreviewView.imageMimeType(for: download.data, path: download.resolvedPath ?? path) else {
+                resolveAsset(path, result: .failure(MarkdownAssetError.notImage))
+                return
+            }
+            if assetCacheBytes + download.data.count <= Self.maxAssetCacheBytes {
+                assetCache[path] = (download.data, mimeType)
+                assetCacheBytes += download.data.count
+            }
+            resolveAsset(path, result: .success((download.data, mimeType)))
         }
     }
 
     private func downloadFailed(_ download: Download, _ text: String) {
         download.timeout?.cancel()
         downloads.removeValue(forKey: download.id)
+        if case .asset(let path) = download.purpose {
+            resolveAsset(path, result: .failure(MarkdownAssetError.failed(text)))
+            return
+        }
         guard download.generation == generation else { return }
         switch download.purpose {
-        case .preview, .changedFile: fail(text)
+        case .preview, .changedFile, .changedMarkdown: fail(text)
         case .before, .after:
             images[download.purpose] = (nil, text)
             showImagesIfReady()
+        case .asset: break
+        }
+    }
+
+    private func loadMarkdownAsset(path: String, completion: @escaping @MainActor (Result<(Data, String), Error>) -> Void) {
+        if let cached = assetCache[path] {
+            completion(.success((cached.data, cached.mimeType)))
+            return
+        }
+        guard ready, client != nil else {
+            completion(.failure(MarkdownAssetError.unavailable))
+            return
+        }
+        if assetCallbacks[path] != nil {
+            assetCallbacks[path]?.append(completion)
+            return
+        }
+        assetCallbacks[path] = [completion]
+        startDownload(path: path, revision: nil, purpose: .asset(path))
+    }
+
+    private func resolveAsset(_ path: String, result: Result<(Data, String), Error>) {
+        guard let callbacks = assetCallbacks.removeValue(forKey: path) else { return }
+        for callback in callbacks { callback(result) }
+    }
+
+    private func failAllAssets(_ error: Error) {
+        let pending = assetCallbacks
+        assetCallbacks.removeAll()
+        for callbacks in pending.values {
+            for callback in callbacks { callback(.failure(error)) }
+        }
+    }
+
+    private var hasForegroundDownloads: Bool {
+        downloads.values.contains {
+            if case .asset = $0.purpose { return false }
+            return true
         }
     }
 
@@ -917,7 +1025,8 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
             changeFile = file
             changeTouched = repositories.first { $0.repositoryPath == repository }?.touched.contains(path) ?? false
             label.stringValue = "\(DiffDocument.statusTitle(file.status)) · \(file.oldPath.map { "\($0) → " } ?? "")\(file.path)"
-            setDetailModes(file.isPrivate ? [] : ["差异", "文件"], selected: 0)
+            let modes: [String] = file.isPrivate ? [] : (FilePreviewContent.isMarkdown(file.path) ? ["差异", "预览", "源码"] : ["差异", "文件"])
+            setDetailModes(modes, selected: 0)
             codeView.show(DiffDocument.file(file, touched: changeTouched))
             show(codeView)
         case .legacyList: break
@@ -975,6 +1084,23 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         if row >= 0 { changesOutline.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false); changesOutline.scrollRowToVisible(row) }
     }
 
+    private func openMarkdownLink(_ raw: String) {
+        if let link = TerminalFileLink.parse(raw) {
+            switch link {
+            case .web(let url):
+                NSWorkspace.shared.open(url)
+            case .file(let target, let line):
+                guard let resolved = MarkdownPreviewView.resolveAssetPath(target, relativeTo: previewResolvedPath) else { return }
+                setMode(.files)
+                select(.file(path: resolved, line: line))
+            }
+            return
+        }
+        if raw.lowercased().hasPrefix("mailto:"), let url = URL(string: raw) {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
     // MARK: - Connection
 
     func clientIsReady(_ client: TermbridgeClient) {
@@ -990,7 +1116,7 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
         guard client === self.client else { return }
         switch state {
         case .failed, .disconnected:
-            let busy = !downloads.isEmpty || !snapshotRequests.isEmpty
+            let busy = hasForegroundDownloads || !snapshotRequests.isEmpty
             disconnect(); treeStatus.stringValue = "Host 已断开，请重新打开。"
             if busy { fail("无法连接 Host，请检查连接后重新打开。") }
         default: break
@@ -1000,7 +1126,7 @@ final class TerminalFilePreview: NSWindowController, NSWindowDelegate, NSOutline
     func client(_ client: TermbridgeClient, receivedControl message: ControlMessage) {
         guard client === self.client else { return }
         if message.type == "error" {
-            if !downloads.isEmpty { fail("Host 暂不支持文件预览，请更新 Host 后重试。") }
+            if hasForegroundDownloads { fail("Host 暂不支持文件预览，请更新 Host 后重试。") }
             return
         }
         guard message.string("sessionId") == sessionID else { return }

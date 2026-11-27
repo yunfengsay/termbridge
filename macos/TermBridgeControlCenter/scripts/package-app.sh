@@ -31,8 +31,12 @@ if [[ "${TB_MACOS_SKIP_SHARED_UI:-0}" != 1 ]]; then
   ( cd "$project_dir/../.." && pnpm -s build:agent-chat-ui \
       "macos/TermBridgeControlCenter/Sources/TermBridgeControlCenter/Resources/AgentChat" ) \
     || { print -u2 'Failed to build the shared Agent Chat surface'; exit 2; }
+  ( cd "$project_dir/../.." && pnpm -s build:markdown-preview \
+      "macos/TermBridgeControlCenter/Sources/TermBridgeControlCenter/Resources/MarkdownPreview" ) \
+    || { print -u2 'Failed to build the Tiptap Markdown preview surface'; exit 2; }
 fi
 shared_ui_dir="$project_dir/Sources/TermBridgeControlCenter/Resources/AgentChat"
+markdown_ui_dir="$project_dir/Sources/TermBridgeControlCenter/Resources/MarkdownPreview"
 # Regenerate the desktop viewer from the same source used by Android and iOS.
 node "$project_dir/../../packages/desktop-ui/scripts/build.mjs" "$project_dir/Sources/TermBridgeControlCenter/Resources/Desktop"
 desktop_ui_dir="$project_dir/Sources/TermBridgeControlCenter/Resources/Desktop"
@@ -44,6 +48,12 @@ for file in chat.js THIRD_PARTY_LICENSES.md; do
   [[ -f "$shared_ui_dir/$file" ]] || { print -u2 "Missing generated $file"; exit 2; }
   shared_ui_shas[$file]=$(/usr/bin/shasum -a 256 "$shared_ui_dir/$file" | cut -d' ' -f1)
   print "[package-app] shared $file ${shared_ui_shas[$file]}"
+done
+typeset -A markdown_ui_shas
+for file in markdown.js markdown.css THIRD_PARTY_LICENSES.md; do
+  [[ -f "$markdown_ui_dir/$file" ]] || { print -u2 "Missing generated MarkdownPreview/$file"; exit 2; }
+  markdown_ui_shas[$file]=$(/usr/bin/shasum -a 256 "$markdown_ui_dir/$file" | cut -d' ' -f1)
+  print "[package-app] markdown $file ${markdown_ui_shas[$file]}"
 done
 
 runtime_dir="${TB_MACOS_RUNTIME_DIR:-$project_dir/build/Runtime}"
@@ -76,6 +86,14 @@ for file in ${(k)shared_ui_shas}; do
   bundled_ui_sha=$(/usr/bin/shasum -a 256 "$packaged" | cut -d' ' -f1)
   [[ "$bundled_ui_sha" == "${shared_ui_shas[$file]}" ]] || {
     print -u2 "Packaged $file $bundled_ui_sha does not match the generated ${shared_ui_shas[$file]}"; exit 2
+  }
+done
+for file in ${(k)markdown_ui_shas}; do
+  packaged="$contents_dir/Resources/TermBridgeControlCenter_TermBridgeControlCenter.bundle/MarkdownPreview/$file"
+  [[ -f "$packaged" ]] || { print -u2 "Packaged app is missing MarkdownPreview/$file"; exit 2; }
+  bundled_md_sha=$(/usr/bin/shasum -a 256 "$packaged" | cut -d' ' -f1)
+  [[ "$bundled_md_sha" == "${markdown_ui_shas[$file]}" ]] || {
+    print -u2 "Packaged MarkdownPreview/$file $bundled_md_sha does not match the generated ${markdown_ui_shas[$file]}"; exit 2
   }
 done
 mkdir -p "$contents_dir/Frameworks"

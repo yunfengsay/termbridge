@@ -3,10 +3,12 @@ package com.termbridge.android.brain
 import android.content.Context
 import android.text.format.DateUtils
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.termbridge.android.R
@@ -23,18 +25,64 @@ class VoiceToolResultView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs) {
     private val binding = ItemVoiceToolResultBinding.inflate(LayoutInflater.from(context), this, true)
 
-    fun bind(view: VoiceToolViewInfo, openItem: (VoiceToolViewItemInfo) -> Unit,
-        markdown: com.termbridge.android.content.ArtifactMarkdown? = null) = with(binding) {
+    fun bind(
+        view: VoiceToolViewInfo,
+        openItem: (VoiceToolViewItemInfo) -> Unit,
+        markdown: com.termbridge.android.content.ArtifactMarkdown? = null,
+        expanded: Boolean = false,
+        onToggleExpanded: ((Boolean) -> Unit)? = null,
+    ) = with(binding) {
         title.text = view.title
         count.text = view.items.size.toString()
+        renderRows(view, openItem, markdown, expanded, onToggleExpanded)
+        isVisible = view.items.isNotEmpty()
+    }
+
+    private fun renderRows(
+        view: VoiceToolViewInfo,
+        openItem: (VoiceToolViewItemInfo) -> Unit,
+        markdown: com.termbridge.android.content.ArtifactMarkdown?,
+        expanded: Boolean,
+        onToggleExpanded: ((Boolean) -> Unit)?,
+    ): Unit = with(binding) {
         rows.removeAllViews()
-        view.items.forEachIndexed { index, item ->
+        val collapsible = view.items.size > MAX_COLLAPSED_ROWS
+        val visibleItems = if (collapsible && !expanded) {
+            view.items.takeLast(MAX_COLLAPSED_ROWS)
+        } else {
+            view.items
+        }
+        val hiddenCount = view.items.size - visibleItems.size
+        visibleItems.forEachIndexed { index, item ->
             val row = ItemVoiceToolRowBinding.inflate(LayoutInflater.from(context), rows, false)
             row.bind(item, openItem, markdown)
             rows.addView(row.root)
-            if (index < view.items.lastIndex) rows.addView(divider())
+            if (index < visibleItems.lastIndex || collapsible) rows.addView(divider())
         }
-        isVisible = view.items.isNotEmpty()
+        if (collapsible) {
+            val toggle = TextView(context).apply {
+                text = if (expanded) {
+                    context.getString(R.string.brain_tool_collapse)
+                } else {
+                    context.getString(R.string.brain_tool_expand_more, hiddenCount)
+                }
+                textSize = 11f
+                setTextColor(ContextCompat.getColor(context, R.color.ink_muted))
+                gravity = Gravity.CENTER
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    context.dp(30),
+                )
+                isClickable = true
+                isFocusable = true
+                setOnClickListener {
+                    val nextExpanded = !expanded
+                    onToggleExpanded?.invoke(nextExpanded)
+                    renderRows(view, openItem, markdown, nextExpanded, onToggleExpanded)
+                }
+            }
+            rows.addView(toggle)
+        }
     }
 
     fun clear() {
@@ -51,6 +99,10 @@ class VoiceToolResultView @JvmOverloads constructor(
             marginStart = context.dp(10)
             marginEnd = context.dp(10)
         }
+    }
+
+    companion object {
+        const val MAX_COLLAPSED_ROWS = 3
     }
 }
 

@@ -873,6 +873,13 @@ export const ControlMessageSchema = z.discriminatedUnion('t', [
   z.object({ t: z.literal('brain_text_result'), requestId: z.string(),
     status: z.enum(['completed', 'failed', 'cancelled']), text: z.string().max(2000) }),
   z.object({
+    t: z.literal('brain_text_delta'),
+    requestId: z.string().min(1).max(128),
+    delta: z.string().max(16_000),
+    text: z.string().max(16_000),
+    final: z.boolean().optional(),
+  }),
+  z.object({
     t: z.literal('brain_execution_event'),
     event: ExecutionForkEventSchema,
   }),

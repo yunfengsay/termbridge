@@ -6,9 +6,10 @@ import UniformTypeIdentifiers
 /// go to Quick Look, and anything else shows its raw bytes.
 struct FilePreviewContent: Equatable {
     enum Mode: Equatable {
-        case code, quickLook, hex
+        case markdown, code, quickLook, hex
         var title: String {
             switch self {
+            case .markdown: return "预览"
             case .code: return "源码"
             case .quickLook: return "预览"
             case .hex: return "十六进制"
@@ -34,6 +35,9 @@ struct FilePreviewContent: Equatable {
             return FilePreviewContent(modes: text == nil ? [.quickLook] : [.quickLook, .code], text: text, language: language)
         }
         if let text {
+            if isMarkdown(name) {
+                return FilePreviewContent(modes: [.markdown, .code], text: text, language: language ?? .markdown)
+            }
             // Text is never media: `.ts` is TypeScript far more often than an MPEG stream.
             // Web pages and rich text are source first; Quick Look renders them without fetching anything.
             let modes: [Mode] = ["html", "htm", "xhtml", "rtf"].contains(ext) ? [.code, .quickLook] : [.code]
@@ -58,6 +62,11 @@ struct FilePreviewContent: Equatable {
         let ext = (name as NSString).pathExtension.lowercased()
         guard !ext.isEmpty, let type = UTType(filenameExtension: ext) else { return false }
         return type.conforms(to: .image)
+    }
+
+    static func isMarkdown(_ name: String) -> Bool {
+        let ext = (name as NSString).pathExtension.lowercased()
+        return ["md", "markdown", "mdown", "mkd", "mdx"].contains(ext)
     }
 
     private static func isDocument(_ ext: String) -> Bool {

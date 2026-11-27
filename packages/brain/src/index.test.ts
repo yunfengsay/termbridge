@@ -14,17 +14,19 @@ test('system reminders persist and archive independently of visible chat message
   brain.clearAllConversations();
   assert.equal(brain.getHistory().length, 0);
 });
+import { mkdtempSync, readFileSync, rmSync, existsSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createFauxCore, fauxAssistantMessage, fauxText, fauxToolCall } from '@earendil-works/pi-ai';
 import type { BrainToolCall, ExecutionForkEvent } from './executionFork.js';
 import { ControlMessageSchema } from '@termbridge/protocol';
 import {
   BailianBrainConversationService,
-  BailianBrainPlanningService,
   BrainCoordinator,
   createBrainConversationService,
-  createBrainPlanningService,
   DefaultBrainPlanner,
-  LocalBrainPlanningService,
+  inferThinkingFormat,
+  JsonBrainStore,
   MemoryBrainStore,
   PiBailianBrainConversationService,
   parseDeclaredDeliverables,
@@ -400,148 +402,151 @@ test('coordinator stores a model acknowledgement and fails interrupted runs afte
   assert.match(restarted.getSnapshot().messages.at(-1)?.text ?? '', /interrupted/);
 });
 
-test('Bailian planner sends bounded context and validates its structured route', async () => {
-  let requestBody: Record<string, unknown> | undefined;
-  const planner = new BailianBrainPlanningService({
-    apiKey: 'test-key',
-    model: 'test-model',
-    request: async (_url, init) => {
-      requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
-      return new Response(
-        JSON.stringify({
-          choices: [{ message: { content: '{"agent":"codex","targetSessionId":"herdr:wA:p1","instruction":"Keep TOKEN_42 intact","reply":"I will route this to herdr:wA:p1."}' } }],
-        }),
-      );
-    },
+test('Pi executes read-only tools concurrently while serializing batches with mutations', async () => {
+  const faux = createFauxCore({
+    api: 'openai-completions',
+    provider: 'bailian',
+    models: [{ id: 'deepseek-v4.1-flash' }],
   });
-  const plan = await planner.plan({
-    text: 'Keep TOKEN_42 intact',
-    requestedAgent: 'codex',
-    availableAgents: ['shell', 'codex'],
-    snapshot: { messages: [], tasks: [] },
-    agentContexts: [
-      {
-        sessionId: 'herdr:wA:p1', source: 'herdr', name: 'TermBridge', workspace: 'termbridge',
-        agent: 'codex', command: 'termbridge · codex', status: 'idle',
-        preview: 'Working on the Android Brain', context: 'FULL_CONTEXT_ALPHA', lastSeenAt: 100,
-      },
-      {
-        sessionId: 'herdr:w7:p2', source: 'herdr', workspace: 'my-small-phone',
-        agent: 'voice_ux_refactor', command: 'my-small-phone · voice_ux_refactor', status: 'done',
-        preview: 'Finished voice playback', context: 'FULL_CONTEXT_BETA', lastSeenAt: 90,
-      },
+  faux.setResponses([
+    fauxAssistantMessage([
+      fauxToolCall('read_a', {}, { id: 'r-1' }),
+      fauxToolCall('read_b', {}, { id: 'r-2' }),
+    ], { stopReason: 'toolUse' }),
+    fauxAssistantMessage([
+      fauxToolCall('read_a', {}, { id: 'r-3' }),
+      fauxToolCall('write_c', {}, { id: 'w-1' }),
+    ], { stopReason: 'toolUse' }),
+    fauxAssistantMessage([fauxText('完成')]),
+  ]);
+
+  let inFlight = 0;
+  let maxConcurrentReadOnly = 0;
+  let maxConcurrentWithWrite = 0;
+  let round = 1;
+  const service = new PiBailianBrainConversationService({
+    apiKey: 'test-key',
+    streamFn: faux.streamSimple,
+  });
+
+  const result = await service.respond({
+    instructions: 'Parallel read-only test',
+    messages: [{ role: 'user', content: 'run tools' }],
+    tools: [
+      { name: 'read_a', description: 'Read A', parameters: { type: 'object', properties: {} }, readOnly: true },
+      { name: 'read_b', description: 'Read B', parameters: { type: 'object', properties: {} }, readOnly: true },
+      { name: 'write_c', description: 'Write C', parameters: { type: 'object', properties: {} }, readOnly: false },
     ],
-    sourceSession: {
-      sessionId: 'herdr:wA:p1', source: 'herdr', name: 'TermBridge', workspace: 'termbridge',
-      agent: 'codex', command: 'termbridge · codex', status: 'idle',
-      preview: 'Working on the Android Brain', context: 'FULL_CONTEXT_ALPHA', lastSeenAt: 100,
+    onToolCall: async (call) => {
+      if (call.callId === 'r-3') round = 2;
+      inFlight += 1;
+      if (round === 1) maxConcurrentReadOnly = Math.max(maxConcurrentReadOnly, inFlight);
+      else maxConcurrentWithWrite = Math.max(maxConcurrentWithWrite, inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 25));
+      inFlight -= 1;
+      return '{"ok":true}';
     },
   });
 
-  assert.equal(plan.provider, 'bailian');
-  assert.equal(plan.agent, 'codex');
-  assert.equal(plan.targetSessionId, 'herdr:wA:p1');
-  assert.doesNotMatch(plan.reply, /herdr:wA:p1/);
-  assert.match(plan.reply, /TermBridge/);
-  assert.match(plan.instruction, /TOKEN_42/);
-  assert.equal(requestBody?.model, 'test-model');
-  const userContext = ((requestBody?.messages as Array<{ role: string; content: string }>)[1]?.content) ?? '';
-  assert.match(userContext, /herdr:wA:p1/);
-  assert.match(userContext, /FULL_CONTEXT_ALPHA/);
-  assert.match(userContext, /herdr:w7:p2/);
-  assert.match(userContext, /FULL_CONTEXT_BETA/);
-  const structuredContext = JSON.parse(userContext) as {
-    currentRequest?: string;
-    sourceSession?: { sessionId?: string; name?: string; context?: string };
-  };
-  assert.equal(structuredContext.currentRequest, 'Keep TOKEN_42 intact');
-  assert.equal(structuredContext.sourceSession?.sessionId, 'herdr:wA:p1');
-  assert.equal(structuredContext.sourceSession?.name, 'TermBridge');
-  assert.equal(structuredContext.sourceSession?.context, undefined);
+  assert.equal(result.text, '完成');
+  assert.equal(maxConcurrentReadOnly, 2, 'read-only batch should run concurrently');
+  assert.equal(maxConcurrentWithWrite, 1, 'batch containing mutating tool must run sequentially');
 });
 
-test('Bailian planner rejects a target session id that is not in the current roster', async () => {
-  const planner = new BailianBrainPlanningService({
+test('Pi streams incremental text deltas and keeps fork_completed strictly after async model_completed observers', async () => {
+  const faux = createFauxCore({
+    api: 'openai-completions',
+    provider: 'bailian',
+    models: [{ id: 'deepseek-v4.1-flash' }],
+  });
+  faux.setResponses([fauxAssistantMessage([fauxText('第一段，第二段。')])]);
+  const deltas: string[] = [];
+  const fullSnapshots: string[] = [];
+  const phases: string[] = [];
+  const service = new PiBailianBrainConversationService({
     apiKey: 'test-key',
-    request: async () => new Response(JSON.stringify({
-      choices: [{ message: { content: '{"agent":"codex","targetSessionId":"herdr:missing","instruction":"Do it","reply":"Routing."}' } }],
-    })),
+    streamFn: faux.streamSimple,
   });
 
-  await assert.rejects(
-    planner.plan({
-      text: 'Do it',
-      availableAgents: ['codex'],
-      snapshot: { messages: [], tasks: [] },
-      agentContexts: [{
-        sessionId: 'herdr:wA:p1', source: 'herdr', workspace: 'termbridge', agent: 'codex',
-        command: 'termbridge · codex', status: 'idle', lastSeenAt: 100,
-      }],
-    }),
-    /selected unavailable target session/,
-  );
-});
-
-test('Bailian planner receives the authoritative newest direct-message target', async () => {
-  let requestBody: Record<string, unknown> | undefined;
-  const planner = new BailianBrainPlanningService({
-    apiKey: 'test-key',
-    request: async (_url, init) => {
-      requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
-      return new Response(JSON.stringify({
-        choices: [{ message: { content: '{"agent":"codex","targetSessionId":"herdr:wA:p3","instruction":"Guess from an old task","reply":"The latest target was herdr:wA:p3."}' } }],
-      }));
+  const result = await service.respond({
+    instructions: 'Stream test',
+    messages: [
+      { role: 'user', content: '查一下状态' },
+      { role: 'assistant', content: '查到了', toolSummary: 'inspect_workspace: 2 agents (herdr:w1:p1)' },
+      { role: 'user', content: '详细说说' },
+    ],
+    tools: [],
+    onToolCall: async () => '{}',
+    onTextDelta: (delta, full) => {
+      deltas.push(delta);
+      fullSnapshots.push(full);
+    },
+    execution: {
+      forkId: 'fork-stream',
+      requestId: 'req-stream',
+      observer: {
+        onEvent: async (event) => {
+          if (event.phase === 'model_completed') await new Promise((resolve) => setTimeout(resolve, 15));
+          phases.push(event.phase);
+        },
+      },
     },
   });
 
-  await planner.plan({
-    text: 'Which Agent did I message most recently?',
-    availableAgents: ['codex'],
-    snapshot: { messages: [], tasks: [] },
-    agentContexts: [{
-      sessionId: 'herdr:wA:p1', source: 'herdr', workspace: 'termbridge', agent: 'codex',
-      command: 'termbridge · codex', status: 'idle', lastSeenAt: 3_100,
-    }, {
-      sessionId: 'herdr:wA:p3', source: 'herdr', workspace: 'termbridge', agent: 'ios_termbridge',
-      command: 'termbridge · ios_termbridge', status: 'working', lastSeenAt: 3_200,
-    }],
-    recentUserMessages: [
-      {
-        sessionId: 'herdr:wA:p1', source: 'herdr', workspace: 'termbridge', agent: 'codex',
-        command: 'termbridge · codex', text: 'ROUTE_CONTEXT_PROBE', clientPlatform: 'android', sentAt: 3_000,
-      },
-      {
-        sessionId: 'herdr:wA:p3', source: 'herdr', workspace: 'termbridge', agent: 'ios_termbridge',
-        command: 'termbridge · ios_termbridge', text: 'NATIVE_DISPATCH_OK', clientPlatform: 'android', sentAt: 2_000,
-      },
-    ],
-  });
+  assert.equal(result.text, '第一段，第二段。');
+  assert.equal(deltas.join(''), '第一段，第二段。');
+  assert.equal(fullSnapshots.at(-1), '第一段，第二段。');
+  assert.deepEqual(phases, ['fork_started', 'model_started', 'model_completed', 'fork_completed']);
+  assert.equal(inferThinkingFormat('deepseek-v4.1-flash'), 'deepseek');
+  assert.equal(inferThinkingFormat('qwen3.8-max'), 'qwen');
+  assert.equal(inferThinkingFormat('gpt-4.1'), 'openai');
+});
 
-  const messages = requestBody?.messages as Array<{ role: string; content: string }>;
-  assert.match(messages[0]?.content ?? '', /sole authority/);
-  const context = JSON.parse(messages[1]?.content ?? '{}') as { recentUserMessages?: Array<{ sessionId: string; sentAt: number }> };
-  assert.deepEqual(context.recentUserMessages?.map((event) => event.sessionId), ['herdr:wA:p1', 'herdr:wA:p3']);
-  const plan = await planner.plan({
-    text: 'Which Agent did I message most recently?',
-    availableAgents: ['codex'],
-    snapshot: { messages: [], tasks: [] },
-    agentContexts: [{
-      sessionId: 'herdr:wA:p1', source: 'herdr', workspace: 'termbridge', agent: 'codex',
-      command: 'termbridge · codex', status: 'idle', lastSeenAt: 3_100,
-    }, {
-      sessionId: 'herdr:wA:p3', source: 'herdr', workspace: 'termbridge', agent: 'ios_termbridge',
-      command: 'termbridge · ios_termbridge', status: 'working', lastSeenAt: 3_200,
-    }],
-    recentUserMessages: [{
-      sessionId: 'herdr:wA:p1', source: 'herdr', workspace: 'termbridge', agent: 'codex',
-      command: 'termbridge · codex', text: 'ROUTE_CONTEXT_PROBE', clientPlatform: 'android', sentAt: 3_000,
-    }],
+test('JsonBrainStore splits archived history and coalesces debounced async writes without data loss', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'tb-brain-store-'));
+  try {
+    const file = join(dir, 'brain.json');
+    const historyFile = join(dir, 'brain-history.json');
+    const store = new JsonBrainStore(file, { debounceMs: 30 });
+    const coordinator = new BrainCoordinator(store);
+    coordinator.appendConversationMessage({ id: 'u1', role: 'user', text: 'first conversation', now: 100 });
+    coordinator.startNewConversation(200);
+    for (let i = 0; i < 10; i += 1) {
+      coordinator.appendExecutionEvent({
+        eventId: `fork-1:${i}`,
+        forkId: 'fork-1',
+        requestId: 'req-1',
+        phase: 'tool_started',
+        createdAt: 300 + i,
+      });
+    }
+    coordinator.appendConversationMessage({ id: 'u2', role: 'user', text: 'active conversation', now: 400 });
+    await coordinator.flush();
+
+    assert.equal(existsSync(file), true);
+    assert.equal(existsSync(historyFile), true);
+    const activeJson = JSON.parse(readFileSync(file, 'utf8')) as { history?: unknown; messages?: unknown[] };
+    assert.equal(activeJson.history, undefined, 'active brain.json should not duplicate archived history');
+    assert.equal(activeJson.messages?.length, 1);
+
+    const reloaded = new BrainCoordinator(new JsonBrainStore(file));
+    assert.equal(reloaded.getSnapshot().messages[0]?.text, 'active conversation');
+    assert.equal(reloaded.getHistory().length, 1);
+    assert.equal(reloaded.getHistoryConversation(reloaded.getHistory()[0]!.id)?.messages[0]?.text, 'first conversation');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('brain_text_delta validates streaming text delta payloads', () => {
+  const parsed = ControlMessageSchema.parse({
+    t: 'brain_text_delta',
+    requestId: 'req-1',
+    delta: '你好',
+    text: '你好',
+    final: false,
   });
-  assert.match(plan.reply, /termbridge/i);
-  assert.doesNotMatch(plan.reply, /herdr:wA:p1/);
-  assert.doesNotMatch(plan.reply, /herdr:wA:p3/);
-  assert.equal(plan.targetSessionId, undefined);
-  assert.equal(plan.answerOnly, true);
+  assert.equal(parsed.t, 'brain_text_delta');
 });
 
 test('coordinator completes an authoritative control-plane answer without a session', () => {
@@ -557,77 +562,6 @@ test('coordinator completes an authoritative control-plane answer without a sess
   assert.equal(completed?.status, 'completed');
   assert.equal(completed?.sessionId, undefined);
   assert.equal(brain.getSnapshot().messages.length, 2);
-});
-
-test('local planner routes a current Herdr Agent by its user-facing name without losing the request', async () => {
-  const planner = new LocalBrainPlanningService();
-  const plan = await planner.plan({
-    text: '请让 TermBridge 继续检查 Android 状态',
-    availableAgents: ['codex', 'claude'],
-    snapshot: { messages: [], tasks: [] },
-    agentContexts: [{
-      sessionId: 'herdr:wA:p1', source: 'herdr', name: 'TermBridge', workspace: 'termbridge', agent: 'codex',
-      command: 'termbridge · codex', status: 'idle', lastSeenAt: 100,
-    }],
-  });
-
-  assert.equal(plan.targetSessionId, 'herdr:wA:p1');
-  assert.equal(plan.instruction, '请让 TermBridge 继续检查 Android 状态');
-  assert.match(plan.reply, /TermBridge/);
-  assert.doesNotMatch(plan.reply, /herdr:wA:p1/);
-});
-
-test('local planner treats a hidden Terminal source as the first referent without changing user text', async () => {
-  const planner = new LocalBrainPlanningService();
-  const sourceSession = {
-    sessionId: 'herdr:wA:p7', source: 'herdr' as const, name: 'TermBridge', workspace: 'termbridge', agent: 'codex',
-    command: 'termbridge · codex', status: 'idle', preview: 'Fixing the Android Terminal', lastSeenAt: 100,
-  };
-  const plan = await planner.plan({
-    text: '继续把这个问题处理完',
-    availableAgents: ['codex', 'claude'],
-    snapshot: { messages: [], tasks: [] },
-    agentContexts: [sourceSession],
-    sourceSession,
-  });
-
-  assert.equal(plan.targetSessionId, 'herdr:wA:p7');
-  assert.equal(plan.instruction, '继续把这个问题处理完');
-  assert.match(plan.reply, /TermBridge/);
-  assert.doesNotMatch(plan.reply, /herdr:wA:p7/);
-});
-
-test('legacy planner factory also refuses local Global fallback', () => {
-  assert.throws(
-    () => createBrainPlanningService({ TB_BRAIN_PROVIDER: 'local' }),
-    /does not support a local provider/,
-  );
-  assert.throws(
-    () => createBrainPlanningService({}),
-    /requires DASHSCOPE_API_KEY/,
-  );
-  assert.ok(createBrainPlanningService({ DASHSCOPE_API_KEY: 'test-key' }) instanceof BailianBrainPlanningService);
-  assert.throws(
-    () => createBrainPlanningService({ TB_BRAIN_PROVIDER: 'unknown' }),
-    /Unknown TB_BRAIN_PROVIDER/,
-  );
-});
-
-test('Brain acknowledgement follows the user language', async () => {
-  const planner = new LocalBrainPlanningService();
-  const chinese = await planner.plan({
-    text: '现在有多少 Agent 在运行？',
-    availableAgents: ['codex'],
-    snapshot: { messages: [], tasks: [] },
-  });
-  const english = await planner.plan({
-    text: 'How many agents are running?',
-    availableAgents: ['codex'],
-    snapshot: { messages: [], tasks: [] },
-  });
-
-  assert.equal(chinese.reply, '我会交给 codex 处理。');
-  assert.equal(english.reply, 'I will route this to codex.');
 });
 
 test('completion ignores a historical task when a restarted host reuses its session id', () => {

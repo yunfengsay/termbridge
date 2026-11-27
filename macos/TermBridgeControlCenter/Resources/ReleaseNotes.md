@@ -1,3 +1,15 @@
+## TermBridge 0.3.39
+
+- macOS「文件与改动」窗口新增基于 Tiptap 的 Markdown 富文本预览：`.md` / `.markdown` / `.mdx` 默认进入「预览」，支持原生「预览 / 源码」切换、YAML Frontmatter、GFM 表格/任务清单/Callout 提示块、代码语法高亮与一键复制、`carousel` 幻灯片轮播、图片点击放大，以及基于 ProseMirror 的 `⌘F` 文档内高亮搜索。
+- 文档内本地/相对/绝对路径图片统一通过自定义 `tb-md-asset://` 协议经 Host `session_file_read` 通道安全拉取，跨远程 Host 也能正常渲染图片并跟随系统深浅色切换。
+- 同步修复 Android 端连续语音通话声纹门控问题：排除前置/尾随静音稀释、新增降噪失真原始声纹回退、修复拒识后静默吞音并在诊断栏区分真实人声字节与拒绝分值。
+
+## TermBridge 0.3.38
+
+- Global Brain 全面升级：内置 Host 新增只读工具并发执行、单步超时看门狗与瞬态自动重试、全局文字实时流式输出（`brain_text_delta`）、多轮工具上下文记忆、结构化 Agent 对话记录摘要，以及 `workspace_files` 代码搜索/行区间读取/Git 只读视图与长期记忆读写工具 `brain_memory`。
+- 修复 Completion 评审服务超时时向全局时间线反复刷卡的问题：新增失败熔断与百炼自动回退，并将 Brain/Context/Completion 持久化升级为异步防抖原子写盘。
+- 完整支持 `agy` 非交互任务派发与独立评审候选；Android 端同步升级连续工具卡自动合并去重与实时流式回复。
+
 ## TermBridge 0.3.34
 
 - 修复终端程序退出后仍占用 PTY 句柄的问题，避免长期运行后无法新建终端或 Herdr 分屏。

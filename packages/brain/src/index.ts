@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { mkdir, rename, writeFile } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 export { DEFAULT_GLOBAL_EXECUTION_MODEL } from './models.js';
 import { homedir } from 'node:os';
@@ -103,6 +104,8 @@ interface PersistedBrainState extends BrainState {
 export interface BrainStateStore {
   read(): BrainSnapshot | BrainState;
   write(snapshot: BrainState): void;
+  flush?(): Promise<void>;
+  flushSync?(): void;
 }
 
 function cleanSnapshot(value: unknown): BrainSnapshot {
@@ -186,24 +189,144 @@ export class MemoryBrainStore implements BrainStateStore {
   }
 }
 
+export interface JsonBrainStoreOptions {
+  /** Debounce interval in ms for non-blocking async atomic writes. 0 (default) writes synchronously. */
+  debounceMs?: number;
+}
+
 export class JsonBrainStore implements BrainStateStore {
-  constructor(private readonly path = process.env.TB_BRAIN_STATE || join(homedir(), '.termbridge', 'brain.json')) {}
+  private readonly historyPath: string;
+  private readonly debounceMs: number;
+  private lastHistoryKey?: string;
+  private pendingState?: BrainState;
+  private timer?: ReturnType<typeof setTimeout>;
+  private writeChain: Promise<void> = Promise.resolve();
+  private exitHookRegistered = false;
+
+  constructor(
+    private readonly path = process.env.TB_BRAIN_STATE || join(homedir(), '.termbridge', 'brain.json'),
+    options: JsonBrainStoreOptions = {},
+  ) {
+    this.historyPath = `${this.path.replace(/\.json$/i, '')}-history.json`;
+    this.debounceMs = Math.max(0, Math.floor(options.debounceMs ?? 0));
+  }
 
   read(): BrainState {
     if (!existsSync(this.path)) return cleanState(undefined);
     try {
-      return cleanState(JSON.parse(readFileSync(this.path, 'utf8')));
+      const main = JSON.parse(readFileSync(this.path, 'utf8')) as Partial<PersistedBrainState>;
+      let history = main.history;
+      if (!Array.isArray(history) && existsSync(this.historyPath)) {
+        try {
+          const parsedHistory = JSON.parse(readFileSync(this.historyPath, 'utf8')) as { history?: unknown };
+          if (Array.isArray(parsedHistory?.history)) {
+            history = parsedHistory.history as BrainConversationHistory[];
+          }
+        } catch {
+          // Corrupted companion history file must not break active timeline recovery.
+        }
+      }
+      const state = cleanState({ ...main, history });
+      this.lastHistoryKey = historySignature(state.history);
+      return state;
     } catch {
       return cleanState(undefined);
     }
   }
 
   write(snapshot: BrainState): void {
+    const cloned = structuredClone(snapshot);
+    if (this.debounceMs <= 0) {
+      this.writeFilesSync(cloned);
+      return;
+    }
+    this.pendingState = cloned;
+    this.ensureExitHook();
+    if (this.timer) return;
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      void this.drainAsync();
+    }, this.debounceMs);
+    this.timer.unref?.();
+  }
+
+  async flush(): Promise<void> {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
+    await this.drainAsync();
+    await this.writeChain;
+  }
+
+  flushSync(): void {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
+    if (!this.pendingState) return;
+    const state = this.pendingState;
+    this.pendingState = undefined;
+    this.writeFilesSync(state);
+  }
+
+  private ensureExitHook(): void {
+    if (this.exitHookRegistered) return;
+    this.exitHookRegistered = true;
+    process.once('exit', () => {
+      try {
+        this.flushSync();
+      } catch {
+        // Best-effort flush on process exit.
+      }
+    });
+  }
+
+  private drainAsync(): Promise<void> {
+    if (!this.pendingState) return this.writeChain;
+    const state = this.pendingState;
+    this.pendingState = undefined;
+    this.writeChain = this.writeChain
+      .then(() => this.writeFilesAsync(state))
+      .catch(() => {
+        // Persistence errors must not terminate the Host process.
+      });
+    return this.writeChain;
+  }
+
+  private writeFilesSync(snapshot: BrainState): void {
+    const { history, ...active } = snapshot;
     mkdirSync(dirname(this.path), { recursive: true });
+    const historyKey = historySignature(history);
+    if (historyKey !== this.lastHistoryKey || !existsSync(this.historyPath)) {
+      const historyTmp = `${this.historyPath}.${process.pid}.tmp`;
+      writeFileSync(historyTmp, JSON.stringify({ version: 4, history }) + '\n', { mode: 0o600 });
+      renameSync(historyTmp, this.historyPath);
+      this.lastHistoryKey = historyKey;
+    }
     const temporary = `${this.path}.${process.pid}.tmp`;
-    writeFileSync(temporary, JSON.stringify({ version: 4, ...snapshot }, null, 2) + '\n', { mode: 0o600 });
+    writeFileSync(temporary, JSON.stringify({ version: 4, ...active }) + '\n', { mode: 0o600 });
     renameSync(temporary, this.path);
   }
+
+  private async writeFilesAsync(snapshot: BrainState): Promise<void> {
+    const { history, ...active } = snapshot;
+    await mkdir(dirname(this.path), { recursive: true });
+    const historyKey = historySignature(history);
+    if (historyKey !== this.lastHistoryKey || !existsSync(this.historyPath)) {
+      const historyTmp = `${this.historyPath}.${process.pid}.tmp`;
+      await writeFile(historyTmp, JSON.stringify({ version: 4, history }) + '\n', { mode: 0o600 });
+      await rename(historyTmp, this.historyPath);
+      this.lastHistoryKey = historyKey;
+    }
+    const temporary = `${this.path}.${process.pid}.tmp`;
+    await writeFile(temporary, JSON.stringify({ version: 4, ...active }) + '\n', { mode: 0o600 });
+    await rename(temporary, this.path);
+  }
+}
+
+function historySignature(history: BrainConversationHistory[]): string {
+  return history.map((item) => `${item.id}:${item.updatedAt}:${item.messageCount}:${item.toolResults?.length ?? 0}`).join('|');
 }
 
 export interface SubmitBrainMessage {
@@ -271,6 +394,14 @@ export class BrainCoordinator {
 
   getSnapshot(): BrainSnapshot {
     return structuredClone(this.snapshot);
+  }
+
+  flush(): Promise<void> {
+    return this.store.flush?.() ?? Promise.resolve();
+  }
+
+  flushSync(): void {
+    this.store.flushSync?.();
   }
 
   appendSystemReminder(requestId: string, text: string, now = Date.now()): void {
@@ -835,7 +966,6 @@ function localizedTaskText(source: string, chinese: string, english: string): st
   return /\p{Script=Han}/u.test(source) ? chinese : english;
 }
 
-export * from './planner.js';
 export * from './conversation.js';
 export * from './piConversation.js';
 export * from './controlPlane.js';

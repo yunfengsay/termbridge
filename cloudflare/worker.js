@@ -7106,6 +7106,13 @@ var ControlMessageSchema = z.discriminatedUnion("t", [
     text: z.string().max(2e3)
   }),
   z.object({
+    t: z.literal("brain_text_delta"),
+    requestId: z.string().min(1).max(128),
+    delta: z.string().max(16e3),
+    text: z.string().max(16e3),
+    final: z.boolean().optional()
+  }),
+  z.object({
     t: z.literal("brain_execution_event"),
     event: ExecutionForkEventSchema
   }),

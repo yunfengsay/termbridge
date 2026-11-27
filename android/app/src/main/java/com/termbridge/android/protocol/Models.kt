@@ -86,6 +86,7 @@ object BrainSilentProtocol {
     const val CANCEL = "brain_cancel"
     const val CANCEL_RESULT = "brain_cancel_result"
     const val TEXT_RESULT = "brain_text_result"
+    const val TEXT_DELTA = "brain_text_delta"
 }
 
 /** Host acknowledges before clients stop legacy polling. */

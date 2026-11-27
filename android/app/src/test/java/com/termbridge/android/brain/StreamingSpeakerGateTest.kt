@@ -43,4 +43,42 @@ class StreamingSpeakerGateTest {
         gate.reset()
         assertTrue(gate.accept(shortArrayOf(0), false).audio.isEmpty())
     }
+
+    @Test fun `pre-roll and hangover silence are kept for ASR but excluded from speaker scoring`() {
+        val measuredFrames = mutableListOf<List<Short>>()
+        val gate = StreamingSpeakerGate(windowFrames = 4) { frames ->
+            measuredFrames += frames.map { it.single() }
+            0.85f
+        }
+        // 2 pre-roll silence frames (speech=true, voicedForSpeaker=false) + 2 voiced frames
+        assertTrue(gate.accept(shortArrayOf(10), speech = true, voicedForSpeaker = false).audio.isEmpty())
+        assertTrue(gate.accept(shortArrayOf(11), speech = true, voicedForSpeaker = false).audio.isEmpty())
+        assertTrue(gate.accept(shortArrayOf(12), speech = true, voicedForSpeaker = true).audio.isEmpty())
+        val first = gate.accept(shortArrayOf(13), speech = true, voicedForSpeaker = true)
+        assertTrue(first.authorized)
+        // Full audio (including pre-roll) is released to ASR, while CAM++ only scored the 2 voiced frames.
+        assertEquals(listOf<Short>(10, 11, 12, 13), first.audio.map { it.single() })
+        assertEquals(listOf(listOf<Short>(12, 13)), measuredFrames)
+
+        // Pure hangover silence tail after authorized utterance drains cleanly without spurious rejection.
+        gate.accept(shortArrayOf(14), speech = true, voicedForSpeaker = false)
+        val tail = gate.accept(shortArrayOf(0), speech = false, voicedForSpeaker = false)
+        assertFalse(tail.rejected)
+        assertEquals(listOf<Short>(14), tail.audio.map { it.single() })
+        assertEquals(1, measuredFrames.size)
+    }
+
+    @Test fun `falls back to raw pre-denoiser frames when denoised audio distorts owner voiceprint`() {
+        val gate = StreamingSpeakerGate(windowFrames = 2) { frames ->
+            // Denoised frames carry value 1 (low score); raw frames carry value 9 (owner match).
+            if (frames.first().single() == 9.toShort()) 0.72f else 0.18f
+        }
+        gate.accept(shortArrayOf(1), speech = true, voicedForSpeaker = true, rawFrame = shortArrayOf(9))
+        val result = gate.accept(shortArrayOf(1), speech = true, voicedForSpeaker = true, rawFrame = shortArrayOf(9))
+        assertTrue(result.authorized)
+        assertFalse(result.rejected)
+        // Outgoing audio stays denoised while verification succeeded via raw acoustic domain.
+        assertEquals(listOf<Short>(1, 1), result.audio.map { it.single() })
+        assertEquals(0.72f, result.score!!, 0.001f)
+    }
 }

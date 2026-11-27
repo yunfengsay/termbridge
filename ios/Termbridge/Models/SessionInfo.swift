@@ -111,6 +111,7 @@ enum BrainSilentProtocol {
   static let cancel = "brain_cancel"
   static let cancelResult = "brain_cancel_result"
   static let textResult = "brain_text_result"
+  static let textDelta = "brain_text_delta"
 }
 
 /// Optional protocol extension; iOS keeps legacy behavior unless explicitly requested.
@@ -729,6 +730,22 @@ struct BrainMessageInfo: Identifiable, Hashable {
   let createdAtMilliseconds: Double
   let taskID: String?
   let voiceStatus: String?
+
+  init(
+    id: String,
+    role: String,
+    text: String,
+    createdAtMilliseconds: Double,
+    taskID: String? = nil,
+    voiceStatus: String? = nil
+  ) {
+    self.id = id
+    self.role = role
+    self.text = text
+    self.createdAtMilliseconds = createdAtMilliseconds
+    self.taskID = taskID
+    self.voiceStatus = voiceStatus
+  }
 
   init?(map: [String: MessagePackValue]) {
     guard let id = map["id"]?.stringValue, let role = map["role"]?.stringValue,

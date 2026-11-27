@@ -41,6 +41,7 @@ class OnDeviceVoiceCapture(
         fun onAuthorizedAudio(pcm16: ByteArray)
         fun onUtteranceCommitted()
         fun onVoiceRejected()
+        fun onVoiceRejected(score: Float?) = onVoiceRejected()
         fun onEnrollmentSample(embedding: FloatArray)
         fun onError(message: String)
     }
@@ -164,6 +165,7 @@ class OnDeviceVoiceCapture(
                         models.resetVad()
                         models.resetCleanVad()
                         passthroughPreRoll.clear()
+                        passthroughRawQueue.clear()
                         passthroughNoiseGate = VoiceNoiseGate(noiseSensitivity)
                         passthroughGateActive = false
                         passthroughSpeechFrames = 0
@@ -188,7 +190,8 @@ class OnDeviceVoiceCapture(
             if (running.get() && passthrough && noiseFilterEnabled) {
                 val tail = models.finishDenoise()
                 tail.frames.forEachIndexed { index, audio ->
-                    emitPassthrough(audio, tail.probabilities[index], tail.probabilities[index])
+                    val alignedRaw = if (passthroughRawQueue.isEmpty()) audio else passthroughRawQueue.removeFirst()
+                    emitPassthrough(audio, alignedRaw, tail.probabilities[index], tail.probabilities[index])
                 }
             }
         } catch (error: Exception) {
@@ -323,12 +326,19 @@ class OnDeviceVoiceCapture(
         models.resetVad()
     }
 
+    private data class PassthroughFrame(
+        val audio: ShortArray,
+        val raw: ShortArray,
+        val probability: Float,
+    )
+
     private var passthroughSpeechFrames = 0
     private var passthroughSpeechNotified = false
     private var passthroughAudibleStreak = 0
     private var passthroughForcedSilence = 0
     private val silentFrame = ShortArray(OnDeviceVoiceModels.WINDOW_SAMPLES)
-    private val passthroughPreRoll = ArrayDeque<ShortArray>()
+    private val passthroughPreRoll = ArrayDeque<PassthroughFrame>()
+    private val passthroughRawQueue = ArrayDeque<ShortArray>()
     private var passthroughNoiseGate = VoiceNoiseGate(noiseSensitivity)
     private var passthroughGateActive = false
 
@@ -336,18 +346,28 @@ class OnDeviceVoiceCapture(
     // frame; never fill that delay with raw PCM and duplicate it later.
     private fun processPassthroughFrame(frame: ShortArray, rawProbability: Float) {
         if (!noiseFilterEnabled) {
-            emitPassthrough(frame, rawProbability, rawProbability)
+            emitPassthrough(frame, frame, rawProbability, rawProbability)
             return
         }
+        // Keep aligned raw frames alongside GTCRN output so speaker verification can fall back
+        // to the enrollment (raw) acoustic domain if denoising distorts the owner's voiceprint.
+        passthroughRawQueue.addLast(frame.copyOf())
+        while (passthroughRawQueue.size > MAX_RAW_ALIGN_QUEUE) passthroughRawQueue.removeFirst()
         // Inference failure goes through capture's explicit error path. Mixing
         // undelayed raw frames into a delayed model stream would corrupt timing.
         val filtered = models.denoise(listOf(frame))
         filtered.frames.forEachIndexed { index, audio ->
-            emitPassthrough(audio, filtered.probabilities[index], filtered.probabilities[index])
+            val alignedRaw = if (passthroughRawQueue.isEmpty()) frame else passthroughRawQueue.removeFirst()
+            emitPassthrough(audio, alignedRaw, filtered.probabilities[index], filtered.probabilities[index])
         }
     }
 
-    private fun emitPassthrough(frame: ShortArray, cleanProbability: Float, rawProbability: Float) {
+    private fun emitPassthrough(
+        frame: ShortArray,
+        rawFrame: ShortArray,
+        cleanProbability: Float,
+        rawProbability: Float,
+    ) {
         val decision = passthroughNoiseGate.observe(cleanProbability)
         listener.onSpeechProbability(decision.probability, decision.openThreshold)
         if (decision.opened || decision.closed) {
@@ -362,14 +382,15 @@ class OnDeviceVoiceCapture(
         }
         if (passthroughForcedSilence > 0) {
             passthroughForcedSilence -= 1
-            sendIdentityCheckedFrame(silentFrame, false)
+            sendIdentityCheckedFrame(silentFrame, null, speech = false, voicedForSpeaker = false)
             return
         }
         val audible = if (noiseFilterEnabled) decision.audible else true
         val wasAudible = passthroughGateActive
         passthroughGateActive = audible
+        val wrapped = PassthroughFrame(frame, rawFrame, cleanProbability)
         if (!wasAudible) {
-            passthroughPreRoll.addLast(frame)
+            passthroughPreRoll.addLast(wrapped)
             while (passthroughPreRoll.size > PASSTHROUGH_PRE_ROLL_FRAMES) passthroughPreRoll.removeFirst()
         }
         if (audible) {
@@ -383,25 +404,38 @@ class OnDeviceVoiceCapture(
             passthroughAudibleStreak = 0
         }
         val outgoing = when {
-            !audible -> listOf(silentFrame)
+            !audible -> listOf(PassthroughFrame(silentFrame, silentFrame, 0f))
             !wasAudible && passthroughPreRoll.isNotEmpty() -> passthroughPreRoll.toList().also {
                 passthroughPreRoll.clear()
             }
-            else -> listOf(frame)
+            else -> listOf(wrapped)
         }
         if (streamingSpeakerGate != null) {
-            // Keep the VAD hangover and onset pre-roll; per-frame hard clipping
-            // would remove quiet consonants and worsen ASR. Identity still uses
-            // the VAD when the user disables denoising.
-            outgoing.forEach { sendIdentityCheckedFrame(it, decision.audible) }
+            // Keep the VAD hangover and onset pre-roll in outgoing audio for clean ASR,
+            // while scoring speaker identity only on frames that actually carry vocal energy.
+            val voicedThreshold = minOf(STREAMING_SPEAKER_VOICED_PROBABILITY, decision.closeThreshold)
+            outgoing.forEach { item ->
+                val voiced = decision.audible && item.probability >= voicedThreshold
+                sendIdentityCheckedFrame(
+                    frame = item.audio,
+                    rawFrame = if (noiseFilterEnabled) item.raw else null,
+                    speech = decision.audible,
+                    voicedForSpeaker = voiced,
+                )
+            }
         } else {
             listener.onSpeechGate(audible)
-            listener.onAuthorizedAudio(toPcm16(outgoing))
+            listener.onAuthorizedAudio(toPcm16(outgoing.map { it.audio }))
             trackPassthroughBargeIn(if (noiseFilterEnabled) audible else rawProbability >= SPEAKER_FRAME_PROBABILITY)
         }
     }
 
-    private fun sendIdentityCheckedFrame(frame: ShortArray, speech: Boolean) {
+    private fun sendIdentityCheckedFrame(
+        frame: ShortArray,
+        rawFrame: ShortArray?,
+        speech: Boolean,
+        voicedForSpeaker: Boolean,
+    ) {
         val gate = streamingSpeakerGate
         if (gate == null) {
             listener.onSpeechGate(speech)
@@ -409,19 +443,27 @@ class OnDeviceVoiceCapture(
             trackPassthroughBargeIn(speech)
             return
         }
-        val result = gate.accept(frame, speech)
+        val result = gate.accept(frame, speech, voicedForSpeaker = voicedForSpeaker, rawFrame = rawFrame)
         check(!result.unavailable) { SPEAKER_MODEL_UNAVAILABLE }
         if (result.authorized) {
             if (!streamingSpeakerAccepted) listener.onAuthorizedSpeechDetected()
             streamingSpeakerAccepted = true
             streamingSpeakerRejected = false
             verifiedPlayback.addAll(result.audio)
+        } else if (result.audio.isNotEmpty()) {
+            // Authorized utterance's trailing silence hangover draining cleanly.
+            verifiedPlayback.addAll(result.audio)
         } else if (result.rejected) {
-            if (!streamingSpeakerRejected) listener.onVoiceRejected()
+            if (!streamingSpeakerRejected) listener.onVoiceRejected(result.score)
             streamingSpeakerRejected = true
             streamingSpeakerAccepted = false
         }
-        if (!speech) streamingSpeakerAccepted = false
+        if (!speech) {
+            streamingSpeakerAccepted = false
+            // Reset rejection flag at utterance boundary so subsequent rejected turns
+            // always surface feedback instead of silently sending digital silence.
+            streamingSpeakerRejected = false
+        }
         // Pace verified PCM at capture rate, not a burst + another second of
         // silence per window. This is a bounded delay, not growing stream time.
         val output = if (verifiedPlayback.isEmpty()) null else verifiedPlayback.removeFirst()
@@ -550,6 +592,8 @@ class OnDeviceVoiceCapture(
         // ~192 ms of confident speech interrupts assistant playback.
         const val PASSTHROUGH_BARGE_IN_FRAMES = 6
         const val PASSTHROUGH_PRE_ROLL_FRAMES = 10
+        const val STREAMING_SPEAKER_VOICED_PROBABILITY = 0.35f
+        const val MAX_RAW_ALIGN_QUEUE = 12
         // 10 s of uninterrupted "speech" forces a boundary…
         const val PASSTHROUGH_MAX_UTTERANCE_FRAMES = 312
         // …of 2 s digital silence, comfortably above the backend's 1.4 s VAD.

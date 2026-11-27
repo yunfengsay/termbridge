@@ -184,6 +184,7 @@ UI 保留已收到文字并标注中断，重建模型上下文时暂不把这�
 | `brain_snapshot` | client → host | — | 请求 Global 持久化时间线 |
 | `brain_snapshot_result` | host → client | `messages[]`,`tasks[]`,`toolResults[]?`,`routeDecisions[]?`,`runEvents[]?`,`deliverables[]?`,`toolCatalog[]?`,`executionEvents[]?`,`history[]?`,`voiceUsage?` | 当前 Global 快照；`toolCatalog` 是 Host 单一工具注册表的安全公开投影，`executionEvents` 是 Pi/Qwen Execution Fork 的模型与工具生命周期；不含隐藏推理、凭据和原始命令。其余账本字段保持原语义；全部新增字段可选，旧客户端继续读取原字段 |
 | `brain_execution_event` | host → client | `event` | Execution Fork 的低延迟增量。`phase` 为 fork/model/tool 的 started/completed/failed，带 `forkId`,`requestId`,`createdAt`，并可带 `model`,`turn`,`callId`,`toolName`,`summary`。客户端按 Fork 和 call 聚合显示，不为每条事件创建大卡 |
+| `brain_text_delta` | host → client | `requestId`,`delta`,`text`,`final?` | Global 文本回答的低延迟流式增量（按约 60ms 合并推送，后台连接按 `client_stream_policy` 过滤）。客户端可渲染 `${requestId}-brain` 实时草稿气泡，并在最终 `brain_snapshot_result` 到达后由持久化消息替换 |
 | `brain_new` | client → host | — | 将非空当前对话完整归档后开始空白对话；已派发的 Agent 后续完成结果仍写回对应归档 |
 | `brain_clear` | client → host | — | 永久清空当前对话和全部 History；有当前回复、Call 或任一归档中的运行任务时 Host 拒绝，避免丢失执行关联 |
 | `brain_restore` | client → host | `conversationId` | 将指定 History 原子恢复为当前可继续输入的对话；非空当前对话会先归档回 History |

@@ -2,6 +2,8 @@ export interface BrainToolDefinition {
   name: string;
   description: string;
   parameters: Record<string, unknown>;
+  /** Safe for concurrent execution when a turn invokes multiple read-only tools. */
+  readOnly?: boolean;
 }
 
 export interface BrainToolCall {

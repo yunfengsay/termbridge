@@ -27,6 +27,7 @@ test('voice tools register optional native UI beside their execution behavior', 
       { name: 'inspect_workspace', category: 'context', execution: 'direct' },
       { name: 'search_web', category: 'web', execution: 'direct' },
       { name: 'workspace_files', category: 'files', execution: 'direct' },
+      { name: 'brain_memory', category: 'context', execution: 'direct' },
       { name: 'phone_action', category: 'device', execution: 'direct' },
       { name: 'home_assistant', category: 'device', execution: 'direct' },
       { name: 'cancel_execution', category: 'agent', execution: 'direct' },
@@ -132,7 +133,7 @@ test('voice Brain exposes one deep workspace reader plus explicit mutation tools
   assert.deepEqual(VOICE_BRAIN_TOOLS.map((tool) => tool.name), [
     'completion_reviews',
     'tool_script',
-    'inspect_images', 'inspect_workspace', 'search_web', 'workspace_files', 'phone_action', 'home_assistant', 'cancel_execution', 'continue_agent', 'dispatch_agent',
+    'inspect_images', 'inspect_workspace', 'search_web', 'workspace_files', 'brain_memory', 'phone_action', 'home_assistant', 'cancel_execution', 'continue_agent', 'dispatch_agent',
   ]);
   const handle = createVoiceToolHandler(environment());
   const roster = JSON.parse(await handle({

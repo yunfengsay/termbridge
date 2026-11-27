@@ -58,9 +58,9 @@ final class TerminalFilePreviewTests: XCTestCase {
             guard outline.selectedRow >= 0 else { return nil }
             return (outline.view(atColumn: 0, row: outline.selectedRow, makeIfNecessary: true) as? NSTableCellView)?.textField?.stringValue
         }
-        // Source and text read in the code view, all of it, across many chunks.
-        try await until { browser.codeView.string.hasPrefix("# Remote preview") && selectedName() == "large.md" }
-        XCTAssertGreaterThan(browser.codeView.string.utf8.count, 128 * 1024)
+        // Markdown opens in the Tiptap preview by default, across all chunks.
+        try await until { !browser.markdownView.isHidden && browser.markdownView.currentMarkdown.hasPrefix("# Remote preview") && selectedName() == "large.md" }
+        XCTAssertGreaterThan(browser.markdownView.currentMarkdown.utf8.count, 128 * 1024)
         browser.present(sessionID: session, path: "reports/second.txt", settings: settings)
         XCTAssertTrue(browser.window === window)
         try await until { browser.codeView.string == "Second remote file" && selectedName() == "second.txt" }
@@ -80,7 +80,7 @@ final class TerminalFilePreviewTests: XCTestCase {
             (outline.view(atColumn: 0, row: row, makeIfNecessary: true) as? NSTableCellView)?.textField?.stringValue == "large.md"
         })
         outline.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
-        try await until { browser.codeView.string.hasPrefix("# Remote preview") }
+        try await until { !browser.markdownView.isHidden && browser.markdownView.currentMarkdown.hasPrefix("# Remote preview") }
         if let workspace = env["TB_FILE_PREVIEW_TEST_WORKSPACE"] {
             let late = URL(fileURLWithPath: workspace).appendingPathComponent("reports/created-later.txt")
             try Data("created after the directory was cached".utf8).write(to: late)
@@ -175,7 +175,7 @@ final class TerminalFilePreviewTests: XCTestCase {
         try choose("other")
         try await until { browser.codeView.string.contains("README.md") && browser.codeView.string.contains("edited by the Agent") }
         try choose("done.md")
-        try await until { browser.codeView.string == "Committed by the Agent" }
+        try await until { !browser.markdownView.isHidden && browser.markdownView.currentMarkdown.trimmingCharacters(in: .whitespacesAndNewlines) == "Committed by the Agent" }
 
         // A link with a line opens the file there.
         browser.present(sessionID: session, path: workspace + "/src/app.ts", settings: settings, line: 3)

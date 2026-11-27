@@ -156,6 +156,26 @@ extension GlobalConversationViewModel: TermbridgeClientListener {
           executionEvents.append(event)
           executionEvents = Array(executionEvents.sorted { $0.createdAtMilliseconds < $1.createdAtMilliseconds }.suffix(300))
         }
+      case BrainSilentProtocol.textDelta:
+        if let requestID = message.string("requestId"), !requestID.isEmpty,
+           let text = message.string("text")?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty {
+          let messageID = "\(requestID)-brain"
+          let isFinal = message.boolean("final") == true
+          let timestamp = messages.first(where: { $0.id == messageID })?.createdAtMilliseconds
+            ?? max(Date().timeIntervalSince1970 * 1_000, (messages.map(\.createdAtMilliseconds).max() ?? 0) + 1)
+          let draftMessage = BrainMessageInfo(
+            id: messageID,
+            role: "brain",
+            text: text,
+            createdAtMilliseconds: timestamp,
+            voiceStatus: isFinal ? "completed" : "streaming"
+          )
+          if let idx = messages.firstIndex(where: { $0.id == messageID }) {
+            messages[idx] = draftMessage
+          } else {
+            messages.append(draftMessage)
+          }
+        }
       case "brain_accepted": if message.string("requestId") == pendingRequestID { composerStatus = "Accepted" }
       case "error":
         composerStatus = message.string("message") ?? "Host rejected the request"

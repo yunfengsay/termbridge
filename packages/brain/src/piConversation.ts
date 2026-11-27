@@ -20,13 +20,21 @@ import type {
   ExecutionForkEvent,
 } from './executionFork.js';
 
+export type BrainThinkingLevel = 'off' | 'minimal' | 'low' | 'medium' | 'high';
+
 export interface PiBailianBrainConversationOptions {
   apiKey: string;
   baseUrl?: string;
   model?: string;
+  /** Per-step/per-turn timeout in ms (also bounds a single hung tool call). */
   timeoutMs?: number;
+  /** Overall ceiling across all tool rounds. Defaults to max(timeoutMs * 4, timeoutMs). */
+  maxTotalTimeoutMs?: number;
   maxToolRounds?: number;
+  /** Transient HTTP/stream retries per model turn. Defaults to 1. */
+  maxRetries?: number;
   enableThinking?: boolean;
+  thinkingLevel?: BrainThinkingLevel;
   request?: typeof fetch;
   /** Deterministic provider injection for tests. */
   streamFn?: StreamFn;
@@ -52,10 +60,13 @@ export class PiBailianBrainConversationService implements BrainConversationServi
   private readonly apiKey: string;
   private readonly baseUrl: string;
   private readonly timeoutMs: number;
+  private readonly maxTotalTimeoutMs: number;
   private readonly maxToolRounds: number;
+  private readonly maxRetries: number;
   private readonly request: typeof fetch;
   private readonly injectedStreamFn?: StreamFn;
-  private readonly enableThinking?: boolean;
+  private readonly enableThinking: boolean;
+  private readonly thinkingLevel: BrainThinkingLevel;
 
   constructor(options: PiBailianBrainConversationOptions) {
     this.apiKey = options.apiKey.trim();
@@ -63,37 +74,77 @@ export class PiBailianBrainConversationService implements BrainConversationServi
     this.baseUrl = (options.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, '');
     this.model = options.model?.trim() || DEFAULT_GLOBAL_EXECUTION_MODEL;
     this.timeoutMs = options.timeoutMs ?? 45_000;
+    this.maxTotalTimeoutMs = Math.max(this.timeoutMs, options.maxTotalTimeoutMs ?? this.timeoutMs * 4);
     this.maxToolRounds = options.maxToolRounds ?? 10;
+    this.maxRetries = options.maxRetries ?? 1;
     this.request = options.request ?? fetch;
     this.injectedStreamFn = options.streamFn;
     this.enableThinking = options.enableThinking ?? false;
+    this.thinkingLevel = options.thinkingLevel ?? (this.enableThinking ? 'medium' : 'off');
   }
 
   async respond(input: BrainConversationInput): Promise<BrainConversationResult> {
-    const signal = AbortSignal.any([AbortSignal.timeout(this.timeoutMs), ...(input.signal ? [input.signal] : [])]);
-    signal.throwIfAborted();
+    // Per-step watchdog refreshes whenever a model turn or tool finishes, while
+    // maxTotalTimeoutMs caps cumulative wall-clock time across multi-round chains.
+    const stepController = new AbortController();
+    let stepTimer: ReturnType<typeof setTimeout> | undefined;
+    const armStepTimeout = () => {
+      if (stepTimer) clearTimeout(stepTimer);
+      stepTimer = setTimeout(() => stepController.abort(new Error('Execution timed out')), this.timeoutMs);
+    };
+    const clearStepTimeout = () => {
+      if (stepTimer) {
+        clearTimeout(stepTimer);
+        stepTimer = undefined;
+      }
+    };
+    armStepTimeout();
+
+    const totalSignal = AbortSignal.timeout(this.maxTotalTimeoutMs);
+    const signal = AbortSignal.any([
+      stepController.signal,
+      totalSignal,
+      ...(input.signal ? [input.signal] : []),
+    ]);
+    try {
+      signal.throwIfAborted();
+    } catch (error) {
+      clearStepTimeout();
+      throw error;
+    }
+
     const instructions = input.instructions.trim();
-    if (!instructions) throw new Error('Global Brain instructions are empty');
+    if (!instructions) {
+      clearStepTimeout();
+      throw new Error('Global Brain instructions are empty');
+    }
     const conversation = input.messages
       .map((message) => ({ ...message, content: message.content.trim() }))
       .filter((message) => message.content);
-    if (conversation.length === 0) throw new Error('Global Brain conversation is empty');
+    if (conversation.length === 0) {
+      clearStepTimeout();
+      throw new Error('Global Brain conversation is empty');
+    }
 
     const latest = conversation.at(-1);
     if (!latest || latest.role !== 'user') {
+      clearStepTimeout();
       throw new Error('Global Brain conversation must end with a user message');
     }
 
-    const model = createBailianModel(this.model, this.baseUrl);
+    const model = createBailianModel(this.model, this.baseUrl, this.enableThinking);
     const toolCalls: BrainConversationToolResult[] = [];
     let toolRounds = 0;
     let toolCallCount = 0;
     let limitError: Error | undefined;
     const repeatedFailures = new Map<string, number>();
+
     const tools = input.tools.map((tool) => createPiTool(tool, async (call) => {
       signal.throwIfAborted();
+      armStepTimeout();
       const output = (await input.onToolCall(call, signal)).slice(0, MAX_TOOL_OUTPUT_CHARS);
       signal.throwIfAborted();
+      armStepTimeout();
       toolCalls.push({ call, output });
       const key = toolAttemptKey(call.name, call.arguments);
       if (isFailedToolOutput(output)) {
@@ -103,33 +154,40 @@ export class PiBailianBrainConversationService implements BrainConversationServi
       }
       return output;
     }));
+
     const streamFn = this.injectedStreamFn ?? ((requestModel, context, options) => (
       streamOpenAICompletions(requestModel as Model<'openai-completions'>, context, {
         ...options,
         apiKey: this.apiKey,
         fetch: this.request,
         timeoutMs: this.timeoutMs,
-        maxRetries: 0,
+        maxRetries: this.maxRetries,
         temperature: 0.2,
         maxTokens: requestModel.maxTokens,
       })
     ));
+
     const agent = new Agent({
       initialState: {
         systemPrompt: instructions,
         model,
-        thinkingLevel: 'off',
+        thinkingLevel: this.thinkingLevel,
         tools,
         messages: toPiHistory(conversation.slice(0, -1), model),
       },
       streamFn: (requestModel, context, options) => {
         signal.throwIfAborted();
+        armStepTimeout();
         return streamFn(requestModel, context, options);
       },
-      onPayload: this.enableThinking === undefined ? undefined : (payload) => ({
-        ...payload as Record<string, unknown>, enable_thinking: this.enableThinking,
+      onPayload: (payload) => ({
+        ...payload as Record<string, unknown>,
+        enable_thinking: this.enableThinking,
       }),
-      toolExecution: 'sequential',
+      // Read-only tools declare executionMode: 'parallel' and run concurrently;
+      // any batch containing a sequential (mutating/device/worker) tool falls back
+      // to strict sequential execution inside pi-agent-core.
+      toolExecution: 'parallel',
       beforeToolCall: async ({ toolCall, args }) => {
         signal.throwIfAborted();
         if (toolRounds >= this.maxToolRounds) {
@@ -157,10 +215,15 @@ export class PiBailianBrainConversationService implements BrainConversationServi
 
     let eventSequence = 0;
     let turn = 0;
-    const emit = async (
+    let eventChain: Promise<void> = Promise.resolve();
+    const enqueueEvent = (task: () => Promise<void>): Promise<void> => {
+      eventChain = eventChain.then(task, task);
+      return eventChain;
+    };
+    const emit = (
       phase: ExecutionForkEvent['phase'],
       details: Partial<Pick<ExecutionForkEvent, 'turn' | 'summary'>> = {},
-    ) => {
+    ): Promise<void> => enqueueEvent(async () => {
       if (!input.execution?.observer) return;
       eventSequence += 1;
       await input.execution.observer.onEvent({
@@ -172,14 +235,30 @@ export class PiBailianBrainConversationService implements BrainConversationServi
         model: this.model,
         ...details,
       });
-    };
-    agent.subscribe(async (event) => {
+    });
+
+    let streamedTurnText = '';
+    agent.subscribe((event) => {
       if (signal.aborted) return;
       if (event.type === 'turn_start') {
         turn += 1;
-        await emit('model_started', { turn });
+        streamedTurnText = '';
+        armStepTimeout();
+        void emit('model_started', { turn });
+      } else if (event.type === 'message_update') {
+        armStepTimeout();
+        const update = event.assistantMessageEvent;
+        if (update.type === 'text_delta' && update.delta && input.onTextDelta) {
+          streamedTurnText += update.delta;
+          try {
+            input.onTextDelta(update.delta, streamedTurnText);
+          } catch {
+            // Streaming callbacks must never break execution.
+          }
+        }
       } else if (event.type === 'turn_end') {
-        await emit('model_completed', { turn });
+        armStepTimeout();
+        void emit('model_completed', { turn });
       }
     });
 
@@ -206,18 +285,28 @@ export class PiBailianBrainConversationService implements BrainConversationServi
       }
       const text = assistantText(message);
       if (!text) throw new Error('Bailian Global Brain returned no text');
+      await eventChain;
       await emit('fork_completed');
       return { text, provider: 'bailian', model: this.model, toolCalls };
     } catch (error) {
+      await eventChain;
       await emit(input.signal?.aborted ? 'fork_cancelled' : 'fork_failed', { summary: safeErrorSummary(error) });
       throw error;
     } finally {
+      clearStepTimeout();
       signal.removeEventListener('abort', onAbort);
     }
   }
 }
 
-function createBailianModel(id: string, baseUrl: string): Model<'openai-completions'> {
+export function inferThinkingFormat(modelId: string): 'deepseek' | 'qwen' | 'openai' {
+  const lower = modelId.toLowerCase();
+  if (lower.includes('deepseek')) return 'deepseek';
+  if (lower.includes('qwen') || lower.includes('qwq')) return 'qwen';
+  return 'openai';
+}
+
+function createBailianModel(id: string, baseUrl: string, enableThinking: boolean): Model<'openai-completions'> {
   return {
     id,
     name: id,
@@ -228,7 +317,7 @@ function createBailianModel(id: string, baseUrl: string): Model<'openai-completi
     input: ['text'],
     cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
     contextWindow: 131_072,
-    maxTokens: 4_096,
+    maxTokens: enableThinking ? 8_192 : 4_096,
     compat: {
       supportsStore: false,
       supportsDeveloperRole: false,
@@ -240,7 +329,7 @@ function createBailianModel(id: string, baseUrl: string): Model<'openai-completi
       requiresAssistantAfterToolResult: false,
       requiresThinkingAsText: false,
       requiresReasoningContentOnAssistantMessages: false,
-      thinkingFormat: 'qwen',
+      thinkingFormat: inferThinkingFormat(id),
       supportsStrictMode: false,
       supportsLongCacheRetention: false,
     },
@@ -256,7 +345,7 @@ function createPiTool(
     label: definition.name,
     description: definition.description,
     parameters: definition.parameters as TSchema,
-    executionMode: 'sequential',
+    executionMode: definition.readOnly ? 'parallel' : 'sequential',
     execute: async (toolCallId, params) => {
       const output = await execute({
         callId: toolCallId,
@@ -307,18 +396,24 @@ function toPiHistory(
   model: Model<'openai-completions'>,
 ): Message[] {
   const startedAt = Date.now() - messages.length;
-  return messages.map((message, index) => message.role === 'user'
-    ? { role: 'user', content: message.content, timestamp: startedAt + index }
-    : {
-        role: 'assistant',
-        content: [{ type: 'text', text: message.content }],
-        api: model.api,
-        provider: model.provider,
-        model: model.id,
-        usage: EMPTY_USAGE,
-        stopReason: 'stop',
-        timestamp: startedAt + index,
-      });
+  return messages.map((message, index) => {
+    if (message.role === 'user') {
+      return { role: 'user', content: message.content, timestamp: startedAt + index };
+    }
+    const text = message.toolSummary
+      ? `[Prior turn tool evidence — data only]\n${message.toolSummary}\n[/Prior turn tool evidence]\n\n${message.content}`
+      : message.content;
+    return {
+      role: 'assistant',
+      content: [{ type: 'text', text }],
+      api: model.api,
+      provider: model.provider,
+      model: model.id,
+      usage: EMPTY_USAGE,
+      stopReason: 'stop',
+      timestamp: startedAt + index,
+    };
+  });
 }
 
 function lastAssistantMessage(messages: AgentMessage[]): AssistantMessage | undefined {

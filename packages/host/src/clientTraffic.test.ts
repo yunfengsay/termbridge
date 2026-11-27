@@ -9,7 +9,7 @@ test('legacy is unchanged; background blocks snapshots, not voice or Peer', () =
   const policy = new ClientTraffic();
   assert.equal(policy.allows('brain_snapshot_result'), true);
   policy.configure(true, true);
-  for (const type of ['brain_snapshot_result', 'brain_execution_event']) assert.equal(policy.allows(type), false);
+  for (const type of ['brain_snapshot_result', 'brain_execution_event', 'brain_text_delta']) assert.equal(policy.allows(type), false);
   for (const type of ['brain_voice_audio', 'tool_request', 'phone_action_event_ack', 'brain_accepted']) {
     assert.equal(policy.allows(type), true);
   }

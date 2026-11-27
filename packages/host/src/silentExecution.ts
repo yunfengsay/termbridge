@@ -7,11 +7,15 @@ export function createSilentConversations(env: NodeJS.ProcessEnv = process.env) 
   const apiKey = env.DASHSCOPE_API_KEY?.trim();
   if (!apiKey) return undefined;
   const model = env.TB_SILENT_MODEL?.trim() || DEFAULT_GLOBAL_EXECUTION_MODEL;
+  const deepThinking = env.TB_SILENT_DEEP_THINKING
+    ? ['on', 'true', '1'].includes(env.TB_SILENT_DEEP_THINKING.trim().toLowerCase())
+    : false;
   return {
     advanced: new PiBailianBrainConversationService({ apiKey, model, baseUrl: env.DASHSCOPE_BASE_URL,
       timeoutMs: 180_000, enableThinking: false }),
     deep: new PiBailianBrainConversationService({ apiKey, model: env.TB_SILENT_DEEP_MODEL?.trim() || model,
-      baseUrl: env.DASHSCOPE_BASE_URL, timeoutMs: 300_000, enableThinking: false }),
+      baseUrl: env.DASHSCOPE_BASE_URL, timeoutMs: 300_000,
+      enableThinking: deepThinking, thinkingLevel: deepThinking ? 'medium' : 'off' }),
   };
 }
 

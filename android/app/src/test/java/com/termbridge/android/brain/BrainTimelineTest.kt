@@ -89,4 +89,111 @@ class BrainTimelineTest {
         assertEquals("已读取 4 个 Agent", traces.single().tools.first().summary)
         assertEquals("tool_started", traces.single().phase)
     }
+
+    @Test
+    fun `consecutive tool cards merge into one card and deduplicate repeated rows`() {
+        fun decision(id: String, at: Long, agent: String, sessionId: String) = BrainToolResultInfo(
+            id = id,
+            requestId = "req-$id",
+            callId = "call-$id",
+            toolName = "completion_review",
+            createdAt = at,
+            view = VoiceToolViewInfo(
+                kind = "decision_list",
+                title = "需要你决策",
+                items = listOf(
+                    VoiceToolViewItemInfo(
+                        id = "$sessionId-$id",
+                        title = agent,
+                        detail = "判断服务未完成，未自动派发或重试",
+                        status = "idle",
+                        timestamp = at,
+                        sessionId = sessionId,
+                    ),
+                ),
+            ),
+        )
+
+        val items = buildBrainTimelineItems(
+            messages = listOf(
+                BrainMessageInfo("m1", "user", "hi", 500L),
+            ),
+            tasks = emptyList(),
+            toolResults = listOf(
+                decision("t1", 100L, "架构师", "herdr:w2P:p3"),
+                decision("t2", 200L, "架构师", "herdr:w2P:p3"),
+                decision("t3", 300L, "astra-v8", "herdr:w2A:p1"),
+                decision("t4", 400L, "实时流模型", "herdr:w2R:p1"),
+                decision("t5", 600L, "架构师", "herdr:w2P:p3"),
+            ),
+        )
+
+        // First 4 consecutive tool cards before m1 merge into 1; t5 after m1 stays separate.
+        assertEquals(3, items.size)
+        val merged = items[0] as BrainTimelineItem.ToolResult
+        assertEquals("tool:t1..t4", merged.stableId)
+        assertEquals("需要你决策", merged.value.view.title)
+        assertEquals(
+            listOf("架构师 ×2", "astra-v8", "实时流模型"),
+            merged.value.view.items.map(VoiceToolViewItemInfo::title),
+        )
+        assertEquals(200L, merged.value.view.items[0].timestamp)
+        assertEquals("message:m1", items[1].stableId)
+        assertEquals("tool:t5", items[2].stableId)
+    }
+
+    @Test
+    fun `timeline state streams text deltas and retires draft once authoritative snapshot arrives`() {
+        val state = BrainTimelineState()
+        state.applySnapshot(
+            messages = listOf(BrainMessageInfo("req-1", "user", "你好", 100L)),
+            tasks = emptyList(),
+            toolResults = emptyList(),
+            deliverables = emptyList(),
+            executionEvents = emptyList(),
+            history = emptyList(),
+            voiceUsage = null,
+        )
+        assertEquals(true, state.applyTextDelta("req-1", "正在", final = false, now = 110L))
+        assertEquals("streaming", state.mergedMessages().last().voiceStatus)
+        assertEquals("正在", state.mergedMessages().last().text)
+
+        assertEquals(true, state.applyTextDelta("req-1", "正在处理中", final = false, now = 120L))
+        assertEquals(2, state.mergedMessages().size)
+        assertEquals("正在处理中", state.mergedMessages().last().text)
+
+        // Once authoritative snapshot arrives with req-1-brain, draft is cleanly replaced.
+        state.applySnapshot(
+            messages = listOf(
+                BrainMessageInfo("req-1", "user", "你好", 100L),
+                BrainMessageInfo("req-1-brain", "brain", "已完成回复", 130L),
+            ),
+            tasks = emptyList(),
+            toolResults = emptyList(),
+            deliverables = emptyList(),
+            executionEvents = emptyList(),
+            history = emptyList(),
+            voiceUsage = null,
+        )
+        assertEquals(2, state.mergedMessages().size)
+        assertEquals("已完成回复", state.mergedMessages().last().text)
+        assertEquals(null, state.mergedMessages().last().voiceStatus)
+    }
+
+    @Test
+    fun `voice diagnostics controller formats live counters and resets cleanly`() {
+        var clock = 10_000L
+        val diag = VoiceDiagnosticsController { clock }
+        diag.resetForCall()
+        diag.recordFrame()
+        diag.recordAudible(true)
+        diag.recordVad(0.85f, 0.50f)
+        diag.recordCaptured(2048)
+        diag.recordSent(1024)
+        clock = 12_000L
+        val text = diag.formatStatus(active = true, hasRequestId = true, remoteReady = true)
+        assertEquals(true, text.contains("采集 1帧/2KB → 已发 1KB(人声2KB) [语音▶]"))
+        assertEquals(true, text.contains("最近: 通话开始 · 2s前"))
+        assertEquals("", diag.formatStatus(active = false, hasRequestId = false, remoteReady = false))
+    }
 }

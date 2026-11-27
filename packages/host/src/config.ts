@@ -172,7 +172,7 @@ export function resolveBrainAgent(
 ): { command: string; args: string[]; env: Record<string, string> } | null {
   const shell = cfg.shell || process.env.SHELL || 'zsh';
   const command = cfg.agents[name];
-  if (!command || (name !== 'codex' && name !== 'claude')) return null;
+  if (!command || (name !== 'codex' && name !== 'claude' && name !== 'agy')) return null;
   const scrubKey = basename(shell) === 'fish' ? 'set -e DASHSCOPE_API_KEY; ' : 'unset DASHSCOPE_API_KEY; ';
   const invocation = name === 'codex'
     ? `${command} exec --skip-git-repo-check --color never --output-last-message "$TB_BRAIN_RESULT" "$TB_BRAIN_PROMPT"`

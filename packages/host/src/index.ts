@@ -3,8 +3,11 @@ import { PriorityRelaySender, type FramePriority } from './priorityQueue.js';
 import { ProxyTunnelManager } from './proxyTunnel.js';
 import { readSessionFile, readSessionRevision, listSessionDirectory } from './sessionFiles.js';
 import { ConversationFiles } from './conversationFiles.js';
-import { CompletionSupervisor, completionJudge } from './completionSupervisor.js';
-import { reviewCompletion } from './completionReview.js';
+import { createHostCompletionSupervisor, observeSupervisorCompletions } from './brain/completionWiring.js';
+import { createBrainWorkerController } from './brain/workerDispatch.js';
+import { buildConversationHistoryMessages, summarizeForkToolCalls } from './brain/toolHistorySummary.js';
+import { createBrainRouter } from './brain/brainRouter.js';
+import { readStructuredAgentTranscript } from './brain/agentTranscriptSummary.js';
 import os from 'node:os';
 import { VoiceLearning } from './voiceLearning.js';
 import { HostVoicePipeline } from './voicePipeline.js';
@@ -31,9 +34,8 @@ import {
 import {
   BrainCoordinator,
   createBrainConversationService,
-  DELIVERABLE_INSTRUCTIONS,
+  JsonBrainStore,
   type BrainConversationService,
-  type BrainTask,
   type BrainToolCall,
   type ExecutionForkEvent,
 } from '@termbridge/brain';
@@ -74,7 +76,6 @@ import {
   loadConfig,
   saveConfig,
   resolveAgent,
-  resolveBrainAgent,
 } from './config.js';
 import { pickBackend } from './backend.js';
 import { PeerBridge } from './bridge.js';
@@ -340,6 +341,7 @@ let brainConversationScopeId = `brain-conversation-${randomUUID()}`;
 
 function rotateBrainConversationScope(): void {
   intentHints.clearAll();
+  forkToolSummaries.clear();
   brainConversationScopeId = `brain-conversation-${randomUUID()}`;
 }
 
@@ -419,20 +421,12 @@ function notifyRealtimeVoiceOfCompletions(previousContext: ReturnType<AgentConte
     previousContext,
     agentContexts.recentCompletions(500, true),
   );
-  const snapshot = agentContexts.getSnapshot();
   if (completionSupervisor) {
-    for (const event of completions) {
-      const record = snapshot.records.find(r => r.sessionId === event.sessionId);
-      const task = brain.getSnapshot().tasks.filter(t => t.sessionId === event.sessionId).sort((a, b) => b.createdAt - a.createdAt)[0];
-      const message = snapshot.userMessages.filter(m => m.sessionId === event.sessionId && m.sentAt <= event.completedAt).sort((a, b) => b.sentAt - a.sentAt)[0];
-      void completionSupervisor.observe({ event, revision: record?.revision, conversationId: brainConversationScopeId,
-        goal: message?.text ?? task?.text,
-        candidates: snapshot.records.filter(r => r.present && r.sessionId !== event.sessionId && !!event.workspace &&
-          r.workspace === event.workspace && ['idle', 'done'].includes(r.status) && /codex|claude/i.test(r.agent || r.command))
-          .slice(0, 16).map(r => ({ sessionId: r.sessionId, name: r.name || r.agent || r.command, source: r.source,
-            workspace: r.workspace, task: r.preview?.slice(0, 600), runtime: r.agent || r.command })),
-      }).catch(() => console.error('[host] Completion receipt could not be persisted'));
-    }
+    observeSupervisorCompletions(completionSupervisor, completions, {
+      agentContexts,
+      brain,
+      getBrainConversationScopeId: () => brainConversationScopeId,
+    });
     return;
   }
   const event = buildVoiceCompletionEvent(completions);
@@ -454,7 +448,8 @@ function notifyRealtimeVoiceOfCompletions(previousContext: ReturnType<AgentConte
 let relay: WebSocket;
 let latestRelayTopology: Extract<ControlMessage, { t: 'relay_topology' }> | undefined;
 
-const brain = new BrainCoordinator();
+const brain = new BrainCoordinator(new JsonBrainStore(undefined, { debounceMs: 150 }));
+const forkToolSummaries = new Map<string, string>();
 const phoneActionTimeline = new PhoneActionTimeline(brain);
 let voiceUsageSummary = readVoiceUsageSummary();
 const brainResultDirectory = join(hostStateDirectory, 'brain-results');
@@ -514,6 +509,15 @@ function publishExecutionEvent(event: ExecutionForkEvent): void {
     if (!clients.get(clientId)?.traffic.allows('brain_execution_event') &&
         !brainRequestWaiters.get(event.requestId)?.has(clientId)) continue;
     sendToClient(clientId, encodeControl({ t: 'brain_execution_event', event: stored }));
+  }
+}
+
+function broadcastBrainTextDelta(requestId: string, delta: string, text: string, final = false): void {
+  const frame = encodeControl({ t: 'brain_text_delta', requestId, delta, text, final });
+  for (const clientId of clients.keys()) {
+    if (!clients.get(clientId)?.traffic.allows('brain_text_delta') &&
+        !brainRequestWaiters.get(requestId)?.has(clientId)) continue;
+    sendToClient(clientId, frame);
   }
 }
 
@@ -617,9 +621,14 @@ const mgr = new SessionManager(
   },
   backend,
 );
-process.once('exit', () => mgr.dispose());
+function flushHostBrainState(): void {
+  try { brain.flushSync(); } catch { /* ignore */ }
+  try { agentContexts.flushSync(); } catch { /* ignore */ }
+  try { completionSupervisor?.flushSync(); } catch { /* ignore */ }
+}
+process.once('exit', () => { flushHostBrainState(); mgr.dispose(); });
 for (const [signal, code] of [['SIGTERM', 143], ['SIGINT', 130]] as const) {
-  process.once(signal, () => { try { mgr.dispose(); } finally { process.exit(code); } });
+  process.once(signal, () => { try { flushHostBrainState(); mgr.dispose(); } finally { process.exit(code); } });
 }
 brain.failInterruptedTasks(new Set(mgr.sessions.keys()));
 
@@ -666,48 +675,71 @@ const agentChat = createAgentChatRouter({
   send: (clientId, frame) => sendToClient(clientId, frame),
   log: console.log,
 });
-const agentContexts = new AgentContextIndex();
-const completionNotifications = new Set<string>();
-const completionSupervisor = process.env.TYPESAFE_API_KEY && process.env.TB_COMPLETION_REVIEW !== 'off'
-  ? new CompletionSupervisor(join(hostStateDirectory, 'completion-reviews.json'), {
-    judge: completionJudge(process.env.TYPESAFE_API_KEY),
-    current: id => {
-      const record = agentContexts.getSnapshot().records.find(r => r.sessionId === id && r.present);
-      return record && { revision: record.revision, completedAt: record.completedAt, status: record.status };
-    },
-    review: async (input, signal) => {
-      const cwd = await reviewCwd(input.event.sessionId);
-      const service = voiceExecutionConversations?.standard ?? brainConversation;
-      if (!cwd || !service) throw new Error('Read-only reviewer unavailable');
-      return reviewCompletion(service, input, cwd, signal);
-    },
-    handoff: async (id, text) => { const result = await continueVoiceAgent(id, text); return { ok: result.ok === true }; },
-    publish: (record, view) => {
-      console.log('[host] completion_review', JSON.stringify({ id: record.id, status: record.status,
-        next: record.decision?.next, confidence: record.decision?.confidence, elapsedMs: Date.now() - record.createdAt }));
-      if (record.input.conversationId !== brainConversationScopeId &&
-          !brain.getConversationToolResults().some(r => r.id === record.id)) return;
-      brain.upsertConversationToolResult({ id: record.id, requestId: record.id, callId: record.id,
-        toolName: 'completion_review', createdAt: record.createdAt, view });
-      if (record.input.conversationId !== brainConversationScopeId) return;
-      broadcastBrainSnapshot();
-      for (const [key, conversation] of realtimeConversations) {
-        const route = realtimeVoiceRoute(key);
-        if (!route) continue;
-        sendToClient(route.clientId, encodeControl({ t: 'brain_voice_tool_result', requestId: route.requestId,
-          callId: record.id, toolName: 'completion_review', view }));
-        const stamp = `${key}:${record.id}:${record.status}`;
-        if (!['ready', 'needs_decision'].includes(record.status) || completionNotifications.has(stamp)) continue;
-        completionNotifications.add(stamp);
-        if (completionNotifications.size > 1000) completionNotifications.delete(completionNotifications.values().next().value!);
-        sendToClient(route.clientId, encodeControl({ t: 'brain_voice_status', requestId: route.requestId,
-          status: 'notification', notificationKind: 'agent_completion' }));
-        conversation.injectUserMessage(buildVoiceCompletionEvent([{ ...record.input.event,
-          summary: `${record.receipt || 'Agent 自述完成，未经验收'}\n${record.review || record.input.event.summary}` }]));
-      }
-    },
-  }) : undefined;
+const agentContexts = new AgentContextIndex(undefined, { debounceMs: 500 });
 const existingAgentDispatches = new ExistingAgentDispatchTracker();
+const completionSupervisor = createHostCompletionSupervisor({
+  hostStateDirectory,
+  typesafeApiKey: process.env.TYPESAFE_API_KEY,
+  completionReviewEnv: process.env.TB_COMPLETION_REVIEW,
+  agentContexts,
+  brain,
+  getBrainConversationScopeId: () => brainConversationScopeId,
+  getReviewService: () => voiceExecutionConversations?.standard ?? brainConversation,
+  reviewCwd,
+  continueVoiceAgent: (id, text) => workerController.continueVoiceAgent(id, text),
+  broadcastBrainSnapshot,
+  realtimeConversations,
+  realtimeVoiceRoute,
+  sendToClient,
+});
+const workerController = createBrainWorkerController({
+  getConfig: () => config,
+  getAgentRegistry: () => agentRegistry,
+  brain,
+  brainMemory,
+  agentContexts,
+  herdr,
+  mgr,
+  getBridge: () => bridge,
+  toolScripts,
+  silentExecutions,
+  existingAgentDispatches,
+  completionSupervisor,
+  brainResultDirectory,
+  brainResultPaths,
+  prefillDelayMs: PREFILL_DELAY_MS,
+  broadcastBrainSnapshot,
+});
+const brainRouter = createBrainRouter({
+  brain,
+  brainConversation,
+  completionSupervisor,
+  silentExecutions,
+  inFlightBrainRequests,
+  brainRequestWaiters,
+  maxConcurrentBrainRequests: MAX_CONCURRENT_BRAIN_REQUESTS,
+  maxBrainTextChars: MAX_BRAIN_TEXT_CHARS,
+  hasActiveRealtimeConversations: () => realtimeConversations.size > 0,
+  consumeBrainQuota,
+  closeRealtimeVoiceForClient,
+  rotateBrainConversationScope,
+  sendBrainSnapshot,
+  broadcastBrainSnapshot,
+  sendBrainAccepted,
+  addBrainWaiter,
+  sendBackgroundReply,
+  sendBrainError,
+  broadcastTextDelta: broadcastBrainTextDelta,
+  listPeerAndWaiterClientIds: (requestId) => {
+    const targets: number[] = [];
+    for (const [targetId, state] of clients) {
+      if (state.peer || brainRequestWaiters.get(requestId)?.has(targetId)) targets.push(targetId);
+    }
+    return targets;
+  },
+  sendToClient,
+  runGlobalExecutionFork,
+});
 let contextRefreshInFlight: Promise<void> | undefined;
 
 function refreshAgentContexts(): Promise<void> {
@@ -806,6 +838,7 @@ interface GlobalExecutionForkInput {
   voiceClientId?: number;
   imageAttachment?: BrainImageAttachment;
   priorUserSpeech?: string;
+  onTextDelta?: (delta: string, fullText: string) => void;
 }
 
 /** One deep execution path shared by text and realtime speech frontends. */
@@ -873,12 +906,41 @@ async function runGlobalExecutionFork(input: GlobalExecutionForkInput) {
     listAgentProfiles: () => agentRegistry.list(),
     recentCompletions: () => agentContexts.recentCompletions(10),
     recentUserMessages: () => agentContexts.recentUserMessages(100),
+    readAgentTranscript: async (sessionId) => {
+      const session = herdr.sessions.get(sessionId);
+      if (!session) return undefined;
+      return readStructuredAgentTranscript({
+        agent: session.agent,
+        providerSessionId: session.agentSessionId,
+        sessionRef: session.agentSessionRef,
+        cwd: session.cwd,
+      });
+    },
     listTasks: () => brain.getSnapshot().tasks,
     searchWeb: async (query) => {
       if (!voiceService) throw new Error('Web search is not configured');
       return { ok: true, ...await voiceService.searchWeb({ query }) };
     },
-    workspaceFiles: (action, path) => workspaceFiles.execute(action, path),
+    workspaceFiles: (action, path, options) => workspaceFiles.execute(action, path, options),
+    brainMemory: async (args) => {
+      const action = typeof args.action === 'string' ? args.action.trim() : '';
+      if (action === 'read') return { ok: true, text: brainMemory.read() };
+      if (action === 'search') return brainMemory.search(String(args.query ?? ''));
+      if (action === 'upsert') {
+        return brainMemory.upsert({
+          section: typeof args.section === 'string' ? args.section : 'General',
+          key: typeof args.key === 'string' ? args.key : undefined,
+          content: String(args.content ?? ''),
+        });
+      }
+      if (action === 'remove') {
+        return brainMemory.remove({
+          section: typeof args.section === 'string' ? args.section : undefined,
+          query: String(args.query ?? ''),
+        });
+      }
+      throw new Error('action must be read, search, upsert, or remove');
+    },
     inspectImages: (question, assetIds) => inspectAttachedImages({
       attachment: input.imageAttachment, question, assetIds, describe: describeImages,
       isCurrent: imageSelectionIsCurrent,
@@ -933,14 +995,14 @@ async function runGlobalExecutionFork(input: GlobalExecutionForkInput) {
         error: 'Screen capture completed without a valid image attachment; cannot inspect pixels.' };
       return captured;
     },
-    dispatchAgent: (task, agent, callId) => dispatchWorkerAgent({
+    dispatchAgent: (task, agent, callId) => workerController.dispatchWorkerAgent({
       requestId: brainToolRequestId(input.requestId, callId),
       text: workerTaskWithImageAttachment(task, input.imageAttachment),
       requestedAgent: input.requestedAgent || agent || undefined,
       clientPlatform: input.clientPlatform,
     }),
-    continueAgent: continueVoiceAgent,
-    cancelExecution: cancelExecutionById,
+    continueAgent: (sessionId, text) => workerController.continueVoiceAgent(sessionId, text),
+    cancelExecution: (id) => workerController.cancelExecutionById(id),
     completionReviews: async () => ({ ok: !!completionSupervisor, reviews: completionSupervisor?.list().slice(0, 10).map(r => ({
       id: r.id, name: r.input.event.name, sessionId: r.input.event.sessionId, status: r.status,
       next: r.decision?.next, completedAt: r.input.event.completedAt, review: r.review, receipt: r.receipt,
@@ -957,13 +1019,12 @@ async function runGlobalExecutionFork(input: GlobalExecutionForkInput) {
     }, input.signal),
   });
   const forkId = `fork-${input.requestId}`.slice(0, 128);
-  const messages = selectVoiceContextMessages(snapshot.messages).slice(-12).map((message) => ({
-    role: message.role === 'brain' ? 'assistant' as const : 'user' as const,
-    content: message.text,
-  }));
-  if (messages.at(-1)?.role !== 'user' || messages.at(-1)?.content !== input.text.trim()) {
-    messages.push({ role: 'user', content: input.text.trim() });
-  }
+  const messages = buildConversationHistoryMessages(
+    snapshot.messages,
+    snapshot.toolResults,
+    input.text,
+    forkToolSummaries,
+  );
 
   const notifyPhoneOutcomes = !input.voiceKey || input.workflow === 'silent';
   if (notifyPhoneOutcomes) phoneActionTimeline.begin(input.requestId);
@@ -972,12 +1033,13 @@ async function runGlobalExecutionFork(input: GlobalExecutionForkInput) {
       signal: input.signal,
       instructions: buildExecutionForkInstructions({
         runtimeContext,
-        persistentMemory: brainMemory.voiceSnapshot(),
+        persistentMemory: brainMemory.voiceSnapshot(input.text),
       }) + intentHints.hint(intentKey, input.text, {
         ...intentContext(input.text, input.sourceSessionId), history: hintContext.history,
       }),
       messages,
       tools: GLOBAL_BRAIN_TOOLS,
+      onTextDelta: input.onTextDelta,
       execution: {
         forkId,
         requestId: input.requestId,
@@ -1028,6 +1090,11 @@ async function runGlobalExecutionFork(input: GlobalExecutionForkInput) {
     if (response.toolCalls.some(({ call }) => call.name === 'inspect_images') && !imageSelectionIsCurrent()) {
       throw new Error('Image attachment changed or call ended; discard the obsolete answer');
     }
+    const turnToolSummary = summarizeForkToolCalls(response.toolCalls);
+    if (turnToolSummary) {
+      forkToolSummaries.set(input.requestId, turnToolSummary);
+      if (forkToolSummaries.size > 40) forkToolSummaries.delete(forkToolSummaries.keys().next().value!);
+    }
     if (!response.toolCalls.some(({ call }) => (
       call.name === 'continue_agent' || call.name === 'dispatch_agent'
     ))) {
@@ -1066,202 +1133,6 @@ async function runGlobalExecutionFork(input: GlobalExecutionForkInput) {
     input.signal?.removeEventListener('abort', cancelIntent);
     if (!input.voiceKey) intentHints.clear(intentKey);
   }
-}
-
-async function continueVoiceAgent(sessionId: string, text: string): Promise<Record<string, unknown>> {
-  const instruction = `${text}\n\n${brainMemory.agentInstructions()}`;
-  const herdrSession = herdr.sessions.get(sessionId);
-  if (herdrSession) {
-    await herdr.write(herdrSession, pasteAndSubmit(instruction));
-    return { ok: true, sessionId, name: herdrSession.name, source: 'herdr', status: 'sent' };
-  }
-  const ptySession = mgr.sessions.get(sessionId);
-  if (ptySession) {
-    mgr.write(ptySession, pasteAndSubmit(instruction));
-    return { ok: true, sessionId, name: ptySession.label, source: 'pty', status: 'sent' };
-  }
-  return { ok: false, error: `Agent session ${sessionId} is not available` };
-}
-
-async function cancelExecutionById(id: string): Promise<Record<string, unknown>> {
-  if (id.startsWith('completion-')) return { ok: completionSupervisor?.cancel(id) ?? false, id,
-    status: completionSupervisor?.list().find(r => r.id === id)?.status ?? 'not_found' };
-  const script = toolScripts.cancel(id);
-  if (script) return script;
-  if (silentExecutions.cancel(id.startsWith('fork-') ? id.slice(5) : id)) {
-    return { ok: true, id, kind: 'silent_execution', status: 'cancelled',
-      summary: 'Orchestration cancelled. Dispatched workers must be cancelled by their own task ID; completed actions cannot be undone.' };
-  }
-  const task = brain.findTaskById(id);
-  if (task) {
-    if (task.status !== 'queued' && task.status !== 'dispatched') {
-      return {
-        ok: false,
-        id,
-        kind: 'worker_task',
-        status: 'not_cancellable',
-        error: `Task ${id} is already ${task.status}`,
-        failureKind: 'not_cancellable',
-        retryable: false,
-      };
-    }
-    if (task.sessionId) {
-      const ptySession = mgr.sessions.get(task.sessionId);
-      const herdrSession = herdr.sessions.get(task.sessionId);
-      if (ptySession) {
-        mgr.kill(ptySession);
-      } else if (herdrSession) {
-        await herdr.write(herdrSession, Buffer.from('\x03'));
-      }
-    }
-    existingAgentDispatches.cancel(task.taskId);
-    const cancelled = brain.cancelTask(task.taskId);
-    broadcastBrainSnapshot();
-    return {
-      ok: Boolean(cancelled),
-      id: task.taskId,
-      kind: 'worker_task',
-      status: 'cancelled',
-      summary: `${task.agent} 的任务已取消`,
-      ...(task.sessionId ? { sessionId: task.sessionId } : {}),
-    };
-  }
-
-  if (id.startsWith('phone-')) {
-    const response = await bridge.call('app', 'phone.action.cancel', { actionId: id }, 10_000);
-    if (!response.ok) {
-      return {
-        ok: false,
-        id,
-        kind: 'phone_action',
-        status: 'not_cancellable',
-        error: response.error || `Phone action ${id} could not be cancelled`,
-        failureKind: 'not_cancellable',
-        retryable: false,
-      };
-    }
-    return {
-      ok: true,
-      id,
-      kind: 'phone_action',
-      status: 'cancelled',
-      summary: '手机操作已取消',
-      ...(response.data && typeof response.data === 'object' ? response.data as Record<string, unknown> : {}),
-    };
-  }
-
-  const ptySession = mgr.sessions.get(id);
-  if (ptySession) {
-    mgr.kill(ptySession);
-    return { ok: true, id, kind: 'pty_session', status: 'aborted', summary: 'Terminal 任务已终止' };
-  }
-  const herdrSession = herdr.sessions.get(id);
-  if (herdrSession) {
-    await herdr.write(herdrSession, Buffer.from('\x03'));
-    return {
-      ok: true,
-      id,
-      kind: 'herdr_session',
-      status: 'aborted',
-      sessionId: id,
-      summary: `${herdrSession.name} 已收到中断信号`,
-    };
-  }
-  return {
-    ok: false,
-    id,
-    status: 'not_found',
-    error: `No running execution ${id}`,
-    failureKind: 'invalid_request',
-    retryable: false,
-  };
-}
-
-interface DispatchWorkerAgentInput {
-  requestId: string;
-  text: string;
-  requestedAgent?: string;
-  clientPlatform?: string;
-}
-
-/** The only path from Global conversation into a new local worker process. */
-async function dispatchWorkerAgent(input: DispatchWorkerAgentInput): Promise<Record<string, unknown>> {
-  const existing = brain.findTaskByRequestId(input.requestId);
-  if (existing) return workerDispatchResult(existing);
-  const availableAgents = agentRegistry.ids();
-  if (input.requestedAgent && !availableAgents.includes(input.requestedAgent)) {
-    throw new Error(`Agent ${input.requestedAgent} is not configured`);
-  }
-
-  const snapshot = brain.getSnapshot();
-  const runtimeContext = agentContexts.buildPromptContext({
-    currentRequest: input.text,
-    clientPlatform: input.clientPlatform,
-    messages: snapshot.messages,
-    tasks: snapshot.tasks,
-  });
-  const agentInstruction = `${input.text.trim()}\n\n${brainMemory.agentInstructions()}\n\n${DELIVERABLE_INSTRUCTIONS}`;
-  const dispatchPrompt = `${agentInstruction}\n\n${runtimeContext}`;
-  const task = brain.submit({
-    requestId: input.requestId,
-    text: input.text,
-    dispatchText: input.text,
-    requestedAgent: input.requestedAgent,
-    availableAgents,
-    recordUserMessage: false,
-  });
-  broadcastBrainSnapshot();
-
-  mkdirSync(brainResultDirectory, { recursive: true });
-  const resultPath = join(brainResultDirectory, `${task.taskId.replace(/[^a-zA-Z0-9._-]/g, '-')}.md`);
-  rmSync(resultPath, { force: true });
-  const brainAgent = resolveBrainAgent(config, task.agent, dispatchPrompt, resultPath);
-  const resolved = brainAgent ?? resolveAgent(config, task.agent);
-  if (!resolved) {
-    brain.failTask(task.taskId, `Agent ${task.agent} is no longer configured`);
-    broadcastBrainSnapshot();
-    return { ok: false, error: `Agent ${task.agent} is no longer configured` };
-  }
-
-  try {
-    const session = mgr.create({
-      command: resolved.command,
-      args: resolved.args,
-      cols: 100,
-      rows: 30,
-      label: task.agent,
-      ...(brainAgent ? { env: brainAgent.env, durable: false } : {}),
-      onCreated: (createdSession) => {
-        if (brainAgent) brainResultPaths.set(createdSession.id, resultPath);
-        brain.bindSession(task.taskId, createdSession.id);
-        broadcastBrainSnapshot();
-      },
-    });
-    if (!brainAgent) {
-      setTimeout(() => {
-        if (mgr.sessions.has(session.id)) mgr.write(session, Buffer.from(`${dispatchPrompt}\r`, 'utf8'));
-      }, PREFILL_DELAY_MS);
-    }
-  } catch (error) {
-    rmSync(resultPath, { force: true });
-    brain.failTask(task.taskId, (error as Error).message);
-    broadcastBrainSnapshot();
-    return { ok: false, error: (error as Error).message };
-  }
-  return workerDispatchResult(brain.findTaskByRequestId(input.requestId) || task);
-}
-
-function workerDispatchResult(task: BrainTask): Record<string, unknown> {
-  return {
-    ok: task.status !== 'failed',
-    requestId: task.requestId,
-    taskId: task.taskId,
-    runId: task.taskId,
-    agent: task.agent,
-    status: task.status,
-    ...(task.sessionId ? { sessionId: task.sessionId } : {}),
-    ...(task.error ? { error: task.error } : {}),
-  };
 }
 
 void herdr.init().then(() => refreshAgentContexts()).catch((error) => {
@@ -1397,7 +1268,7 @@ async function handlePhoneActionEvent(
     let worker: Record<string, unknown> | undefined;
     if (editTask) {
       try {
-        worker = await dispatchWorkerAgent({
+        worker = await workerController.dispatchWorkerAgent({
           requestId: brainToolRequestId(event.requestId, `${event.callId}-photo-edit`),
           text: editTask,
           requestedAgent: origin?.requestedAgent,
@@ -1553,6 +1424,7 @@ async function handleClientControl(clientId: number, msg: ControlMessage): Promi
   }
   if (remoteDesktop.handle(clientId, msg)) return;
   if (await agentChat.handle(clientId, msg)) return;
+  if (await brainRouter.handle(clientId, msg)) return;
   switch (msg.t) {
     case 'voice_learning_sync': {
       const peer = clients.get(clientId)?.peer;
@@ -2045,72 +1917,6 @@ async function handleClientControl(clientId: number, msg: ControlMessage): Promi
     }
     case 'agents': {
       sendToClient(clientId, encodeControl({ t: 'agents_result', names: Object.keys(config.agents) }));
-      break;
-    }
-    case 'brain_snapshot': {
-      sendBrainSnapshot(clientId);
-      break;
-    }
-    case 'brain_completion_action': {
-      try {
-        if (!completionSupervisor) throw new Error('Completion review is not configured');
-        if (msg.action === 'approve') await completionSupervisor.approve(msg.id);
-        else if (!completionSupervisor.cancel(msg.id)) throw new Error('Already dispatched; cancelling the card cannot stop a terminal Agent');
-        sendToClient(clientId, encodeControl({ t: 'brain_completion_result', requestId: msg.requestId, ok: true }));
-      } catch (error) {
-        sendToClient(clientId, encodeControl({ t: 'brain_completion_result', requestId: msg.requestId, ok: false, error: (error as Error).message }));
-      }
-      break;
-    }
-    case 'brain_new': {
-      if (inFlightBrainRequests.size > 0 || realtimeConversations.size > 0) {
-        sendToClient(clientId, encodeControl({
-          t: 'error',
-          message: 'Finish the current Brain reply or call before starting a new conversation',
-        }));
-        break;
-      }
-      brain.startNewConversation();
-      rotateBrainConversationScope();
-      broadcastBrainSnapshot();
-      break;
-    }
-    case 'brain_clear': {
-      if (inFlightBrainRequests.size > 0 || realtimeConversations.size > 0 || brain.hasActiveTasks()) {
-        sendToClient(clientId, encodeControl({
-          t: 'error',
-          message: 'Finish the current Brain reply, call, or running task before clearing Global history',
-        }));
-        break;
-      }
-      brain.clearAllConversations();
-      rotateBrainConversationScope();
-      broadcastBrainSnapshot();
-      break;
-    }
-    case 'brain_restore': {
-      if (inFlightBrainRequests.size > 0 || realtimeConversations.size > 0) {
-        sendToClient(clientId, encodeControl({
-          t: 'error',
-          message: 'Finish the current Brain reply or call before restoring a conversation',
-        }));
-        break;
-      }
-      if (!brain.restoreConversation(msg.conversationId)) {
-        sendToClient(clientId, encodeControl({ t: 'error', message: 'Global conversation history was not found' }));
-        break;
-      }
-      rotateBrainConversationScope();
-      broadcastBrainSnapshot();
-      break;
-    }
-    case 'brain_history': {
-      const conversation = brain.getHistoryConversation(msg.conversationId);
-      if (!conversation) {
-        sendToClient(clientId, encodeControl({ t: 'error', message: 'Global conversation history was not found' }));
-        break;
-      }
-      sendToClient(clientId, encodeControl({ t: 'brain_history_result', conversation }));
       break;
     }
     case 'brain_voice_start': {
@@ -2734,95 +2540,6 @@ async function handleClientControl(clientId: number, msg: ControlMessage): Promi
         }));
       } finally {
         inFlightSyntheses.delete(msg.requestId);
-      }
-      break;
-    }
-    case 'brain_cancel': {
-      sendToClient(clientId, encodeControl({ t: 'brain_cancel_result', requestId: msg.requestId,
-        cancelled: silentExecutions.cancel(msg.requestId) }));
-      break;
-    }
-    case 'brain_send': {
-      if (
-        typeof msg.requestId !== 'string' ||
-        typeof msg.text !== 'string' ||
-        (msg.agent != null && typeof msg.agent !== 'string') ||
-        !msg.requestId ||
-        msg.requestId.length > 128 ||
-        !msg.text.trim() ||
-        msg.text.length > MAX_BRAIN_TEXT_CHARS
-      ) {
-        sendToClient(clientId, encodeControl({ t: 'error', message: 'Invalid Brain request size' }));
-        break;
-      }
-      const existing = brain.findTaskByRequestId(msg.requestId)
-        || brain.findConversationMessage(msg.requestId)
-        || brain.findConversationMessage(`${msg.requestId}-brain`);
-      if (existing) {
-        sendBrainAccepted(clientId, msg.requestId);
-        sendBrainSnapshot(clientId);
-        sendBackgroundReply(clientId, msg.requestId);
-        if (inFlightBrainRequests.has(msg.requestId)) addBrainWaiter(msg.requestId, clientId);
-        break;
-      }
-      const conversation = brainConversation;
-      if (!conversation) {
-        sendToClient(clientId, encodeControl({
-          t: 'error',
-          message: 'Global Brain requires DASHSCOPE_API_KEY; local Codex fallback is disabled',
-        }));
-        break;
-      }
-      if (inFlightBrainRequests.has(msg.requestId)) {
-        addBrainWaiter(msg.requestId, clientId);
-        sendBrainAccepted(clientId, msg.requestId);
-        break;
-      }
-      if (inFlightBrainRequests.size >= MAX_CONCURRENT_BRAIN_REQUESTS || !consumeBrainQuota()) {
-        sendToClient(clientId, encodeControl({ t: 'error', message: 'Brain request limit reached; retry in a minute' }));
-        break;
-      }
-      inFlightBrainRequests.add(msg.requestId);
-      const silentSignal = msg.workflow === 'silent' ? silentExecutions.start(msg.requestId) : undefined;
-      let silentStatus: 'completed' | 'failed' | 'cancelled' = 'completed';
-      if (silentSignal) closeRealtimeVoiceForClient(clientId);
-      addBrainWaiter(msg.requestId, clientId);
-      sendBrainAccepted(clientId, msg.requestId);
-
-      try {
-        brain.appendConversationMessage({ id: msg.requestId, role: 'user', text: msg.text });
-        broadcastBrainSnapshot();
-        await runGlobalExecutionFork({
-          workflow: msg.workflow, modelTier: msg.modelTier, signal: silentSignal,
-          requestId: msg.requestId,
-          text: msg.text,
-          clientPlatform: msg.clientPlatform || 'global-text',
-          requestedAgent: msg.agent || undefined,
-          sourceSessionId: msg.sourceSessionId,
-          imageAttachment: msg.imageAttachment,
-        });
-      } catch (error) {
-        if (silentSignal) {
-          silentStatus = silentSignal.aborted ? 'cancelled' : 'failed';
-          brain.appendConversationMessage({ id: `${msg.requestId}-brain`, role: 'brain',
-            text: silentSignal.aborted ? '已取消本次编排。已派发的 Agent 需单独停止，已执行操作不会撤销。' : `执行失败：${(error as Error).message}` });
-        } else sendBrainError(msg.requestId, (error as Error).message);
-      } finally {
-        if (silentSignal) {
-          const answer = brain.findConversationMessage(`${msg.requestId}-brain`);
-          for (const [targetId, state] of clients) {
-            if (state.peer || brainRequestWaiters.get(msg.requestId)?.has(targetId)) {
-              sendToClient(targetId, encodeControl({ t: 'brain_text_result', requestId: msg.requestId,
-                status: silentStatus,
-                text: (answer?.text || '执行结束，请打开对话查看状态').slice(0, 2000) }));
-            }
-          }
-          silentExecutions.finish(msg.requestId);
-          broadcastBrainSnapshot();
-        }
-        for (const waiter of brainRequestWaiters.get(msg.requestId) ?? []) sendBackgroundReply(waiter, msg.requestId);
-        inFlightBrainRequests.delete(msg.requestId);
-        brainRequestWaiters.delete(msg.requestId);
       }
       break;
     }

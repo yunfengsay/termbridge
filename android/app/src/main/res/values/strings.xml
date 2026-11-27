@@ -510,6 +510,7 @@
     <string name="phone_action_policy_inline_title">Approval for each action</string>
     <string name="brain_voice_interrupted">Voice · Interrupted</string>
     <string name="brain_voice_streaming">Voice · Responding</string>
+    <string name="brain_text_streaming">Replying…</string>
     <string name="voice_mode_continuous">Continuous</string>
     <string name="voice_mode_wake_word">Wake word</string>
     <string name="voice_wake_standby">Waiting for local wake word</string>
@@ -648,5 +649,7 @@
     <string name="content_open_external">Open with system app</string>
     <string name="content_open_external_failed">No installed app can open this file.</string>
     <string name="content_pdf_pages">Showing %1$d of %2$d pages</string>
+    <string name="brain_tool_expand_more">Show %1$d earlier</string>
+    <string name="brain_tool_collapse">Collapse</string>
     <string name="content_text_truncated">Showing first %1$d KB (%2$s total)</string>
 </resources>

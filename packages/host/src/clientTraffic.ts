@@ -15,7 +15,7 @@ export class ClientTraffic {
   }
 
   allows(type: string): boolean {
-    return !this.background || !['brain_snapshot_result', 'brain_execution_event'].includes(type);
+    return !this.background || !['brain_snapshot_result', 'brain_execution_event', 'brain_text_delta'].includes(type);
   }
 
   /** Baseline then state/identity changes only; never stream previews or terminal content. */

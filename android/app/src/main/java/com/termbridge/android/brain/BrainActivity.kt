@@ -199,14 +199,8 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
     private var activeVoiceModel: String? = null
     private var voiceConnectLatencyMs = 0
     private var bypassOverlayPermissionOnce = false
-    private var latestBrainTasks: List<BrainTaskInfo> = emptyList()
-    private var latestBrainHistory: List<BrainConversationSummaryInfo> = emptyList()
-    private var latestBrainMessages: List<BrainMessageInfo> = emptyList()
-    private var latestAllBrainMessages: List<BrainMessageInfo> = emptyList()
-    private var latestBrainToolResults: List<BrainToolResultInfo> = emptyList()
-    private var latestBrainDeliverables: List<BrainDeliverableInfo> = emptyList()
-    private var latestBrainExecutionEvents: List<ExecutionForkEventInfo> = emptyList()
-    private var latestVoiceUsage: VoiceUsageInfo? = null
+    private val timelineState = BrainTimelineState()
+    private val voiceDiagnostics = VoiceDiagnosticsController()
     private val pendingSpeechIds = mutableSetOf<String>()
     private val pendingSyntheses = mutableMapOf<String, PendingSynthesis>()
     private val microphonePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -231,17 +225,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         if (started && connected && brainReady && voiceConversation.active) startRemoteVoiceSession()
     }
 
-    // On-screen voice pipeline diagnostics: capture/send counters plus the last
-    // gate decision, so a stalled turn shows exactly which stage blocked it.
-    @Volatile private var voiceDbgFrames = 0L
-    @Volatile private var voiceDbgCapturedBytes = 0L
-    @Volatile private var voiceDbgSentBytes = 0L
-    @Volatile private var voiceDbgLastEvent = "等待通话"
-    @Volatile private var voiceDbgLastEventAt = 0L
-    @Volatile private var voiceDbgAudible = false
-    @Volatile private var voiceDbgProbability = 0f
-    @Volatile private var voiceDbgProbabilityPeak = 0f
-    @Volatile private var voiceDbgThreshold = 0f
+    // On-screen voice pipeline diagnostics live in VoiceDiagnosticsController.
     private val voiceDebugTicker = object : Runnable {
         override fun run() {
             renderVoiceDebug()
@@ -249,27 +233,14 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         }
     }
 
-    private fun noteVoiceEvent(event: String) {
-        voiceDbgLastEvent = event
-        voiceDbgLastEventAt = System.currentTimeMillis()
-    }
+    private fun noteVoiceEvent(event: String) = voiceDiagnostics.noteEvent(event)
 
     private fun renderVoiceDebug() {
-        if (!voiceConversation.active) {
-            binding.voiceDebugStatus.text = ""
-            return
-        }
-        val req = if (transcriptionRequestId != null) "有" else "无"
-        val ready = if (voiceRemoteReady) "是" else "否"
-        val age = if (voiceDbgLastEventAt == 0L) "" else " · ${(System.currentTimeMillis() - voiceDbgLastEventAt) / 1000}s前"
-        val gate = if (voiceDbgAudible) "语音▶" else "静音·"
-        val peak = voiceDbgProbabilityPeak
-        voiceDbgProbabilityPeak = voiceDbgProbability
-        binding.voiceDebugStatus.text =
-            "采集 ${voiceDbgFrames}帧/${voiceDbgCapturedBytes / 1024}KB → 已发 ${voiceDbgSentBytes / 1024}KB [$gate]\n" +
-            "VAD p=%.2f 峰值=%.2f 阈值=%.2f · 会话:%s 就绪:%s".format(
-                voiceDbgProbability, peak, voiceDbgThreshold, req, ready) + "\n" +
-            "最近: $voiceDbgLastEvent$age"
+        binding.voiceDebugStatus.text = voiceDiagnostics.formatStatus(
+            active = voiceConversation.active,
+            hasRequestId = transcriptionRequestId != null,
+            remoteReady = voiceRemoteReady,
+        )
     }
     private val restorePotentialSpeechPlayback = Runnable {
         if (voiceBargeInGate.onPotentialSpeechTimedOut()) {
@@ -331,7 +302,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
             onCompleted = { messageId ->
                 runOnUiThread {
                     pendingSpeechIds.remove(messageId)
-                    saveSpokenMessageIds(loadSpokenMessageIds() + messageId, latestBrainMessages)
+                    saveSpokenMessageIds(loadSpokenMessageIds() + messageId, timelineState.brainMessages)
                     if (messageId == voiceCompletionMessageId) {
                         voiceCompletionMessageId = null
                         voiceTurnRequestId = null
@@ -382,7 +353,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                     true
                 }
                 R.id.action_voice_profile -> {
-                    startActivity(VoiceProfileActivity.intent(this, latestVoiceUsage)
+                    startActivity(VoiceProfileActivity.intent(this, timelineState.voiceUsage)
                         .setClass(this, com.termbridge.android.GlobalSettingsActivity::class.java))
                     true
                 }
@@ -625,11 +596,24 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                 Snackbar.make(binding.root, R.string.silent_cancel_unavailable, Snackbar.LENGTH_LONG).show()
             }
             "brain_text_result" -> {
+                val finishedRequestId = message.string("requestId")
+                if (finishedRequestId != null) timelineState.clearStreamingDraft(finishedRequestId)
                 if (message.string("status") != "completed") {
                     Snackbar.make(binding.root, message.string("text").orEmpty(), Snackbar.LENGTH_LONG).show()
                 }
-                if (message.string("requestId") == pendingRequestId) clearPendingRequest()
+                if (finishedRequestId == pendingRequestId) clearPendingRequest()
                 client?.sendControl("t" to "brain_snapshot")
+            }
+            com.termbridge.android.protocol.BrainSilentProtocol.TEXT_DELTA -> {
+                val requestId = message.string("requestId")
+                val text = message.string("text")
+                if (requestId != null && text != null && timelineState.applyTextDelta(
+                        requestId = requestId,
+                        text = text,
+                        final = message.boolean("final") == true,
+                    )) {
+                    renderTimeline(firstRender = false)
+                }
             }
             "brain_snapshot_result" -> renderSnapshot(
                 message.brainMessages(),
@@ -720,16 +704,17 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         val firstRender = !loaded
         loaded = true
         binding.progress.isVisible = false
-        latestBrainMessages = messages.filter { it.role == "brain" }
-        latestAllBrainMessages = messages
-        latestBrainTasks = tasks
-        latestBrainToolResults = toolResults
-        latestBrainDeliverables = deliverables
+        timelineState.applySnapshot(
+            messages = messages,
+            tasks = tasks,
+            toolResults = toolResults,
+            deliverables = deliverables,
+            executionEvents = executionEvents,
+            history = history,
+            voiceUsage = voiceUsage,
+        )
         BrainToolCatalogState.update(toolCatalog)
-        latestBrainExecutionEvents = executionEvents
-        latestBrainHistory = history
-        latestVoiceUsage = voiceUsage
-        renderTimeline(messages, tasks, toolResults, deliverables, executionEvents, firstRender)
+        renderTimeline(firstRender)
         if (voiceConversation.active) {
             val voiceRequestPrefix = "$transcriptionRequestId-voice-"
             toolResults.lastOrNull {
@@ -760,7 +745,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         if (voiceConversation.active && voiceRequest != null && voiceCompletionMessageId == null) {
             val task = tasks.firstOrNull { it.requestId == voiceRequest }
             if (task?.status == "completed" || task?.status == "failed") {
-                val answer = latestBrainMessages.lastOrNull { it.taskId == task.taskId }
+                val answer = timelineState.brainMessages.lastOrNull { it.taskId == task.taskId }
                 if (answer != null && answer.id !in pendingSpeechIds) {
                     if (voiceTextOnly) {
                         voiceTurnRequestId = null
@@ -780,17 +765,10 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         updateComposerState()
     }
 
-    private fun renderTimeline(
-        messages: List<BrainMessageInfo>,
-        tasks: List<BrainTaskInfo>,
-        toolResults: List<BrainToolResultInfo>,
-        deliverables: List<BrainDeliverableInfo>,
-        executionEvents: List<ExecutionForkEventInfo>,
-        firstRender: Boolean,
-    ) {
+    private fun renderTimeline(firstRender: Boolean) {
         val wasAtBottom = !binding.timeline.canScrollVertically(1)
         val previousLastId = adapter.currentList.lastOrNull()?.stableId
-        val items = buildBrainTimelineItems(messages, tasks, toolResults, deliverables, executionEvents)
+        val items = timelineState.buildTimelineItems()
         val followLatest = shouldFollowLatestTimelineItem(
             firstRender = firstRender,
             wasAtBottom = wasAtBottom,
@@ -805,22 +783,13 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
     }
 
     private fun renderExecutionEvent(event: ExecutionForkEventInfo) {
-        latestBrainExecutionEvents = (latestBrainExecutionEvents.filterNot { it.eventId == event.eventId } + event)
-            .sortedBy(ExecutionForkEventInfo::createdAt)
-            .takeLast(300)
-        renderTimeline(
-            latestAllBrainMessages,
-            latestBrainTasks,
-            latestBrainToolResults,
-            latestBrainDeliverables,
-            latestBrainExecutionEvents,
-            firstRender = false,
-        )
+        timelineState.applyExecutionEvent(event)
+        renderTimeline(firstRender = false)
         if (voiceConversation.active) showVoiceExecutionTrace(event.forkId)
     }
 
     private fun showVoiceExecutionTrace(forkId: String) {
-        val trace = buildBrainExecutionTraces(latestBrainExecutionEvents).lastOrNull { it.forkId == forkId } ?: return
+        val trace = buildBrainExecutionTraces(timelineState.executionEvents).lastOrNull { it.forkId == forkId } ?: return
         val items = trace.tools.map { step ->
             VoiceToolViewItemInfo(
                 id = step.callId,
@@ -925,7 +894,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
 
     private fun confirmClearConversation() {
         if (!canChangeConversation()) return
-        if (latestBrainTasks.any { it.status == "queued" || it.status == "dispatched" }) {
+        if (timelineState.tasks.any { it.status == "queued" || it.status == "dispatched" }) {
             Snackbar.make(binding.root, R.string.brain_action_busy, Snackbar.LENGTH_LONG).show()
             return
         }
@@ -944,11 +913,11 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
             Snackbar.make(binding.root, R.string.brain_action_busy, Snackbar.LENGTH_LONG).show()
             return
         }
-        if (latestBrainHistory.isEmpty()) {
+        if (timelineState.history.isEmpty()) {
             Snackbar.make(binding.root, R.string.brain_history_empty, Snackbar.LENGTH_SHORT).show()
             return
         }
-        val labels = latestBrainHistory.map { summary ->
+        val labels = timelineState.history.map { summary ->
             val relative = DateUtils.getRelativeTimeSpanString(
                 summary.updatedAt,
                 System.currentTimeMillis(),
@@ -960,7 +929,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.brain_history)
             .setItems(labels.toTypedArray()) { _, index ->
-                val conversation = latestBrainHistory[index]
+                val conversation = timelineState.history[index]
                 binding.progress.isVisible = true
                 val sent = client?.sendControl(
                     "t" to "brain_restore",
@@ -1313,10 +1282,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
 
     private fun beginListening() {
         if (!voiceConversation.active || !started) return
-        voiceDbgFrames = 0
-        voiceDbgCapturedBytes = 0
-        voiceDbgSentBytes = 0
-        noteVoiceEvent("通话开始")
+        voiceDiagnostics.resetForCall()
         activeVoiceProvider = null
         activeVoiceModel = null
         voiceConnectLatencyMs = 0
@@ -1477,7 +1443,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
 
     private fun activeSilentRequest(): String? =
         pendingRequestId?.takeIf { pendingWorkflow == "silent" }
-            ?: SilentModePolicy.activeRequest(latestBrainExecutionEvents)
+            ?: SilentModePolicy.activeRequest(timelineState.executionEvents)
 
     private fun cancelSilentExecution() {
         val requestId = activeSilentRequest() ?: return
@@ -1610,7 +1576,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
 
                 override fun onLevel(level: Float) = runOnUiThread {
                     if (voiceCaptureId == captureId) {
-                        voiceDbgFrames += 1
+                        voiceDiagnostics.recordFrame()
                         val visibleLevel = if (wakeSession.localStandby) level * 0.08f else level
                         binding.voiceCallLevel.setLevel(visibleLevel)
                         VoiceCallUiState.setLevel(visibleLevel)
@@ -1618,16 +1584,14 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                 }
 
                 override fun onSpeechGate(audible: Boolean) {
-                    voiceDbgAudible = audible
+                    voiceDiagnostics.recordAudible(audible)
                 }
 
                 override fun onSpeechProbability(probability: Float, threshold: Float) {
                     if (voiceSettings.boundaryLearningEnabled && wakeSession.state == VoiceWakeSession.State.ACTIVE) {
                         controlObservation.frame(probability, android.os.SystemClock.elapsedRealtime())
                     }
-                    voiceDbgProbability = probability
-                    voiceDbgThreshold = threshold
-                    if (probability > voiceDbgProbabilityPeak) voiceDbgProbabilityPeak = probability
+                    voiceDiagnostics.recordVad(probability, threshold)
                 }
 
                 override fun onSpeechDetected() = runOnUiThread {
@@ -1635,8 +1599,8 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                         recordVoiceDiagnostic(
                             "speech_candidate",
                             mapOf(
-                                "vadProbability" to voiceDbgProbability,
-                                "vadThreshold" to voiceDbgThreshold,
+                                "vadProbability" to voiceDiagnostics.probability,
+                                "vadThreshold" to voiceDiagnostics.threshold,
                             ),
                         )
                         if (
@@ -1690,7 +1654,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                             }
                             return@forward
                         }
-                        voiceDbgCapturedBytes += pcm16.size
+                        voiceDiagnostics.recordCaptured(pcm16.size)
                         flushVoiceAudioOutbox()
                     }
                 }
@@ -1706,16 +1670,38 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                         if (voiceCaptureId == captureId) {
                             recordVoiceDiagnostic(
                                 "utterance_committed",
-                                mapOf("capturedBytes" to voiceDbgCapturedBytes, "sentBytes" to voiceDbgSentBytes),
+                                mapOf("capturedBytes" to voiceDiagnostics.capturedBytes, "sentBytes" to voiceDiagnostics.sentBytes),
                             )
                             if (voiceRemoteReady) showListeningStatus() else showVoiceOfflineQueue()
                         }
                     }
                 }
 
-                override fun onVoiceRejected() = runOnUiThread {
+                override fun onVoiceRejected() = onVoiceRejected(null)
+
+                override fun onVoiceRejected(score: Float?) = runOnUiThread {
                     if (voiceCaptureId != captureId) return@runOnUiThread
-                    recordVoiceDiagnostic("speech_rejected")
+                    val diagFields = if (score != null) {
+                        mapOf(
+                            "score" to String.format(java.util.Locale.US, "%.3f", score),
+                            "threshold" to TargetSpeakerTracker.AUTHORIZATION_THRESHOLD,
+                        )
+                    } else {
+                        emptyMap()
+                    }
+                    recordVoiceDiagnostic("speech_rejected", diagFields)
+                    noteVoiceEvent(
+                        if (score != null) {
+                            String.format(
+                                java.util.Locale.US,
+                                "声纹拒绝 %.2f<%.2f",
+                                score,
+                                TargetSpeakerTracker.AUTHORIZATION_THRESHOLD,
+                            )
+                        } else {
+                            "声纹拒绝"
+                        },
+                    )
                     handler.removeCallbacks(restorePotentialSpeechPlayback)
                     if (voiceBargeInGate.onPotentialSpeechRejected()) {
                         realtimePlayer.resumeAfterRejectedSpeech()
@@ -1767,7 +1753,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
                     "requestId" to requestId,
                     "data" to pcm16,
                 ) == true
-                if (ok) voiceDbgSentBytes += pcm16.size
+                if (ok) voiceDiagnostics.recordSent(pcm16.size)
                 ok
             },
             sendCommit = {
@@ -2279,7 +2265,7 @@ class BrainActivity : AppCompatActivity(), TermbridgeClient.Listener {
         wakeSession.park()
         closeWakeRemoteSession()
         callAudioSession.setStandby(true)
-        recordVoiceDiagnostic("local_wake_standby", mapOf("sentBytes" to voiceDbgSentBytes))
+        recordVoiceDiagnostic("local_wake_standby", mapOf("sentBytes" to voiceDiagnostics.sentBytes))
         showWakeStandby()
     }
 

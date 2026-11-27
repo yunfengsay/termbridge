@@ -13,6 +13,8 @@ export type BrainConversationRole = 'user' | 'assistant';
 export interface BrainConversationMessage {
   role: BrainConversationRole;
   content: string;
+  /** Compact structured summary of verified tool outcomes produced on this assistant turn. */
+  toolSummary?: string;
 }
 
 export interface BrainConversationInput {
@@ -21,6 +23,8 @@ export interface BrainConversationInput {
   messages: BrainConversationMessage[];
   tools: BrainToolDefinition[];
   onToolCall(call: BrainToolCall, signal?: AbortSignal): Promise<string>;
+  /** Optional incremental text delta callback for streaming Global text replies. */
+  onTextDelta?(delta: string, fullText: string): void;
   execution?: ExecutionForkContext;
 }
 
@@ -59,11 +63,15 @@ export function createBrainConversationService(
   }
   const apiKey = env.DASHSCOPE_API_KEY?.trim();
   if (!apiKey) return undefined;
+  const enableThinking = env.TB_BRAIN_THINKING
+    ? ['on', 'true', '1'].includes(env.TB_BRAIN_THINKING.trim().toLowerCase())
+    : false;
   return new PiBailianBrainConversationService({
     apiKey,
     baseUrl: env.DASHSCOPE_BASE_URL,
     model: env.TB_BRAIN_MODEL,
     timeoutMs: positiveInteger(env.TB_BRAIN_TIMEOUT_MS),
+    enableThinking,
   });
 }
 
